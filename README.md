@@ -2,11 +2,16 @@
 This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
 ---
-
+Download the app
+shorturl.at/kQbai
+---
+---
 ## Scan this and Install the App
 <img width="282" height="281" alt="Screenshot 2026-01-18 at 2 44 38 AM" src="https://github.com/user-attachments/assets/d528015e-5b52-4a4c-b9d9-d3183fda45fc" />
-
 ---
+
+## Demo video of the app
+https://go.screenpal.com/watch/cOVbrPnrMYt
 
 ##  What is this app about?
 Aroma Luxe is a perfume boutique app. You can browse through a collection of high-end perfumes, check their details (like what they smell like - Top/Base notes), and buy them. It's designed with a "less is more" theme, using mostly Black & White colors to make it look expensive.
