@@ -1,4 +1,4 @@
-# Aroma Luxe - My Perfume Shop App 🌸
+# Aroma Luxe - My Perfume Shop App 
 
 Hi! This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
@@ -37,7 +37,7 @@ I used standard and popular tools to make sure the app is fast and works on both
 
 ---
 
-## 📂 Folder Setup
+## Folder Setup
 - `src/screens`: All the pages (Home, Cart, Checkout, etc.).
 - `src/components`: Small parts like the recommendation cards.
 - `src/data`: This is where I kept all the perfume information and images.
@@ -45,11 +45,11 @@ I used standard and popular tools to make sure the app is fast and works on both
 
 ---
 
-## 🚀 How to start the project
+##  How to start the project
 1. Clone the repo.
 2. Run `npm install` to get the libraries.
 3. Run `npx expo start`.
 4. Open it using the **Expo Go** app on your phone.
 
 ---
-Built with ❤️ for perfume lovers.
+
