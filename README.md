@@ -1,6 +1,5 @@
 # Aroma Luxe - My Perfume Shop App 
-
-Hi! This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
+This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
 ---
 
