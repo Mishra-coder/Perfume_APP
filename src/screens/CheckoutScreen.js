@@ -17,10 +17,15 @@ const CheckoutScreen = ({ navigation }) => {
         phone: '',
         street: '',
         city: '',
-        zip: ''
+        zipcode: ''
     });
 
-    const isComplete = address.name && address.phone && address.street && address.city && address.zip;
+    const isComplete =
+        address.name &&
+        address.phone.length === 10 &&
+        address.street &&
+        address.city &&
+        address.zipcode.length === 6;
 
     const handlePlaceOrder = () => {
         const orderId = `AL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
@@ -40,6 +45,20 @@ const CheckoutScreen = ({ navigation }) => {
     };
 
     const updateField = (field, value) => {
+        if (field === 'zipcode') {
+            const clean = value.replace(/[^0-9]/g, '');
+            if (clean.length > 6) return;
+            setAddress(prev => ({ ...prev, zipcode: clean }));
+            return;
+        }
+
+        if (field === 'phone') {
+            const clean = value.replace(/[^0-9]/g, '');
+            if (clean.length > 10) return;
+            setAddress(prev => ({ ...prev, phone: clean }));
+            return;
+        }
+
         setAddress(prev => ({ ...prev, [field]: value }));
     };
 
@@ -70,9 +89,11 @@ const CheckoutScreen = ({ navigation }) => {
                         onChangeText={(t) => updateField('phone', t)}
                         mode="outlined"
                         keyboardType="phone-pad"
+                        placeholder="10 digit mobile number"
                         style={[styles.input, { backgroundColor: colors.background }]}
                         activeOutlineColor={colors.primary}
                         textColor={colors.text}
+                        maxLength={10}
                     />
 
                     <TextInput
@@ -96,14 +117,16 @@ const CheckoutScreen = ({ navigation }) => {
                             textColor={colors.text}
                         />
                         <TextInput
-                            label="Zip"
-                            value={address.zip}
-                            onChangeText={(t) => updateField('zip', t)}
+                            label="Zipcode"
+                            value={address.zipcode}
+                            onChangeText={(t) => updateField('zipcode', t)}
                             mode="outlined"
                             keyboardType="number-pad"
+                            placeholder="6 digits"
                             style={[styles.input, { flex: 1, backgroundColor: colors.background }]}
                             activeOutlineColor={colors.primary}
                             textColor={colors.text}
+                            maxLength={6}
                         />
                     </View>
                 </View>

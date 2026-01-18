@@ -99,7 +99,7 @@ const AuthScreen = ({ navigation }) => {
                         disabled={!isFormValid}
                         onPress={handleAuthAction}
                     >
-                        {isLoginMode ? 'Sign In' : 'Create Account'}
+                        {isLoginMode ? 'Login' : 'Create Account'}
                     </Button>
                 </View>
 
@@ -109,7 +109,7 @@ const AuthScreen = ({ navigation }) => {
                     </Text>
                     <TouchableOpacity onPress={toggleMode}>
                         <Text style={[styles.footerLink, { color: colors.primary }]}>
-                            {isLoginMode ? 'Join Now' : 'Sign In'}
+                            {isLoginMode ? 'Join Now' : 'Login'}
                         </Text>
                     </TouchableOpacity>
                 </View>
