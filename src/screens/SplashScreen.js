@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet, Animated, Image } from 'react-native';
 import { Text } from 'react-native-paper';
 
 const SplashScreen = ({ navigation }) => {
@@ -43,6 +43,7 @@ const SplashScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     shell: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
     visuals: { alignItems: 'center' },
+    logo: { width: 120, height: 120, marginBottom: 20 },
     prime: { fontSize: 56, fontWeight: '900', color: '#1a1a1a', letterSpacing: 8 },
     second: { fontSize: 20, fontWeight: '300', color: '#888', letterSpacing: 12, marginTop: -5 },
     line: { width: 40, height: 2, backgroundColor: '#000', marginVertical: 30 },

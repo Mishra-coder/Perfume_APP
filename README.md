@@ -52,4 +52,4 @@ I used standard and popular tools to make sure the app is fast and works on both
 4. Open it using the **Expo Go** app on your phone.
 
 ---
-Built with ❤️ for perfume lovers.
+Built with for perfume lovers.
