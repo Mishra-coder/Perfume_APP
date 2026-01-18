@@ -1,19 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions, TextInput } from 'react-native';
-import { Text, IconButton, Avatar, Badge } from 'react-native-paper';
+import { Text, IconButton, Avatar, Badge, useTheme as usePaperTheme } from 'react-native-paper';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 
-const { width } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
     const { getTotalItems } = useCart();
     const { user } = useUser();
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
 
-    const [isSearching, setIsSearching] = useState(false);
+    const [isSearchActive, setIsSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showFloatingBtn, setShowFloatingBtn] = useState(false);
+    const [showDiscoveryButton, setShowDiscoveryButton] = useState(false);
 
     const filteredProducts = useMemo(() => {
         const query = searchQuery.toLowerCase().trim();
@@ -25,67 +28,58 @@ const HomeScreen = ({ navigation }) => {
         );
     }, [searchQuery]);
 
-    const featuredProducts = filteredProducts.slice(0, 3);
-    const mainCollection = filteredProducts.slice(3);
+    const featuredItems = filteredProducts.slice(0, 3);
+    const remainingItems = filteredProducts.slice(3);
+
+    const handleSearchExit = () => {
+        setIsSearchActive(false);
+        setSearchQuery('');
+    };
 
     const renderHeader = () => {
-        if (isSearching) {
+        if (isSearchActive) {
             return (
-                <View style={styles.searchHeader}>
-                    <IconButton
-                        icon="arrow-left"
-                        size={24}
-                        onPress={() => { setIsSearching(false); setSearchQuery(''); }}
-                    />
+                <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
+                    <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={handleSearchExit} />
                     <TextInput
-                        placeholder="Search for luxury scents..."
+                        placeholder="Search luxury scents..."
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                         autoFocus
-                        style={styles.searchBox}
-                        placeholderTextColor="#aaa"
+                        style={[styles.searchInput, { color: colors.text }]}
+                        placeholderTextColor={isDarkMode ? "#666666" : "#aaaaaa"}
                     />
-                    {searchQuery.length > 0 ? (
-                        <IconButton icon="close-circle" size={20} onPress={() => setSearchQuery('')} />
-                    ) : null}
+                    {searchQuery.length > 0 && (
+                        <IconButton icon="close-circle" size={20} iconColor={colors.primary} onPress={() => setSearchQuery('')} />
+                    )}
                 </View>
             );
         }
 
         return (
-            <View style={styles.topNav}>
-                <IconButton
-                    icon="menu"
-                    size={24}
-                    iconColor="#1a1a1a"
-                    onPress={() => navigation.navigate('Recommendation')}
-                />
+            <View style={styles.standardHeader}>
+                <IconButton icon="menu" size={24} iconColor={colors.text} onPress={() => navigation.navigate('Recommendation')} />
+                <View style={styles.headerActions}>
+                    <IconButton icon="magnify" size={24} iconColor={colors.text} onPress={() => setIsSearchActive(true)} />
 
-                <View style={styles.navActions}>
-                    <IconButton icon="magnify" size={24} iconColor="#1a1a1a" onPress={() => setIsSearching(true)} />
-
-                    <TouchableOpacity
+                    <BadgeIcon
+                        icon="shopping-outline"
+                        count={getTotalItems()}
                         onPress={() => navigation.navigate('Cart')}
-                        style={styles.badgeWrapper}
-                    >
-                        <IconButton icon="shopping-outline" size={24} iconColor="#1a1a1a" />
-                        {getTotalItems() > 0 ? (
-                            <Badge style={styles.countBadge} size={18}>{getTotalItems()}</Badge>
-                        ) : null}
-                    </TouchableOpacity>
+                        themeColors={colors}
+                        isDarkMode={isDarkMode}
+                    />
 
-                    <TouchableOpacity
+                    <BadgeIcon
+                        icon="package-variant-closed"
+                        count={user.orders.length}
                         onPress={() => navigation.navigate('Orders')}
-                        style={styles.badgeWrapper}
-                    >
-                        <IconButton icon="package-variant-closed" size={24} iconColor="#1a1a1a" />
-                        {user.orders.length > 0 ? (
-                            <Badge style={styles.countBadge} size={18}>{user.orders.length}</Badge>
-                        ) : null}
-                    </TouchableOpacity>
+                        themeColors={colors}
+                        isDarkMode={isDarkMode}
+                    />
 
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                        <Avatar.Icon size={36} icon="account" backgroundColor="#f5f5f5" color="#1a1a1a" />
+                        <Avatar.Icon size={36} icon="account" backgroundColor={isDarkMode ? '#1a1a1a' : '#f5f5f5'} color={colors.text} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -95,112 +89,119 @@ const HomeScreen = ({ navigation }) => {
     const renderListHeader = () => (
         <View>
             <View style={styles.heroSection}>
-                <Text style={styles.heroTitle}>Aroma Luxe</Text>
-                <Text style={styles.heroSub}>Curated Premium Fragrances</Text>
+                <Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text>
+                <Text style={styles.heroSubtitle}>Curated Premium Fragrances</Text>
             </View>
 
-            {featuredProducts.length > 0 ? (
+            {featuredItems.length > 0 && (
                 <FlatList
-                    data={featuredProducts}
+                    data={featuredItems}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={p => p.id}
+                    keyExtractor={item => item.id.toString()}
                     renderItem={({ item }) => (
                         <FeaturedCard
-                            item={item}
+                            product={item}
+                            isDarkMode={isDarkMode}
+                            themeColors={colors}
                             onPress={() => navigation.navigate('ProductDetail', { product: item })}
                         />
                     )}
-                    style={styles.heroList}
+                    style={styles.featuredList}
                 />
-            ) : null}
+            )}
 
-            <Text style={styles.listHeading}>Our Collection</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Our Collection</Text>
         </View>
     );
 
     return (
-        <View style={styles.shell}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {renderHeader()}
 
             <FlatList
-                data={mainCollection}
-                keyExtractor={p => p.id}
+                data={remainingItems}
+                keyExtractor={item => item.id.toString()}
                 showsVerticalScrollIndicator={false}
-                onScroll={(event) => {
-                    const offsetY = event.nativeEvent.contentOffset.y;
-                    setShowFloatingBtn(offsetY > 100);
-                }}
+                onScroll={(e) => setShowDiscoveryButton(e.nativeEvent.contentOffset.y > 100)}
                 scrollEventThrottle={16}
                 ListHeaderComponent={renderListHeader()}
                 renderItem={({ item }) => (
-                    <ProductListItem
-                        item={item}
-                        onSelect={(p) => navigation.navigate('ProductDetail', { product: p })}
+                    <ProductRow
+                        product={item}
+                        isDarkMode={isDarkMode}
+                        themeColors={colors}
+                        onPress={() => navigation.navigate('ProductDetail', { product: item })}
                     />
                 )}
                 ListEmptyComponent={
-                    <View style={styles.noResults}>
-                        <Text style={styles.noResultsText}>No scents found matching your search.</Text>
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>No scents found matching your search.</Text>
                     </View>
                 }
-                contentContainerStyle={styles.mainContent}
+                contentContainerStyle={styles.listContent}
             />
 
-            {showFloatingBtn && (
+            {showDiscoveryButton && (
                 <TouchableOpacity
-                    style={styles.floatingBtn}
+                    style={[styles.fab, { backgroundColor: colors.primary }]}
                     onPress={() => navigation.navigate('Recommendation')}
                     activeOpacity={0.9}
                 >
-                    <Text style={styles.floatingText}>TYPE</Text>
+                    <Text style={[styles.fabText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>FIND</Text>
                 </TouchableOpacity>
             )}
         </View>
     );
 };
 
-const FeaturedCard = ({ item, onPress }) => (
-    <TouchableOpacity style={styles.featuredCard} onPress={onPress} activeOpacity={0.9}>
-        <Image source={item.image} style={styles.featuredImg} />
-        <View style={styles.featuredOverlay}>
-            <Text style={styles.featName} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.featPrice}>₹{item.price}</Text>
+const BadgeIcon = ({ icon, count, onPress, themeColors, isDarkMode }) => (
+    <TouchableOpacity onPress={onPress} style={styles.badgeWrapper}>
+        <IconButton icon={icon} size={24} iconColor={themeColors.text} />
+        {count > 0 && (
+            <Badge style={[styles.badge, { backgroundColor: themeColors.primary, color: isDarkMode ? '#000000' : '#ffffff' }]} size={18}>
+                {count}
+            </Badge>
+        )}
+    </TouchableOpacity>
+);
+
+const FeaturedCard = ({ product, onPress, isDarkMode, themeColors }) => (
+    <TouchableOpacity style={[styles.featuredCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fafafa' }]} onPress={onPress} activeOpacity={0.9}>
+        <Image source={product.image} style={styles.featuredImage} />
+        <View style={[styles.featuredOverlay, { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.85)' }]}>
+            <Text style={[styles.featuredName, { color: themeColors.text }]} numberOfLines={1}>{product.name}</Text>
+            <Text style={[styles.featuredPrice, { color: isDarkMode ? themeColors.primary : '#000000' }]}>₹{product.price}</Text>
         </View>
     </TouchableOpacity>
 );
 
-const ProductListItem = ({ item, onSelect }) => (
-    <TouchableOpacity
-        style={styles.listItem}
-        onPress={() => onSelect(item)}
-        activeOpacity={0.8}
-    >
-        <View style={styles.listThumbBox}>
-            <Image source={item.image} style={styles.listThumb} />
+const ProductRow = ({ product, onPress, isDarkMode, themeColors }) => (
+    <TouchableOpacity style={styles.productRow} onPress={onPress} activeOpacity={0.8}>
+        <View style={[styles.thumbnailWrapper, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
+            <Image source={product.image} style={styles.thumbnail} />
         </View>
-        <View style={styles.listInfo}>
-            <Text style={styles.listTitle}>{item.name}</Text>
-            <Text style={styles.listCat}>{item.category} • Eau De Parfum</Text>
-            <Text style={styles.listPrice}>₹{item.price}</Text>
+        <View style={styles.productInfo}>
+            <Text style={[styles.productName, { color: themeColors.text }]}>{product.name}</Text>
+            <Text style={styles.productCategory}>{product.category} • Eau De Parfum</Text>
+            <Text style={[styles.productPrice, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>₹{product.price}</Text>
         </View>
-        <IconButton icon="chevron-right" size={20} iconColor="#eee" />
+        <IconButton icon="chevron-right" size={20} iconColor={isDarkMode ? '#333333' : '#eeeeee'} />
     </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
-    shell: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    topNav: {
+    standardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: 50,
         paddingHorizontal: 15,
     },
-    navActions: {
+    headerActions: {
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -210,26 +211,22 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingHorizontal: 15,
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
         paddingBottom: 10,
     },
-    searchBox: {
+    searchInput: {
         flex: 1,
         fontSize: 16,
-        color: '#1a1a1a',
         paddingVertical: 8,
     },
     badgeWrapper: {
         marginRight: 5,
     },
-    countBadge: {
+    badge: {
         position: 'absolute',
         top: 5,
         right: 5,
-        backgroundColor: '#000',
-        color: '#fff',
     },
-    mainContent: {
+    listContent: {
         paddingBottom: 100,
     },
     heroSection: {
@@ -238,27 +235,25 @@ const styles = StyleSheet.create({
     heroTitle: {
         fontSize: 36,
         fontWeight: '900',
-        color: '#1a1a1a',
         letterSpacing: -1,
     },
-    heroSub: {
+    heroSubtitle: {
         fontSize: 15,
-        color: '#888',
+        color: '#888888',
         marginTop: 5,
     },
-    heroList: {
+    featuredList: {
         paddingLeft: 25,
         marginBottom: 40,
     },
     featuredCard: {
-        width: width * 0.7,
+        width: SCREEN_WIDTH * 0.7,
         height: 380,
         marginRight: 20,
         borderRadius: 25,
         overflow: 'hidden',
-        backgroundColor: '#fafafa',
     },
-    featuredImg: {
+    featuredImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
@@ -269,91 +264,82 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         padding: 25,
-        backgroundColor: 'rgba(255,255,255,0.85)',
     },
-    featName: {
+    featuredName: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#1a1a1a',
     },
-    featPrice: {
+    featuredPrice: {
         fontSize: 16,
-        color: '#000',
         marginTop: 5,
         fontWeight: '900',
     },
-    listHeading: {
+    sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginHorizontal: 25,
         marginBottom: 20,
-        color: '#1a1a1a',
     },
-    listItem: {
+    productRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 25,
         marginBottom: 20,
     },
-    listThumbBox: {
+    thumbnailWrapper: {
         width: 80,
         height: 80,
         borderRadius: 20,
-        backgroundColor: '#f9f9f9',
         overflow: 'hidden',
     },
-    listThumb: {
+    thumbnail: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
     },
-    listInfo: {
+    productInfo: {
         flex: 1,
         marginLeft: 15,
     },
-    listTitle: {
+    productName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#1a1a1a',
     },
-    listCat: {
+    productCategory: {
         fontSize: 12,
-        color: '#666',
+        color: '#666666',
         marginTop: 4,
     },
-    listPrice: {
+    productPrice: {
         fontSize: 15,
         fontWeight: '900',
         marginTop: 6,
-        color: '#1a1a1a',
     },
-    noResults: {
+    emptyContainer: {
         padding: 50,
         alignItems: 'center',
     },
-    noResultsText: {
-        color: '#999',
+    emptyText: {
+        color: '#999999',
         fontSize: 15,
         textAlign: 'center',
     },
-    floatingBtn: {
+    fab: {
         position: 'absolute',
         bottom: 30,
         right: 20,
-        backgroundColor: '#1a1a1a',
         width: 60,
         height: 60,
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10,
-        shadowColor: '#000',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
     },
-    floatingText: {
-        color: '#fff',
+    fabText: {
         fontSize: 12,
         fontWeight: '900',
         letterSpacing: 1,

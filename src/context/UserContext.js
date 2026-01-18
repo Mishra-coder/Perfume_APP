@@ -11,7 +11,7 @@ export const useUser = () => {
     return context;
 };
 
-const STORAGE_KEY = 'aroma_luxe_user_data';
+const USER_SESSION_KEY = 'aroma_luxe_user_session';
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState({
@@ -23,31 +23,31 @@ export const UserProvider = ({ children }) => {
     });
 
     useEffect(() => {
-        const loadUserData = async () => {
-            try {
-                const savedData = await AsyncStorage.getItem(STORAGE_KEY);
-                if (savedData) {
-                    setUser(JSON.parse(savedData));
-                }
-            } catch (error) {
-                console.error('UserContext: Error loading persisted data', error);
-            }
-        };
-
-        loadUserData();
+        loadStoredSession();
     }, []);
 
-    const syncAndSetUser = async (updatedData) => {
+    const loadStoredSession = async () => {
+        try {
+            const storedSession = await AsyncStorage.getItem(USER_SESSION_KEY);
+            if (storedSession) {
+                setUser(JSON.parse(storedSession));
+            }
+        } catch (error) {
+            console.error('UserContext: Error recovering stored session', error);
+        }
+    };
+
+    const syncUser = async (updatedData) => {
         setUser(updatedData);
         try {
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+            await AsyncStorage.setItem(USER_SESSION_KEY, JSON.stringify(updatedData));
         } catch (error) {
-            console.error('UserContext: Error saving data', error);
+            console.error('UserContext: Error persisting user data', error);
         }
     };
 
     const login = (profile) => {
-        syncAndSetUser({
+        syncUser({
             ...user,
             ...profile,
             isLoggedIn: true
@@ -55,41 +55,40 @@ export const UserProvider = ({ children }) => {
     };
 
     const logout = () => {
-        const anonymousState = {
+        syncUser({
             name: '',
             email: '',
             favoriteOccasions: [],
             orders: user.orders,
             isLoggedIn: false
-        };
-        syncAndSetUser(anonymousState);
-    };
-
-    const setUserProfile = (name, occasions = []) => {
-        syncAndSetUser({
-            ...user,
-            name,
-            favoriteOccasions: occasions
         });
     };
 
-    const saveOrder = (newOrder) => {
-        syncAndSetUser({
+    const updateProfile = (name, favoriteOccasions = []) => {
+        syncUser({
+            ...user,
+            name,
+            favoriteOccasions
+        });
+    };
+
+    const addOrder = (newOrder) => {
+        syncUser({
             ...user,
             orders: [newOrder, ...user.orders]
         });
     };
 
-    const value = {
+    const userValue = {
         user,
         login,
         logout,
-        setUserProfile,
-        saveOrder
+        setUserProfile: updateProfile,
+        saveOrder: addOrder
     };
 
     return (
-        <UserContext.Provider value={value}>
+        <UserContext.Provider value={userValue}>
             {children}
         </UserContext.Provider>
     );

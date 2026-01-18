@@ -1,128 +1,135 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Appbar, TextInput, Button, Text, RadioButton, Surface } from 'react-native-paper';
+import { Appbar, TextInput, Button, Text, RadioButton, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 
 const CheckoutScreen = ({ navigation }) => {
     const { getGrandTotal, cartItems } = useCart();
     const { user, saveOrder } = useUser();
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
 
-    const [paymentOption, setPaymentOption] = useState('cod');
-    const [destination, setDestination] = useState({
-        userName: user.name || '',
+    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [address, setAddress] = useState({
+        name: user.name || '',
         phone: '',
         street: '',
         city: '',
         zip: ''
     });
 
-    const canPlaceOrder = destination.userName && destination.phone && destination.street && destination.city && destination.zip;
+    const isComplete = address.name && address.phone && address.street && address.city && address.zip;
 
-    const onPlaceOrder = () => {
+    const handlePlaceOrder = () => {
         const orderId = `AL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-        const finalOrder = {
+
+        const order = {
             id: orderId,
             items: cartItems,
-            total: getGrandTotal(),
+            totalAmount: getGrandTotal(),
             date: new Date().toISOString(),
             status: 'Processing',
-            shipping: destination,
-            payment: paymentOption
+            shipping: address,
+            paymentMethod
         };
 
-        saveOrder(finalOrder);
+        saveOrder(order);
         navigation.navigate('Success', { orderId });
     };
 
-    const updateField = (key, value) => {
-        setDestination(prev => ({ ...prev, [key]: value }));
+    const updateField = (field, value) => {
+        setAddress(prev => ({ ...prev, [field]: value }));
     };
 
     return (
-        <View style={styles.base}>
-            <Appbar.Header style={styles.navBar}>
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
-                <Appbar.Content title="Order Details" titleStyle={styles.navTitle} />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f0f0f0' }]}>
+                <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
+                <Appbar.Content title="Order Details" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
             </Appbar.Header>
 
-            <ScrollView style={styles.scroller} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Shipping Info</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Shipping Info</Text>
+
                     <TextInput
                         label="Recipient Name"
-                        value={destination.userName}
-                        onChangeText={(v) => updateField('userName', v)}
+                        value={address.name}
+                        onChangeText={(t) => updateField('name', t)}
                         mode="outlined"
-                        style={styles.field}
+                        style={[styles.input, { backgroundColor: colors.background }]}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                     />
+
                     <TextInput
                         label="Phone Number"
-                        value={destination.phone}
-                        onChangeText={(v) => updateField('phone', v)}
+                        value={address.phone}
+                        onChangeText={(t) => updateField('phone', t)}
                         mode="outlined"
                         keyboardType="phone-pad"
-                        style={styles.field}
+                        style={[styles.input, { backgroundColor: colors.background }]}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                     />
+
                     <TextInput
                         label="Complete Address"
-                        value={destination.street}
-                        onChangeText={(v) => updateField('street', v)}
+                        value={address.street}
+                        onChangeText={(t) => updateField('street', t)}
                         mode="outlined"
-                        style={styles.field}
+                        style={[styles.input, { backgroundColor: colors.background }]}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                     />
-                    <View style={styles.splitRow}>
+
+                    <View style={styles.row}>
                         <TextInput
                             label="City"
-                            value={destination.city}
-                            onChangeText={(v) => updateField('city', v)}
+                            value={address.city}
+                            onChangeText={(t) => updateField('city', t)}
                             mode="outlined"
-                            style={[styles.field, { flex: 1.5, marginRight: 10 }]}
+                            style={[styles.input, { flex: 1.5, marginRight: 10, backgroundColor: colors.background }]}
+                            activeOutlineColor={colors.primary}
+                            textColor={colors.text}
                         />
                         <TextInput
                             label="Zip"
-                            value={destination.zip}
-                            onChangeText={(v) => updateField('zip', v)}
+                            value={address.zip}
+                            onChangeText={(t) => updateField('zip', t)}
                             mode="outlined"
                             keyboardType="number-pad"
-                            style={[styles.field, { flex: 1 }]}
+                            style={[styles.input, { flex: 1, backgroundColor: colors.background }]}
+                            activeOutlineColor={colors.primary}
+                            textColor={colors.text}
                         />
                     </View>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>How will you pay?</Text>
-                    <Surface style={styles.optionsCard} elevation={0}>
-                        <PaymentRow
-                            label="UPI Transfer"
-                            selected={paymentOption === 'upi'}
-                            onSelect={() => setPaymentOption('upi')}
-                        />
-                        <PaymentRow
-                            label="Cash on Delivery"
-                            selected={paymentOption === 'cod'}
-                            onSelect={() => setPaymentOption('cod')}
-                        />
-                        <PaymentRow
-                            label="Card Payment"
-                            selected={paymentOption === 'card'}
-                            onSelect={() => setPaymentOption('card')}
-                        />
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>How will you pay?</Text>
+                    <Surface style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} elevation={0}>
+                        <PaymentRow label="UPI Transfer" selected={paymentMethod === 'upi'} onSelect={() => setPaymentMethod('upi')} themeColors={colors} />
+                        <PaymentRow label="Cash on Delivery" selected={paymentMethod === 'cod'} onSelect={() => setPaymentMethod('cod')} themeColors={colors} />
+                        <PaymentRow label="Card Payment" selected={paymentMethod === 'card'} onSelect={() => setPaymentMethod('card')} themeColors={colors} />
                     </Surface>
                 </View>
 
                 <View style={styles.footer}>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceLabel}>Grand Total</Text>
-                        <Text style={styles.priceValue}>₹{getGrandTotal()}</Text>
+                    <View style={styles.summary}>
+                        <Text style={styles.summaryLabel}>Grand Total</Text>
+                        <Text style={[styles.summaryPrice, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{getGrandTotal()}</Text>
                     </View>
+
                     <Button
                         mode="contained"
-                        style={styles.actionBtn}
-                        contentStyle={styles.btnInner}
-                        labelStyle={styles.btnText}
-                        disabled={!canPlaceOrder}
-                        onPress={onPlaceOrder}
+                        style={[styles.confirmBtn, { backgroundColor: colors.primary }]}
+                        contentStyle={styles.confirmBtnContent}
+                        labelStyle={[styles.confirmBtnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                        disabled={!isComplete}
+                        onPress={handlePlaceOrder}
                     >
                         Confirm Purchase
                     </Button>
@@ -132,28 +139,24 @@ const CheckoutScreen = ({ navigation }) => {
     );
 };
 
-const PaymentRow = ({ label, selected, onSelect }) => (
-    <TouchableOpacity style={styles.payRow} onPress={onSelect}>
-        <RadioButton value="v" status={selected ? 'checked' : 'unchecked'} color="#000" onPress={onSelect} />
-        <Text style={styles.payLabel}>{label}</Text>
+const PaymentRow = ({ label, selected, onSelect, themeColors }) => (
+    <TouchableOpacity style={styles.paymentRow} onPress={onSelect}>
+        <RadioButton value="selected" status={selected ? 'checked' : 'unchecked'} color={themeColors.primary} onPress={onSelect} />
+        <Text style={[styles.paymentLabel, { color: themeColors.text }]}>{label}</Text>
     </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
-    base: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    navBar: {
-        backgroundColor: '#fff',
+    appbar: {
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
     },
-    navTitle: {
+    appbarTitle: {
         fontWeight: 'bold',
-        color: '#1a1a1a',
     },
-    scroller: {
+    scroll: {
         flex: 1,
         padding: 20,
     },
@@ -164,59 +167,51 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 15,
-        color: '#1a1a1a',
     },
-    field: {
+    input: {
         marginBottom: 15,
-        backgroundColor: '#fff',
-        color: '#1a1a1a',
     },
-    splitRow: {
+    row: {
         flexDirection: 'row',
     },
-    optionsCard: {
-        backgroundColor: '#f9f9f9',
+    card: {
         borderRadius: 15,
         padding: 5,
     },
-    payRow: {
+    paymentRow: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 12,
     },
-    payLabel: {
+    paymentLabel: {
         fontSize: 15,
         marginLeft: 5,
-        color: '#1a1a1a',
     },
     footer: {
         marginTop: 10,
         paddingBottom: 50,
     },
-    priceRow: {
+    summary: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 20,
         alignItems: 'center',
     },
-    priceLabel: {
+    summaryLabel: {
         fontSize: 16,
-        color: '#666',
+        color: '#666666',
     },
-    priceValue: {
+    summaryPrice: {
         fontSize: 24,
         fontWeight: '900',
-        color: '#1a1a1a',
     },
-    actionBtn: {
-        backgroundColor: '#000',
+    confirmBtn: {
         borderRadius: 15,
     },
-    btnInner: {
+    confirmBtnContent: {
         height: 60,
     },
-    btnText: {
-        color: '#fff',
+    confirmBtnLabel: {
         fontWeight: 'bold',
         fontSize: 16,
     },

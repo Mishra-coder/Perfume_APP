@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, Button, IconButton } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, Button, IconButton, useTheme as usePaperTheme } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 
 const SuccessScreen = ({ navigation, route }) => {
     const { clearCart } = useCart();
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
+
     const orderId = route.params?.orderId || 'AL-DIRECT';
 
     useEffect(() => {
@@ -12,28 +16,28 @@ const SuccessScreen = ({ navigation, route }) => {
     }, []);
 
     return (
-        <View style={styles.base}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <View style={styles.center}>
-                <View style={styles.successIconBox}>
-                    <IconButton icon="check-bold" size={60} iconColor="#fff" />
+                <View style={[styles.iconBox, { backgroundColor: colors.primary }]}>
+                    <IconButton icon="check-bold" size={60} iconColor={isDarkMode ? '#000000' : '#ffffff'} />
                 </View>
 
-                <Text style={styles.heroText}>Order Confirmed!</Text>
-                <Text style={styles.infoText}>
+                <Text style={[styles.title, { color: colors.text }]}>Order Confirmed!</Text>
+                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
                     Your luxury selection is being prepared. We'll notify you once it's on the way.
                 </Text>
 
-                <View style={styles.detailsCard}>
-                    <DetailRow label="Order ID" value={orderId} />
-                    <DetailRow label="Status" value="Processing" color="#27ae60" />
-                    <DetailRow label="Est. Delivery" value="3-5 Business Days" />
+                <View style={[styles.summary, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
+                    <InfoRow label="Order ID" value={orderId} themeColors={colors} />
+                    <InfoRow label="Status" value="Processing" color={isDarkMode ? colors.primary : "#27ae60"} themeColors={colors} />
+                    <InfoRow label="Est. Delivery" value="3-5 Business Days" themeColors={colors} />
                 </View>
 
                 <Button
                     mode="contained"
-                    style={styles.actionBtn}
-                    contentStyle={styles.btnInner}
-                    labelStyle={styles.btnText}
+                    style={[styles.btn, { backgroundColor: colors.primary }]}
+                    contentStyle={styles.btnContent}
+                    labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
                     onPress={() => navigation.navigate('Main')}
                 >
                     Return to Boutique
@@ -43,82 +47,71 @@ const SuccessScreen = ({ navigation, route }) => {
     );
 };
 
-const DetailRow = ({ label, value, color = '#1a1a1a' }) => (
-    <View style={styles.row}>
-        <Text style={styles.rowLabel}>{label}</Text>
-        <Text style={[styles.rowValue, { color }]}>{value}</Text>
+const InfoRow = ({ label, value, color, themeColors }) => (
+    <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>{label}</Text>
+        <Text style={[styles.infoValue, { color: color || themeColors.text }]}>{value}</Text>
     </View>
 );
 
 const styles = StyleSheet.create({
-    base: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
         justifyContent: 'center',
     },
     center: {
         alignItems: 'center',
         padding: 30,
     },
-    successIconBox: {
+    iconBox: {
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: '#000',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 30,
         elevation: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
     },
-    heroText: {
+    title: {
         fontSize: 30,
         fontWeight: '900',
-        color: '#1a1a1a',
         marginBottom: 15,
     },
-    infoText: {
+    subtitle: {
         fontSize: 16,
-        color: '#666',
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 40,
     },
-    detailsCard: {
+    summary: {
         width: '100%',
-        backgroundColor: '#fcfcfc',
         borderRadius: 20,
         padding: 25,
         marginBottom: 40,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
     },
-    row: {
+    infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 15,
     },
-    rowLabel: {
+    infoLabel: {
         fontSize: 14,
-        color: '#999',
+        color: '#999999',
         fontWeight: 'bold',
     },
-    rowValue: {
+    infoValue: {
         fontSize: 14,
         fontWeight: '900',
     },
-    actionBtn: {
+    btn: {
         width: '100%',
-        backgroundColor: '#000',
         borderRadius: 15,
     },
-    btnInner: {
+    btnContent: {
         height: 60,
     },
-    btnText: {
-        color: '#fff',
+    btnLabel: {
         fontWeight: 'bold',
         fontSize: 16,
     },

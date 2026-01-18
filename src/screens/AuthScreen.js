@@ -1,105 +1,115 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { Text, TextInput, Button, IconButton, Surface } from 'react-native-paper';
+import { Text, TextInput, Button, IconButton, useTheme as usePaperTheme } from 'react-native-paper';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 
 const AuthScreen = ({ navigation }) => {
     const { login } = useUser();
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: ''
+    });
 
-    const canSubmit = isLoginMode
-        ? (email && password)
-        : (name && email && password);
+    const isFormValid = isLoginMode
+        ? (formData.email && formData.password)
+        : (formData.fullName && formData.email && formData.password);
 
     const handleAuthAction = () => {
-        const displayName = name || email.split('@')[0];
-        login({ name: displayName, email });
+        const displayName = formData.fullName || formData.email.split('@')[0];
+        login({ name: displayName, email: formData.email });
         navigation.goBack();
+    };
+
+    const toggleMode = () => setIsLoginMode(prev => !prev);
+
+    const updateField = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.main}
+            style={[styles.container, { backgroundColor: colors.background }]}
         >
-            <ScrollView contentContainerStyle={styles.scrollArea} showsVerticalScrollIndicator={false}>
-                <View style={styles.topBar}>
-                    <IconButton
-                        icon="arrow-left"
-                        size={24}
-                        onPress={() => navigation.goBack()}
-                    />
-                </View>
-
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>
-                    <Text style={styles.heroText}>
-                        {isLoginMode ? 'Welcome Back' : 'Join the Club'}
+                    <IconButton icon="arrow-left" size={24} onPress={() => navigation.goBack()} iconColor={colors.text} />
+                </View>
+
+                <View style={styles.heroSection}>
+                    <Text style={[styles.title, { color: colors.text }]}>
+                        {isLoginMode ? 'Welcome Back' : 'Sign Up'}
                     </Text>
-                    <Text style={styles.subText}>
-                        {isLoginMode
-                            ? 'Continue your premium scent journey.'
-                            : 'Sign up for exclusive luxury access.'}
+                    <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                        {isLoginMode ? 'Continue your luxury journey.' : 'Join for exclusive fragrance access.'}
                     </Text>
                 </View>
 
-                <View style={styles.formArea}>
+                <View style={styles.form}>
                     {!isLoginMode && (
                         <TextInput
-                            label="Name"
-                            value={name}
-                            onChangeText={setName}
+                            label="Full Name"
+                            value={formData.fullName}
+                            onChangeText={(val) => updateField('fullName', val)}
                             mode="outlined"
-                            style={styles.field}
-                            outlineColor="#f0f0f0"
-                            activeOutlineColor="#000"
+                            style={[styles.input, { backgroundColor: colors.background }]}
+                            outlineColor={isDarkMode ? '#333333' : '#f0f0f0'}
+                            activeOutlineColor={colors.primary}
+                            textColor={colors.text}
                         />
                     )}
 
                     <TextInput
-                        label="Email"
-                        value={email}
-                        onChangeText={setEmail}
+                        label="Email Address"
+                        value={formData.email}
+                        onChangeText={(val) => updateField('email', val)}
                         mode="outlined"
                         autoCapitalize="none"
-                        style={styles.field}
-                        outlineColor="#f0f0f0"
-                        activeOutlineColor="#000"
+                        keyboardType="email-address"
+                        style={[styles.input, { backgroundColor: colors.background }]}
+                        outlineColor={isDarkMode ? '#333333' : '#f0f0f0'}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                     />
 
                     <TextInput
                         label="Password"
-                        value={password}
-                        onChangeText={setPassword}
+                        value={formData.password}
+                        onChangeText={(val) => updateField('password', val)}
                         mode="outlined"
                         secureTextEntry
-                        style={styles.field}
-                        outlineColor="#f0f0f0"
-                        activeOutlineColor="#000"
+                        style={[styles.input, { backgroundColor: colors.background }]}
+                        outlineColor={isDarkMode ? '#333333' : '#f0f0f0'}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                     />
 
                     <Button
                         mode="contained"
-                        style={styles.mainBtn}
-                        contentStyle={styles.btnInner}
-                        labelStyle={styles.btnText}
-                        disabled={!canSubmit}
+                        buttonColor={colors.primary}
+                        style={styles.actionBtn}
+                        contentStyle={styles.actionBtnContent}
+                        labelStyle={[styles.actionBtnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                        disabled={!isFormValid}
                         onPress={handleAuthAction}
                     >
-                        {isLoginMode ? 'Login' : 'Create Account'}
+                        {isLoginMode ? 'Sign In' : 'Create Account'}
                     </Button>
                 </View>
 
-                <View style={styles.switchBox}>
-                    <Text style={styles.switchHint}>
-                        {isLoginMode ? "Don't have an account? " : "Already registered? "}
+                <View style={styles.footer}>
+                    <Text style={[styles.footerText, { color: '#999999' }]}>
+                        {isLoginMode ? "Don't have an account? " : "Already have an account? "}
                     </Text>
-                    <TouchableOpacity onPress={() => setIsLoginMode(!isLoginMode)}>
-                        <Text style={styles.switchAction}>
-                            {isLoginMode ? 'Sign Up' : 'Login'}
+                    <TouchableOpacity onPress={toggleMode}>
+                        <Text style={[styles.footerLink, { color: colors.primary }]}>
+                            {isLoginMode ? 'Join Now' : 'Sign In'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -109,62 +119,56 @@ const AuthScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    main: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    scrollArea: {
+    scrollContent: {
         paddingHorizontal: 25,
         paddingBottom: 40,
     },
-    topBar: {
+    header: {
         paddingTop: 50,
         marginLeft: -10,
     },
-    header: {
+    heroSection: {
         marginTop: 20,
         marginBottom: 40,
     },
-    heroText: {
+    title: {
         fontSize: 34,
         fontWeight: '900',
-        color: '#1a1a1a',
     },
-    subText: {
+    subtitle: {
         fontSize: 16,
-        color: '#888',
         marginTop: 10,
         lineHeight: 22,
     },
-    formArea: {
+    form: {
         marginTop: 10,
     },
-    field: {
+    input: {
         marginBottom: 15,
-        backgroundColor: '#fff',
     },
-    mainBtn: {
+    actionBtn: {
         marginTop: 20,
-        backgroundColor: '#1a1a1a',
         borderRadius: 15,
     },
-    btnInner: {
+    actionBtnContent: {
         height: 56,
     },
-    btnText: {
-        color: '#fff',
+    actionBtnLabel: {
         fontWeight: 'bold',
         fontSize: 16,
     },
-    switchBox: {
+    footer: {
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 50,
     },
-    switchHint: {
+    footerText: {
         color: '#999',
     },
-    switchAction: {
+    footerLink: {
         fontWeight: 'bold',
         textDecorationLine: 'underline',
     },

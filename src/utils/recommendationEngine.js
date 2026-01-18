@@ -2,91 +2,75 @@ const SCENT_PROFILES = {
     date: {
         matches: ["sweet"],
         notes: ["Vanilla", "Musk", "Amber", "Rose", "Jasmine"],
-        idealStrength: [3, 4, 5],
+        strengths: [3, 4, 5],
         label: "Romantic & Sensual"
     },
     college: {
         matches: ["fresh"],
         notes: ["Citrus", "Aqua", "Green Tea", "Bergamot", "Lemon"],
-        idealStrength: [1, 2, 3],
+        strengths: [1, 2, 3],
         label: "Fresh & Energetic"
     },
     party: {
         matches: ["strong"],
         notes: ["Oud", "Spices", "Leather", "Amber", "Black Currant"],
-        idealStrength: [4, 5],
+        strengths: [4, 5],
         label: "Bold & Statement"
     },
     office: {
         matches: ["mild"],
         notes: ["Lavender", "Cedar", "Sandalwood", "Sage", "Vetiver"],
-        idealStrength: [2, 3, 4],
+        strengths: [2, 3, 4],
         label: "Polished & Professional"
     },
     gym: {
         matches: ["fresh"],
         notes: ["Mint", "Lemon", "Aqua", "Marine Notes", "Verbena"],
-        idealStrength: [1, 2],
+        strengths: [1, 2],
         label: "Fresh & Sporty"
     },
     festival: {
         matches: ["strong"],
         notes: ["Rose", "Jasmine", "Sandalwood", "Oud", "Saffron"],
-        idealStrength: [4, 5],
+        strengths: [4, 5],
         label: "Elegant & Traditional"
     }
 };
 
-const calculateMatchScore = (perfume, selectedOccasion) => {
-    const rules = SCENT_PROFILES[selectedOccasion];
-    if (!rules) return 0;
+const calculateScore = (perfume, occasion) => {
+    const profile = SCENT_PROFILES[occasion];
+    if (!profile) return 0;
 
-    let points = 0;
+    let score = 0;
 
-    if (perfume.occasions.includes(selectedOccasion)) {
-        points += 40;
-    }
+    if (perfume.occasions.includes(occasion)) score += 40;
+    if (profile.matches.includes(perfume.profile)) score += 20;
+    if (profile.strengths.includes(perfume.strength)) score += 15;
 
-    if (rules.matches.includes(perfume.profile)) {
-        points += 20;
-    }
+    const allNotes = [...perfume.notes.top, ...perfume.notes.middle, ...perfume.notes.base].map(n => n.toLowerCase());
+    const noteWeight = 25 / profile.notes.length;
 
-    if (rules.idealStrength.includes(perfume.strength)) {
-        points += 15;
-    }
-
-    const perfumeNotes = [...perfume.notes.top, ...perfume.notes.middle, ...perfume.notes.base];
-    const weightPerNote = 25 / rules.notes.length;
-
-    rules.notes.forEach(neededNote => {
-        if (perfumeNotes.some(note => note.toLowerCase().includes(neededNote.toLowerCase()))) {
-            points += weightPerNote;
-        }
+    profile.notes.forEach(note => {
+        if (allNotes.some(n => n.includes(note.toLowerCase()))) score += noteWeight;
     });
 
-    return Math.round(points);
+    return Math.round(score);
 };
 
-const getRecommendationReasons = (perfume, occasion) => {
-    const rules = SCENT_PROFILES[occasion];
-    const topNote = perfume.notes.top[0];
-    const baseNote = perfume.notes.base[0];
-
-    return `The perfect choice for your ${occasion}. It opens with refreshing ${topNote} and settles into a lasting ${baseNote} base, making it a very ${rules.label.toLowerCase()} fragrance.`;
+const getReason = (perfume, occasion) => {
+    const profile = SCENT_PROFILES[occasion];
+    const top = perfume.notes.top[0];
+    const base = perfume.notes.base[0];
+    return `The perfect choice for your ${occasion}. It opens with refreshing ${top} and settles into a lasting ${base} base, making it a very ${profile.label.toLowerCase()} fragrance.`;
 };
 
-export const getRecommendations = (allProducts, occasion) => {
-    const scoredList = allProducts.map(perfume => {
-        const score = calculateMatchScore(perfume, occasion);
-
-        return {
-            ...perfume,
-            matchPercentage: score,
-            reasoning: getRecommendationReasons(perfume, occasion)
-        };
-    });
-
-    return scoredList
+export const getRecommendations = (products, occasion) => {
+    return products
+        .map(p => ({
+            ...p,
+            matchPercentage: calculateScore(p, occasion),
+            reasoning: getReason(p, occasion)
+        }))
         .sort((a, b) => b.matchPercentage - a.matchPercentage)
         .slice(0, 3);
 };

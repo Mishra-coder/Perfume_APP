@@ -1,82 +1,95 @@
 import React from 'react';
 import { View, StyleSheet, FlatList, Image } from 'react-native';
-import { Appbar, Text, Surface, IconButton, Chip } from 'react-native-paper';
+import { Appbar, Text, Surface, IconButton, Chip, useTheme as usePaperTheme } from 'react-native-paper';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 
 const OrdersScreen = ({ navigation }) => {
     const { user } = useUser();
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
 
-    const formatDate = (isoStr) => {
-        return new Date(isoStr).toLocaleDateString('en-IN', {
+    const formatDate = (iso) => {
+        return new Date(iso).toLocaleDateString('en-IN', {
             day: 'numeric',
             month: 'short',
             year: 'numeric'
         });
     };
 
-    const renderEmptyState = () => (
+    const renderEmpty = () => (
         <View style={styles.emptyContainer}>
-            <IconButton icon="package-variant" size={70} iconColor="#eee" />
-            <Text style={styles.emptyTitle}>Nothing here yet</Text>
-            <Text style={styles.emptySubtitle}>
-                Your orders will appear here once you complete a purchase.
-            </Text>
+            <IconButton icon="package-variant" size={70} iconColor={isDarkMode ? '#222222' : '#eeeeee'} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Nothing here yet</Text>
+            <Text style={styles.emptyText}>Your orders will appear here once you complete a purchase.</Text>
         </View>
     );
 
     return (
-        <View style={styles.container}>
-            <Appbar.Header style={styles.header}>
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
-                <Appbar.Content title="Purchases" titleStyle={styles.headerTitle} />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f5f5f5' }]}>
+                <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
+                <Appbar.Content title="Order History" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
             </Appbar.Header>
 
             {user.orders.length > 0 ? (
                 <FlatList
                     data={user.orders}
-                    keyExtractor={order => order.id}
+                    keyExtractor={order => order.id.toString()}
                     renderItem={({ item }) => (
                         <OrderCard
                             order={item}
-                            formattedDate={formatDate(item.date)}
+                            date={formatDate(item.purchaseDate || item.date)}
+                            isDarkMode={isDarkMode}
+                            themeColors={colors}
                         />
                     )}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={styles.list}
                     showsVerticalScrollIndicator={false}
                 />
-            ) : renderEmptyState()}
+            ) : renderEmpty()}
         </View>
     );
 };
 
-const OrderCard = ({ order, formattedDate }) => (
-    <Surface style={styles.card} elevation={0}>
+const OrderCard = ({ order, date, isDarkMode, themeColors }) => (
+    <Surface
+        style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff', borderColor: isDarkMode ? '#333333' : '#f2f2f2' }]}
+        elevation={0}
+    >
         <View style={styles.cardHeader}>
             <View>
-                <Text style={styles.orderId}>Order #{order.id}</Text>
-                <Text style={styles.orderDate}>{formattedDate}</Text>
+                <Text style={[styles.orderId, { color: themeColors.text }]}>Order #{order.id}</Text>
+                <Text style={styles.orderDate}>{date}</Text>
             </View>
-            <Chip style={styles.statusBadge} textStyle={styles.statusText}>
-                {order.status}
+            <Chip
+                style={[styles.statusChip, { backgroundColor: isDarkMode ? '#112211' : '#eefcf1' }]}
+                textStyle={[styles.statusText, { color: isDarkMode ? themeColors.primary : '#27ae60' }]}
+            >
+                {order.orderStatus || order.status}
             </Chip>
         </View>
 
-        <View style={styles.imageGallery}>
-            {order.items.slice(0, 3).map((product, index) => (
-                <View key={index} style={styles.thumbnailBox}>
-                    <Image source={product.image} style={styles.thumbnail} />
+        <View style={styles.gallery}>
+            {order.items.slice(0, 3).map((item, i) => (
+                <View key={i} style={[styles.thumbBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }]}>
+                    <Image source={item.image} style={styles.thumbImage} />
                 </View>
             ))}
             {order.items.length > 3 && (
-                <View style={styles.overFlowCounter}>
-                    <Text style={styles.overflowText}>+{order.items.length - 3}</Text>
+                <View style={[styles.moreBadge, { backgroundColor: isDarkMode ? '#333333' : '#f5f5f5' }]}>
+                    <Text style={[styles.moreText, { color: isDarkMode ? '#ffffff' : '#666666' }]}>
+                        +{order.items.length - 3}
+                    </Text>
                 </View>
             )}
         </View>
 
-        <View style={styles.cardFooter}>
-            <Text style={styles.paymentHint}>Paid Amount</Text>
-            <Text style={styles.totalAmount}>₹{order.total}</Text>
+        <View style={[styles.cardFooter, { borderTopColor: isDarkMode ? '#222222' : '#f9f9f9' }]}>
+            <Text style={styles.summaryLabel}>Paid Amount</Text>
+            <Text style={[styles.summaryValue, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>
+                ₹{order.totalAmount || order.total}
+            </Text>
         </View>
     </Surface>
 );
@@ -84,26 +97,21 @@ const OrderCard = ({ order, formattedDate }) => (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    header: {
-        backgroundColor: '#fff',
+    appbar: {
         borderBottomWidth: 1,
-        borderBottomColor: '#f5f5f5',
     },
-    headerTitle: {
+    appbarTitle: {
         fontWeight: 'bold',
     },
-    listContent: {
+    list: {
         padding: 20,
     },
     card: {
-        backgroundColor: '#fff',
         borderRadius: 20,
         padding: 20,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#f2f2f2',
     },
     cardHeader: {
         flexDirection: 'row',
@@ -113,50 +121,45 @@ const styles = StyleSheet.create({
     orderId: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#1a1a1a',
     },
     orderDate: {
         fontSize: 12,
-        color: '#aaa',
+        color: '#aaaaaa',
         marginTop: 2,
     },
-    statusBadge: {
-        backgroundColor: '#eefcf1',
+    statusChip: {
+        borderRadius: 8,
     },
     statusText: {
-        color: '#27ae60',
         fontSize: 12,
         fontWeight: 'bold',
     },
-    imageGallery: {
+    gallery: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 20,
     },
-    thumbnailBox: {
+    thumbBox: {
         width: 60,
         height: 60,
         borderRadius: 12,
-        backgroundColor: '#fafafa',
         marginRight: 10,
         overflow: 'hidden',
     },
-    thumbnail: {
+    thumbImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
     },
-    overFlowCounter: {
+    moreBadge: {
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#f5f5f5',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    overflowText: {
+    moreText: {
         fontSize: 13,
-        color: '#666',
         fontWeight: 'bold',
     },
     cardFooter: {
@@ -164,17 +167,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#f9f9f9',
         alignItems: 'center',
     },
-    paymentHint: {
-        color: '#999',
+    summaryLabel: {
+        color: '#999999',
         fontSize: 14,
     },
-    totalAmount: {
+    summaryValue: {
         fontSize: 18,
         fontWeight: '900',
-        color: '#1a1a1a',
     },
     emptyContainer: {
         flex: 1,
@@ -185,11 +186,10 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#333',
     },
-    emptySubtitle: {
+    emptyText: {
         fontSize: 15,
-        color: '#999',
+        color: '#999999',
         marginTop: 8,
         textAlign: 'center',
         paddingHorizontal: 40,

@@ -1,88 +1,116 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Appbar, TextInput, Button, Avatar, Text, Surface, IconButton } from 'react-native-paper';
+import { Appbar, TextInput, Button, Avatar, Text, Surface, IconButton, Switch, useTheme as usePaperTheme } from 'react-native-paper';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 
 const ProfileScreen = ({ navigation }) => {
     const { user, setUserProfile, logout } = useUser();
+    const { isDarkMode, toggleTheme } = useTheme();
+    const { colors } = usePaperTheme();
 
-    const [nameDraft, setNameDraft] = useState(user.name);
+    const [name, setName] = useState(user.name);
     const [isEditing, setIsEditing] = useState(false);
 
-    const onSave = () => {
-        setUserProfile(nameDraft);
+    const handleUpdate = () => {
+        setUserProfile(name);
         setIsEditing(false);
     };
 
-    const onLogout = () => {
+    const handleLogout = () => {
         logout();
         navigation.navigate('Main');
     };
 
     return (
-        <View style={styles.shell}>
-            <Appbar.Header style={styles.navBar}>
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
-                <Appbar.Content title="Profile Settings" />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f0f0f0' }]}>
+                <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
+                <Appbar.Content title="Account Settings" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
             </Appbar.Header>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={styles.hero}>
-                    <Avatar.Icon size={100} icon="account" style={styles.heroAvatar} color="#fff" />
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                <View style={[styles.hero, { backgroundColor: isDarkMode ? '#121212' : '#fafafa' }]}>
+                    <Avatar.Icon
+                        size={100}
+                        icon="account"
+                        style={[styles.avatar, { backgroundColor: colors.primary }]}
+                        color={isDarkMode ? '#000000' : '#ffffff'}
+                    />
 
                     {isEditing ? (
                         <View style={styles.editForm}>
                             <TextInput
-                                label="Update Name"
-                                value={nameDraft}
-                                onChangeText={setNameDraft}
+                                label="Update Display Name"
+                                value={name}
+                                onChangeText={setName}
                                 mode="outlined"
-                                style={styles.nameField}
-                                activeOutlineColor="#000"
+                                style={[styles.input, { backgroundColor: colors.background }]}
+                                activeOutlineColor={colors.primary}
+                                textColor={colors.text}
                             />
-                            <Button mode="contained" onPress={onSave} style={styles.saveBtn} labelStyle={styles.btnTxt}>
+                            <Button
+                                mode="contained"
+                                onPress={handleUpdate}
+                                style={[styles.updateBtn, { backgroundColor: colors.primary }]}
+                                labelStyle={[styles.updateBtnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                            >
                                 Confirm Update
                             </Button>
                         </View>
                     ) : (
-                        <View style={styles.profileInfo}>
-                            <Text style={styles.userName}>{user.name || "Guest Traveler"}</Text>
+                        <View style={styles.info}>
+                            <Text style={[styles.name, { color: colors.text }]}>
+                                {user.name || "Guest Connoisseur"}
+                            </Text>
                             {user.isLoggedIn && (
-                                <TouchableOpacity onPress={() => setIsEditing(true)}>
-                                    <Text style={styles.editHint}>Edit Name</Text>
+                                <TouchableOpacity onPress={() => setIsEditing(true)} activeOpacity={0.7}>
+                                    <Text style={styles.editLink}>Modify Profile Details</Text>
                                 </TouchableOpacity>
                             )}
                         </View>
                     )}
                 </View>
 
-                <View style={styles.menuArea}>
-                    <MenuTile
+                <View style={styles.menu}>
+                    <Text style={[styles.sectionTitle, { color: colors.primary }]}>Preferences</Text>
+                    <View style={styles.row}>
+                        <View style={styles.labelGroup}>
+                            <IconButton icon={isDarkMode ? "weather-night" : "weather-sunny"} iconColor={colors.primary} size={24} />
+                            <Text style={[styles.label, { color: colors.text }]}>Dark Mode</Text>
+                        </View>
+                        <Switch value={isDarkMode} onValueChange={toggleTheme} color={colors.primary} />
+                    </View>
+
+                    <Text style={[styles.sectionTitle, { color: colors.primary, marginTop: 25 }]}>Experience</Text>
+
+                    <MenuItem
                         icon="package-variant-closed"
-                        title="Purchase History"
-                        sub="View all your past orders"
+                        title="Order History"
+                        subtitle="Review your past fragrance purchases"
                         onPress={() => navigation.navigate('Orders')}
                     />
-                    <MenuTile
+
+                    <MenuItem
                         icon="map-marker-outline"
-                        title="My Addresses"
-                        sub="Manage delivery details"
+                        title="Saved Addresses"
+                        subtitle="Manage your delivery destinations"
                     />
 
                     {user.isLoggedIn ? (
-                        <MenuTile
+                        <MenuItem
                             icon="logout"
                             title="Sign Out"
-                            sub="Securely exit your account"
-                            danger
-                            onPress={onLogout}
+                            subtitle="Securely sign out of your account"
+                            isDestructive
+                            onPress={handleLogout}
                         />
                     ) : (
-                        <MenuTile
+                        <MenuItem
                             icon="login"
-                            title="Join / Sign In"
-                            sub="Unlock exclusive fragrance access"
-                            accent
+                            title="SignIn / Register"
+                            subtitle="Join the Aroma Luxe membership"
+                            isPrimary
                             onPress={() => navigation.navigate('Auth')}
                         />
                     )}
@@ -92,111 +120,126 @@ const ProfileScreen = ({ navigation }) => {
     );
 };
 
-const MenuTile = ({ icon, title, sub, onPress, danger = false, accent = false }) => (
-    <TouchableOpacity style={styles.tile} onPress={onPress} activeOpacity={0.7}>
-        <Surface style={[styles.tileIconBox, danger && styles.bgDanger, accent && styles.bgAccent]} elevation={0}>
-            <IconButton icon={icon} size={24} iconColor={danger ? '#d32f2f' : accent ? '#007bff' : '#000'} />
-        </Surface>
-        <View style={styles.tileContent}>
-            <Text style={[styles.tileTitle, danger && styles.textDanger, accent && styles.textAccent]}>{title}</Text>
-            <Text style={styles.tileSub}>{sub}</Text>
-        </View>
-        <IconButton icon="chevron-right" size={20} iconColor="#eee" />
-    </TouchableOpacity>
-);
+const MenuItem = ({ icon, title, subtitle, onPress, isDestructive, isPrimary }) => {
+    const { colors } = usePaperTheme();
+    const { isDarkMode } = useTheme();
+
+    const bgColor = isDarkMode ? '#1a1a1a' : (isDestructive ? '#fff0f0' : isPrimary ? '#f0f7ff' : '#f5f5f5');
+    const fgColor = isDestructive ? '#d32f2f' : (isPrimary ? '#007bff' : (isDarkMode ? colors.primary : '#000000'));
+
+    return (
+        <TouchableOpacity style={[styles.itemWrapper, { borderBottomColor: isDarkMode ? '#222222' : '#f9f9f9' }]} onPress={onPress}>
+            <Surface style={[styles.itemIcon, { backgroundColor: bgColor }]} elevation={0}>
+                <IconButton icon={icon} size={24} iconColor={fgColor} />
+            </Surface>
+            <View style={styles.itemContent}>
+                <Text style={[styles.itemTitle, { color: isDestructive ? '#d32f2f' : isPrimary ? '#007bff' : colors.text }]}>{title}</Text>
+                <Text style={styles.itemSubtitle}>{subtitle}</Text>
+            </View>
+            <IconButton icon="chevron-right" size={20} iconColor={isDarkMode ? '#444444' : '#eeeeee'} />
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
-    shell: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    navBar: {
-        backgroundColor: '#fff',
+    appbar: {
         borderBottomWidth: 1,
-        borderBottomColor: '#f9f9f9',
+    },
+    appbarTitle: {
+        fontWeight: 'bold',
+    },
+    scrollContent: {
+        paddingBottom: 40,
     },
     hero: {
         alignItems: 'center',
         paddingVertical: 50,
-        backgroundColor: '#fafafa',
     },
-    heroAvatar: {
-        backgroundColor: '#1a1a1a',
+    avatar: {
+        elevation: 10,
     },
     editForm: {
         width: '80%',
         marginTop: 20,
     },
-    nameField: {
-        backgroundColor: '#fff',
+    input: {
         marginBottom: 10,
     },
-    saveBtn: {
-        backgroundColor: '#000',
+    updateBtn: {
         borderRadius: 12,
     },
-    btnTxt: {
+    updateBtnLabel: {
         fontWeight: 'bold',
     },
-    profileInfo: {
+    info: {
         alignItems: 'center',
         marginTop: 15,
     },
-    userName: {
+    name: {
         fontSize: 26,
         fontWeight: '900',
-        color: '#1a1a1a',
     },
-    editHint: {
-        color: '#888',
+    editLink: {
+        color: '#888888',
         marginTop: 5,
         textDecorationLine: 'underline',
         fontSize: 13,
     },
-    menuArea: {
+    menu: {
         paddingHorizontal: 25,
-        marginTop: 10,
+        marginTop: 20,
     },
-    tile: {
+    sectionTitle: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1.5,
+        marginBottom: 10,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+        marginBottom: 5,
+    },
+    labelGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: -15,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    itemWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 18,
         borderBottomWidth: 1,
-        borderBottomColor: '#f9f9f9',
     },
-    tileIconBox: {
+    itemIcon: {
         width: 50,
         height: 50,
         borderRadius: 15,
-        backgroundColor: '#f5f5f5',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    bgDanger: {
-        backgroundColor: '#fff0f0',
-    },
-    bgAccent: {
-        backgroundColor: '#f0f7ff',
-    },
-    tileContent: {
+    itemContent: {
         flex: 1,
         marginLeft: 15,
     },
-    tileTitle: {
+    itemTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#1a1a1a',
     },
-    tileSub: {
+    itemSubtitle: {
         fontSize: 12,
-        color: '#aaa',
+        color: '#888888',
         marginTop: 2,
-    },
-    textDanger: {
-        color: '#d32f2f',
-    },
-    textAccent: {
-        color: '#007bff',
     },
 });
 

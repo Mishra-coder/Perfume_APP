@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Appbar, Text, IconButton, Surface } from 'react-native-paper';
+import { Appbar, Text, IconButton, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import RecommendationCard from '../components/RecommendationCard';
 import { products } from '../data/products';
 import { getRecommendations } from '../utils/recommendationEngine';
+import { useTheme } from '../context/ThemeContext';
 
 const RecommendationScreen = ({ navigation }) => {
+    const { isDarkMode } = useTheme();
+    const { colors } = usePaperTheme();
+
     const [matches, setMatches] = useState(null);
-    const [activeTarget, setActiveTarget] = useState("");
+    const [occasion, setOccasion] = useState("");
 
     const options = [
         { label: 'Date', key: 'date', icon: 'heart-outline' },
@@ -18,92 +22,111 @@ const RecommendationScreen = ({ navigation }) => {
         { label: 'Festival', key: 'festival', icon: 'party-popper' }
     ];
 
-    const pickOccasion = (opt) => {
-        setActiveTarget(opt.label);
-        setMatches(getRecommendations(products, opt.key));
+    const handleSelect = (item) => {
+        setOccasion(item.label);
+        setMatches(getRecommendations(products, item.key));
     };
 
-    const clearSelection = () => {
+    const reset = () => {
         setMatches(null);
-        setActiveTarget("");
+        setOccasion("");
     };
+
+    const renderIntro = () => (
+        <View style={styles.intro}>
+            <View style={styles.header}>
+                <Text style={[styles.title, { color: colors.text }]}>Where next?</Text>
+                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                    Choose an occasion for a tailored scent.
+                </Text>
+            </View>
+
+            <View style={styles.grid}>
+                {options.map(item => (
+                    <OccasionTile
+                        key={item.key}
+                        item={item}
+                        isDarkMode={isDarkMode}
+                        themeColors={colors}
+                        onPress={() => handleSelect(item)}
+                    />
+                ))}
+            </View>
+        </View>
+    );
+
+    const renderResults = () => (
+        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+            <View style={styles.header}>
+                <Text style={[styles.title, { color: colors.text }]}>Matched for {occasion}</Text>
+                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                    Top picks based on notes and vibes.
+                </Text>
+            </View>
+
+            {matches.map((item, i) => (
+                <RecommendationCard
+                    key={item.id}
+                    perfume={item}
+                    reasoning={item.reasoning}
+                    score={item.matchPercentage}
+                    isPremium={i === 0}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                    onPress={() => navigation.navigate('ProductDetail', { product: item })}
+                />
+            ))}
+            <View style={styles.spacer} />
+        </ScrollView>
+    );
 
     return (
-        <View style={styles.base}>
-            <Appbar.Header style={styles.navBar}>
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
-                <Appbar.Content title="Discovery" />
-                {matches && <Appbar.Action icon="close" onPress={clearSelection} />}
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f9f9f9' }]}>
+                <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
+                <Appbar.Content title="Scent Discovery" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
+                {matches && <Appbar.Action icon="close" onPress={reset} color={colors.text} />}
             </Appbar.Header>
 
-            {!matches ? (
-                <View style={styles.center}>
-                    <View style={styles.intro}>
-                        <Text style={styles.hero}>Where next?</Text>
-                        <Text style={styles.sub}>Choose an occasion for a tailored scent.</Text>
-                    </View>
-
-                    <View style={styles.grid}>
-                        {options.map((opt) => (
-                            <TouchableOpacity key={opt.key} style={styles.tileBox} onPress={() => pickOccasion(opt)}>
-                                <Surface style={styles.tile} elevation={0}>
-                                    <IconButton icon={opt.icon} size={30} iconColor="#1a1a1a" />
-                                    <Text style={styles.tileText}>{opt.label}</Text>
-                                </Surface>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
-            ) : (
-                <ScrollView contentContainerStyle={styles.results} showsVerticalScrollIndicator={false}>
-                    <View style={styles.intro}>
-                        <Text style={styles.hero}>Matched for {activeTarget}</Text>
-                        <Text style={styles.sub}>Top picks based on notes and vibes.</Text>
-                    </View>
-
-                    {matches.map((item, i) => (
-                        <RecommendationCard
-                            key={item.id}
-                            perfume={item}
-                            reasoning={item.reasoning}
-                            score={item.matchPercentage}
-                            isPremium={i === 0}
-                            onPress={() => navigation.navigate('ProductDetail', { product: item })}
-                        />
-                    ))}
-                    <View style={{ height: 40 }} />
-                </ScrollView>
-            )}
+            {!matches ? renderIntro() : renderResults()}
         </View>
     );
 };
 
+const OccasionTile = ({ item, isDarkMode, themeColors, onPress }) => (
+    <TouchableOpacity style={styles.tileWrapper} onPress={onPress} activeOpacity={0.7}>
+        <Surface style={[styles.tile, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]} elevation={0}>
+            <IconButton icon={item.icon} size={30} iconColor={isDarkMode ? themeColors.primary : "#1a1a1a"} />
+            <Text style={[styles.tileLabel, { color: themeColors.text }]}>{item.label}</Text>
+        </Surface>
+    </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
-    base: {
+    container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    navBar: {
-        backgroundColor: '#fff',
+    appbar: {
         borderBottomWidth: 1,
-        borderBottomColor: '#f9f9f9',
     },
-    center: {
+    appbarTitle: {
+        fontWeight: 'bold',
+        fontSize: 18,
+    },
+    intro: {
         flex: 1,
         padding: 25,
     },
-    intro: {
+    header: {
         marginBottom: 40,
         paddingHorizontal: 5,
     },
-    hero: {
+    title: {
         fontSize: 32,
         fontWeight: '900',
-        color: '#1a1a1a',
     },
-    sub: {
+    subtitle: {
         fontSize: 16,
-        color: '#666',
         marginTop: 8,
     },
     grid: {
@@ -111,26 +134,26 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
     },
-    tileBox: {
+    tileWrapper: {
         width: '48%',
         marginBottom: 15,
     },
     tile: {
         height: 120,
         borderRadius: 20,
-        backgroundColor: '#fcfcfc',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#f0f0f0',
     },
-    tileText: {
+    tileLabel: {
         fontWeight: 'bold',
         fontSize: 14,
-        color: '#1a1a1a',
     },
-    results: {
+    list: {
         padding: 25,
+    },
+    spacer: {
+        height: 40,
     },
 });
 

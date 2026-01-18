@@ -1,24 +1,24 @@
 import { Image } from 'react-native';
 
-const p1 = require('../assets/perfumes/p1.jpg');
-const p2 = require('../assets/perfumes/p2.jpg');
-const p3 = require('../assets/perfumes/p3.jpg');
-const p4 = require('../assets/perfumes/p4.jpg');
-const p5 = require('../assets/perfumes/p5.jpg');
-const p6 = require('../assets/perfumes/p6.jpg');
-const p7 = require('../assets/perfumes/p7.jpg');
-const p8 = require('../assets/perfumes/p8.jpg');
-const p9 = require('../assets/perfumes/p9.jpg');
-const p10 = require('../assets/perfumes/p10.jpg');
-const p11 = require('../assets/perfumes/p11.jpg');
-const p12 = require('../assets/perfumes/p12.jpg');
+const perfumeImg1 = require('../assets/perfumes/p1.jpg');
+const perfumeImg2 = require('../assets/perfumes/p2.jpg');
+const perfumeImg3 = require('../assets/perfumes/p3.jpg');
+const perfumeImg4 = require('../assets/perfumes/p4.jpg');
+const perfumeImg5 = require('../assets/perfumes/p5.jpg');
+const perfumeImg6 = require('../assets/perfumes/p6.jpg');
+const perfumeImg7 = require('../assets/perfumes/p7.jpg');
+const perfumeImg8 = require('../assets/perfumes/p8.jpg');
+const perfumeImg9 = require('../assets/perfumes/p9.jpg');
+const perfumeImg10 = require('../assets/perfumes/p10.jpg');
+const perfumeImg11 = require('../assets/perfumes/p11.jpg');
+const perfumeImg12 = require('../assets/perfumes/p12.jpg');
 
 export const products = [
   {
     id: 1,
     name: "Midnight Oud Royale",
     price: 12999,
-    image: p1,
+    image: perfumeImg1,
     description: "A deep, mysterious blend of precious agarwood and rare resins. This fragrance is the epitome of luxury, designed for those who command respect and leave a lasting impression.",
     category: "Oriental",
     type: "Parfum",
@@ -37,7 +37,7 @@ export const products = [
     id: 2,
     name: "Velvet Rose Elixir",
     price: 8499,
-    image: p2,
+    image: perfumeImg2,
     description: "An opulent floral masterpiece combining damask rose with rich textures of clove and decadent praline. A sophisticated scent that wraps you in a blanket of elegance.",
     category: "Floral",
     type: "EDP",
@@ -56,7 +56,7 @@ export const products = [
     id: 3,
     name: "Aqua Allegoria Luxe",
     price: 6499,
-    image: p3,
+    image: perfumeImg3,
     description: "A revitalizing burst of citrus and aquatic notes. Inspired by Mediterranean mornings, this fresh fragrance is clean, light, and undeniably premium.",
     category: "Fresh",
     type: "EDT",
@@ -75,7 +75,7 @@ export const products = [
     id: 4,
     name: "Emperor Aventus Noir",
     price: 15999,
-    image: p4,
+    image: perfumeImg4,
     description: "The ultimate power scent. Featuring a bold combination of fruity top notes and a rich, smoky base. Truly the king of modern fragrances for the elite.",
     category: "Woody",
     type: "EDP",
@@ -94,7 +94,7 @@ export const products = [
     id: 5,
     name: "Chanel N°5 Precious",
     price: 10999,
-    image: p5,
+    image: perfumeImg5,
     description: "The legendary olfactory icon. A complex bouquet of aldehydes and florals that has defined elegance for generations. A timeless classic for the sophisticated woman.",
     category: "Aromatic",
     type: "EDT",
@@ -113,7 +113,7 @@ export const products = [
     id: 6,
     name: "Rouge Crystal 540",
     price: 18999,
-    image: p6,
+    image: perfumeImg6,
     description: "An intoxicating blend of jasmine, saffron, and cedarwood. This radiant fragrance settles on the skin like an amber, floral, and woody breeze.",
     category: "Oriental",
     type: "Parfum",
@@ -132,7 +132,7 @@ export const products = [
     id: 7,
     name: "Sage & Sea Mist",
     price: 7999,
-    image: p7,
+    image: perfumeImg7,
     description: "Escape the everyday along the windswept shore. Waves breaking white, the air fresh with sea salt and spray. Alive with the mineral scent of rugged cliffs.",
     category: "Fresh",
     type: "EDT",
@@ -151,7 +151,7 @@ export const products = [
     id: 8,
     name: "Midnight Opulence Noir",
     price: 9499,
-    image: p8,
+    image: perfumeImg8,
     description: "An addictive gourmand floral. The signature black coffee accord is paired with sensual vanilla and white flowers for a modern, young, and vibrant scent.",
     category: "Floral",
     type: "Parfum",
@@ -170,7 +170,7 @@ export const products = [
     id: 9,
     name: "Code Profumo Intense",
     price: 11499,
-    image: p9,
+    image: perfumeImg9,
     description: "A magnetic, warm fragrance for men. Tonka bean, cardamom, and woody notes create an irresistible aura of masculine strength and charisma.",
     category: "Woody",
     type: "EDT",
@@ -189,7 +189,7 @@ export const products = [
     id: 10,
     name: "Gucci Flora Gardenia",
     price: 7499,
-    image: p10,
+    image: perfumeImg10,
     description: "A joyful floral signature. Built around the Gardenia flower, admired since the dawn of time for its splendour and used in magical elixirs.",
     category: "Floral",
     type: "EDT",
@@ -208,7 +208,7 @@ export const products = [
     id: 11,
     name: "Tobaco-Vanille Luxe",
     price: 14499,
-    image: p11,
+    image: perfumeImg11,
     description: "A modern take on an old-world apothecary scent. Creamy tonka bean, vanilla, cocoa, dry fruit accords and sweet wood sap for a modern, opulent impression.",
     category: "Oriental",
     type: "EDP",
@@ -227,7 +227,7 @@ export const products = [
     id: 12,
     name: "Bleu Absolute Luxe",
     price: 8999,
-    image: p12,
+    image: perfumeImg12,
     description: "An ode to masculine freedom. A woody, aromatic fragrance with a captivating trail. A timeless, powerful scent housed in an enigmatic blue bottle.",
     category: "Aromatic",
     type: "EDT",
