@@ -3,7 +3,7 @@ This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The i
 
 ---
 Download the app
-shorturl.at/kQbai
+https://expo.dev/accounts/devendra.mi/projects/aroma-luxe/builds/e7d68547-1809-41d5-bb37-1f53921e082f
 ---
 ---
 ## Scan this and Install the App
