@@ -1,10 +1,9 @@
 # Aroma Luxe - My Perfume Shop App 
 This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
----
 ## Download the app
 https://expo.dev/accounts/devendra.mi/projects/aroma-luxe/builds/e7d68547-1809-41d5-bb37-1f53921e082f
----
+
 ---
 ## Scan this and Install the App
 <img width="282" height="281" alt="Screenshot 2026-01-18 at 2 44 38 AM" src="https://github.com/user-attachments/assets/d528015e-5b52-4a4c-b9d9-d3183fda45fc" />
