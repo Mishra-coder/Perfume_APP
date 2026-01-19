@@ -11,7 +11,7 @@ export const useUser = () => {
     return context;
 };
 
-const USER_SESSION_KEY = 'aroma_luxe_user_session';
+const STORAGE_KEY = 'aroma_luxe_user_session';
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState({
@@ -19,35 +19,42 @@ export const UserProvider = ({ children }) => {
         email: '',
         favoriteOccasions: [],
         orders: [],
+        wishlist: [],
         isLoggedIn: false
     });
 
     useEffect(() => {
-        loadStoredSession();
+        const loadSession = async () => {
+            try {
+                const stored = await AsyncStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    setUser(prev => ({
+                        ...prev,
+                        ...parsed,
+                        wishlist: parsed.wishlist || [],
+                        orders: parsed.orders || [],
+                        favoriteOccasions: parsed.favoriteOccasions || []
+                    }));
+                }
+            } catch (error) {
+                console.error('Error loading session:', error);
+            }
+        };
+        loadSession();
     }, []);
 
-    const loadStoredSession = async () => {
+    const saveSession = async (updatedUser) => {
+        setUser(updatedUser);
         try {
-            const storedSession = await AsyncStorage.getItem(USER_SESSION_KEY);
-            if (storedSession) {
-                setUser(JSON.parse(storedSession));
-            }
+            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
         } catch (error) {
-            console.error('UserContext: Error recovering stored session', error);
-        }
-    };
-
-    const syncUser = async (updatedData) => {
-        setUser(updatedData);
-        try {
-            await AsyncStorage.setItem(USER_SESSION_KEY, JSON.stringify(updatedData));
-        } catch (error) {
-            console.error('UserContext: Error persisting user data', error);
+            console.error('Error saving session:', error);
         }
     };
 
     const login = (profile) => {
-        syncUser({
+        saveSession({
             ...user,
             ...profile,
             isLoggedIn: true
@@ -55,41 +62,58 @@ export const UserProvider = ({ children }) => {
     };
 
     const logout = () => {
-        syncUser({
+        saveSession({
             name: '',
             email: '',
             favoriteOccasions: [],
             orders: user.orders,
+            wishlist: [],
             isLoggedIn: false
         });
     };
 
     const updateProfile = (name, favoriteOccasions = []) => {
-        syncUser({
+        saveSession({
             ...user,
             name,
             favoriteOccasions
         });
     };
 
-    const addOrder = (newOrder) => {
-        syncUser({
+    const addOrder = (order) => {
+        saveSession({
             ...user,
-            orders: [newOrder, ...user.orders]
+            orders: [order, ...user.orders]
         });
     };
 
-    const userValue = {
+    const toggleWishlist = (product) => {
+        const currentWishlist = user.wishlist || [];
+        const exists = currentWishlist.find(item => item.id === product.id);
+        const updatedWishlist = exists
+            ? currentWishlist.filter(item => item.id !== product.id)
+            : [...currentWishlist, product];
+
+        saveSession({
+            ...user,
+            wishlist: updatedWishlist
+        });
+    };
+
+    const value = {
         user,
         login,
         logout,
         setUserProfile: updateProfile,
-        saveOrder: addOrder
+        saveOrder: addOrder,
+        toggleWishlist,
+        isInWishlist: (productId) => (user.wishlist || []).some(item => item.id === productId)
     };
 
     return (
-        <UserContext.Provider value={userValue}>
+        <UserContext.Provider value={value}>
             {children}
         </UserContext.Provider>
     );
 };
+

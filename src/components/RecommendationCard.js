@@ -7,13 +7,16 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
+    const bg = isDarkMode ? '#1a1a1a' : '#ffffff';
+    const border = isDarkMode ? '#333333' : '#f0f0f0';
+
     return (
-        <Surface style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]} elevation={0}>
-            <TouchableOpacity onPress={onPress}>
-                <View style={[styles.imageContainer, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]}>
-                    <Image source={perfume.image} style={styles.image} />
-                    <View style={[styles.matchBadge, { backgroundColor: isDarkMode ? colors.primary : '#1a1a1a' }]}>
-                        <Text style={[styles.badgeText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>{score}% MATCH</Text>
+        <Surface style={[styles.card, { backgroundColor: bg, borderColor: border }]} elevation={0}>
+            <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+                <View style={[styles.imgBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]}>
+                    <Image source={perfume.image} style={styles.img} />
+                    <View style={[styles.match, { backgroundColor: isDarkMode ? colors.primary : '#1a1a1a' }]}>
+                        <Text style={[styles.matchText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>{score}% MATCH</Text>
                     </View>
                 </View>
 
@@ -22,35 +25,29 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
 
                     <View style={styles.meta}>
                         <Text style={[styles.price, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{perfume.price}</Text>
-                        <Text style={styles.type}>Eau De Parfum</Text>
+                        <Text style={styles.tag}>Eau De Parfum</Text>
                     </View>
 
-                    <View style={[styles.divider, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
+                    <View style={[styles.line, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
 
-                    <View style={styles.notesSection}>
-                        <Text style={styles.notesTitle}>Signature Notes</Text>
-                        <View style={styles.notesList}>
-                            {perfume.notes.top.slice(0, 3).map((note, i) => (
-                                <View key={i} style={[styles.noteTag, { backgroundColor: isDarkMode ? '#333333' : '#f8f8f8' }]}>
-                                    <Text style={[styles.noteText, { color: colors.text }]}>{note}</Text>
+                    <View style={styles.notes}>
+                        <Text style={styles.label}>Signature Notes</Text>
+                        <View style={styles.list}>
+                            {perfume.notes.top.slice(0, 3).map((n, i) => (
+                                <View key={i} style={[styles.note, { backgroundColor: isDarkMode ? '#333333' : '#f8f8f8' }]}>
+                                    <Text style={{ color: colors.text, fontSize: 12 }}>{n}</Text>
                                 </View>
                             ))}
                         </View>
                     </View>
 
-                    <Surface style={[styles.expertBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]} elevation={0}>
-                        <Text style={[styles.expertTitle, { color: colors.text }]}>Expert Perspective</Text>
-                        <Text style={[styles.expertBody, { color: isDarkMode ? '#aaaaaa' : '#333333' }]}>{reasoning}</Text>
+                    <Surface style={[styles.tip, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]} elevation={0}>
+                        <Text style={[styles.tipTitle, { color: colors.text }]}>Why it works</Text>
+                        <Text style={[styles.tipBody, { color: isDarkMode ? '#aaaaaa' : '#333333' }]}>{reasoning}</Text>
                     </Surface>
 
-                    <Button
-                        mode="contained"
-                        style={[styles.btn, { backgroundColor: colors.primary }]}
-                        contentStyle={styles.btnContent}
-                        labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                        onPress={onPress}
-                    >
-                        Explore Scent
+                    <Button mode="contained" style={styles.btn} contentStyle={styles.btnContent} labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]} onPress={onPress}>
+                        Discover Scents
                     </Button>
                 </View>
             </TouchableOpacity>
@@ -63,101 +60,98 @@ const styles = StyleSheet.create({
         marginBottom: 25,
         borderRadius: 25,
         overflow: 'hidden',
-        borderWidth: 1,
+        borderWidth: 1
     },
-    imageContainer: {
+    imgBox: {
         height: 200,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
-    image: {
+    img: {
         width: 150,
-        height: 150,
-        resizeMode: 'cover',
+        height: 150
     },
-    matchBadge: {
+    match: {
         position: 'absolute',
         top: 15,
         right: 15,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 10,
+        padding: 6,
+        borderRadius: 10
     },
-    badgeText: {
+    matchText: {
         fontSize: 10,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     body: {
-        padding: 25,
+        padding: 25
     },
     name: {
         fontSize: 22,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     meta: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 8,
+        marginTop: 10
     },
     price: {
         fontSize: 18,
-        fontWeight: '900',
+        fontWeight: '900'
     },
-    type: {
+    tag: {
         fontSize: 12,
-        color: '#666666',
+        color: '#666666'
     },
-    divider: {
+    line: {
         height: 1,
-        marginVertical: 20,
+        marginVertical: 20
     },
-    notesSection: {
-        marginBottom: 20,
+    notes: {
+        marginBottom: 20
     },
-    notesTitle: {
+    label: {
         fontSize: 12,
         fontWeight: 'bold',
         color: '#999999',
         marginBottom: 10,
-        textTransform: 'uppercase',
+        textTransform: 'uppercase'
     },
-    notesList: {
-        flexDirection: 'row',
+    list: {
+        flexDirection: 'row'
     },
-    noteTag: {
+    note: {
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
-        marginRight: 8,
+        marginRight: 8
     },
-    noteText: {
-        fontSize: 12,
-    },
-    expertBox: {
+    tip: {
         padding: 15,
         borderRadius: 15,
-        marginBottom: 25,
+        marginBottom: 25
     },
-    expertTitle: {
+    tipTitle: {
         fontSize: 13,
         fontWeight: 'bold',
-        marginBottom: 5,
+        marginBottom: 5
     },
-    expertBody: {
+    tipBody: {
         fontSize: 13,
-        lineHeight: 18,
+        lineHeight: 18
     },
     btn: {
-        borderRadius: 12,
+        borderRadius: 12
     },
     btnContent: {
-        height: 50,
+        height: 50
     },
     btnLabel: {
         fontWeight: 'bold',
-        fontSize: 14,
-    },
+        fontSize: 14
+    }
 });
 
+
 export default RecommendationCard;
+

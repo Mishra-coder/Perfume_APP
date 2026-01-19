@@ -3,17 +3,17 @@ import { View, StyleSheet, Animated } from 'react-native';
 import { Text } from 'react-native-paper';
 
 const SplashScreen = ({ navigation }) => {
-    const brandingFadeAnimation = useRef(new Animated.Value(0)).current;
-    const brandingScaleAnimation = useRef(new Animated.Value(0.9)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const scaleAnim = useRef(new Animated.Value(0.9)).current;
 
     useEffect(() => {
         Animated.parallel([
-            Animated.timing(brandingFadeAnimation, {
+            Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 1500,
                 useNativeDriver: true,
             }),
-            Animated.spring(brandingScaleAnimation, {
+            Animated.spring(scaleAnim, {
                 toValue: 1,
                 tension: 10,
                 friction: 8,
@@ -21,63 +21,55 @@ const SplashScreen = ({ navigation }) => {
             }),
         ]).start();
 
-        const navigationTimer = setTimeout(() => {
+        const timer = setTimeout(() => {
             navigation.replace('Main');
         }, 3000);
 
-        return () => clearTimeout(navigationTimer);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
-        <View style={styles.mainLayout}>
-            <Animated.View
-                style={[
-                    styles.brandingContainer,
-                    {
-                        opacity: brandingFadeAnimation,
-                        transform: [{ scale: brandingScaleAnimation }]
-                    }
-                ]}
-            >
-                <Text style={styles.brandingPrimaryText}>AROMA</Text>
-                <Text style={styles.brandingSecondaryText}>LUXE</Text>
-                <View style={styles.separatorLine} />
-                <Text style={styles.brandingTagline}>Luxury in every drop</Text>
+        <View style={styles.container}>
+            <Animated.View style={[styles.branding, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+                <Text style={styles.title}>AROMA</Text>
+                <Text style={styles.subtitle}>LUXE</Text>
+                <View style={styles.line} />
+                <Text style={styles.tagline}>Luxury in every drop</Text>
             </Animated.View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    mainLayout: {
+    container: {
         flex: 1,
         backgroundColor: '#ffffff',
         justifyContent: 'center',
         alignItems: 'center'
     },
-    brandingContainer: {
+    branding: {
         alignItems: 'center'
     },
-    brandingPrimaryText: {
+    title: {
         fontSize: 56,
         fontWeight: '900',
         color: '#1a1a1a',
         letterSpacing: 8
     },
-    brandingSecondaryText: {
+    subtitle: {
         fontSize: 20,
         fontWeight: '300',
         color: '#888888',
         letterSpacing: 12,
         marginTop: -5
     },
-    separatorLine: {
+    line: {
         width: 40,
         height: 2,
         backgroundColor: '#000000',
         marginVertical: 30
     },
-    brandingTagline: {
+    tagline: {
         fontSize: 13,
         color: '#bbbbbb',
         letterSpacing: 2,
@@ -86,3 +78,4 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+

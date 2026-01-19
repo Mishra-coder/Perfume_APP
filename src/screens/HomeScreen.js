@@ -31,16 +31,11 @@ const HomeScreen = ({ navigation }) => {
     const featuredItems = filteredProducts.slice(0, 3);
     const remainingItems = filteredProducts.slice(3);
 
-    const handleSearchExit = () => {
-        setIsSearchActive(false);
-        setSearchQuery('');
-    };
-
     const renderHeader = () => {
         if (isSearchActive) {
             return (
                 <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-                    <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={handleSearchExit} />
+                    <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => setIsSearchActive(false)} />
                     <TextInput
                         placeholder="Search luxury scents..."
                         value={searchQuery}
@@ -63,6 +58,14 @@ const HomeScreen = ({ navigation }) => {
                     <IconButton icon="magnify" size={24} iconColor={colors.text} onPress={() => setIsSearchActive(true)} />
 
                     <BadgeIcon
+                        icon="heart-outline"
+                        count={(user.wishlist || []).length}
+                        onPress={() => navigation.navigate('Wishlist')}
+                        themeColors={colors}
+                        isDarkMode={isDarkMode}
+                    />
+
+                    <BadgeIcon
                         icon="shopping-outline"
                         count={getTotalItems()}
                         onPress={() => navigation.navigate('Cart')}
@@ -72,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
 
                     <BadgeIcon
                         icon="package-variant-closed"
-                        count={user.orders.length}
+                        count={(user.orders || []).length}
                         onPress={() => navigation.navigate('Orders')}
                         themeColors={colors}
                         isDarkMode={isDarkMode}
@@ -192,18 +195,18 @@ const ProductRow = ({ product, onPress, isDarkMode, themeColors }) => (
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     standardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: 50,
-        paddingHorizontal: 15,
+        paddingHorizontal: 15
     },
     headerActions: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     searchHeader: {
         flexDirection: 'row',
@@ -211,118 +214,118 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingHorizontal: 15,
         borderBottomWidth: 1,
-        paddingBottom: 10,
+        paddingBottom: 10
     },
     searchInput: {
         flex: 1,
         fontSize: 16,
-        paddingVertical: 8,
+        paddingVertical: 8
     },
     badgeWrapper: {
-        marginRight: 5,
+        marginRight: 5
     },
     badge: {
         position: 'absolute',
         top: 5,
-        right: 5,
+        right: 5
     },
     listContent: {
-        paddingBottom: 100,
+        paddingBottom: 100
     },
     heroSection: {
-        padding: 25,
+        padding: 25
     },
     heroTitle: {
         fontSize: 36,
         fontWeight: '900',
-        letterSpacing: -1,
+        letterSpacing: -1
     },
     heroSubtitle: {
         fontSize: 15,
         color: '#888888',
-        marginTop: 5,
+        marginTop: 5
     },
     featuredList: {
         paddingLeft: 25,
-        marginBottom: 40,
+        marginBottom: 40
     },
     featuredCard: {
         width: SCREEN_WIDTH * 0.7,
         height: 380,
         marginRight: 20,
         borderRadius: 25,
-        overflow: 'hidden',
+        overflow: 'hidden'
     },
     featuredImage: {
         width: '100%',
         height: '100%',
-        resizeMode: 'cover',
+        resizeMode: 'cover'
     },
     featuredOverlay: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 25,
+        padding: 25
     },
     featuredName: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     featuredPrice: {
         fontSize: 16,
         marginTop: 5,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginHorizontal: 25,
-        marginBottom: 20,
+        marginBottom: 20
     },
     productRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 25,
-        marginBottom: 20,
+        marginBottom: 20
     },
     thumbnailWrapper: {
         width: 80,
         height: 80,
         borderRadius: 20,
-        overflow: 'hidden',
+        overflow: 'hidden'
     },
     thumbnail: {
         width: '100%',
         height: '100%',
-        resizeMode: 'cover',
+        resizeMode: 'cover'
     },
     productInfo: {
         flex: 1,
-        marginLeft: 15,
+        marginLeft: 15
     },
     productName: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     productCategory: {
         fontSize: 12,
         color: '#666666',
-        marginTop: 4,
+        marginTop: 4
     },
     productPrice: {
         fontSize: 15,
         fontWeight: '900',
-        marginTop: 6,
+        marginTop: 6
     },
     emptyContainer: {
         padding: 50,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     emptyText: {
         color: '#999999',
         fontSize: 15,
-        textAlign: 'center',
+        textAlign: 'center'
     },
     fab: {
         position: 'absolute',
@@ -335,15 +338,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 10,
         shadowColor: '#000000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {
+            width: 0,
+            height: 4
+        },
         shadowOpacity: 0.3,
-        shadowRadius: 5,
+        shadowRadius: 5
     },
     fabText: {
         fontSize: 12,
         fontWeight: '900',
-        letterSpacing: 1,
-    },
+        letterSpacing: 1
+    }
 });
 
+
 export default HomeScreen;
+

@@ -32,7 +32,7 @@ const RecommendationScreen = ({ navigation }) => {
         setOccasion("");
     };
 
-    const renderIntro = () => (
+    const WelcomeSection = () => (
         <View style={styles.intro}>
             <View style={styles.header}>
                 <Text style={[styles.title, { color: colors.text }]}>Where next?</Text>
@@ -55,7 +55,7 @@ const RecommendationScreen = ({ navigation }) => {
         </View>
     );
 
-    const renderResults = () => (
+    const ResultsList = () => (
         <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
             <View style={styles.header}>
                 <Text style={[styles.title, { color: colors.text }]}>Matched for {occasion}</Text>
@@ -82,13 +82,13 @@ const RecommendationScreen = ({ navigation }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f9f9f9' }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background }]}>
                 <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
                 <Appbar.Content title="Scent Discovery" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
                 {matches && <Appbar.Action icon="close" onPress={reset} color={colors.text} />}
             </Appbar.Header>
 
-            {!matches ? renderIntro() : renderResults()}
+            {!matches ? <WelcomeSection /> : <ResultsList />}
         </View>
     );
 };
@@ -104,57 +104,59 @@ const OccasionTile = ({ item, isDarkMode, themeColors, onPress }) => (
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     appbar: {
-        borderBottomWidth: 1,
+        borderBottomWidth: 0
     },
     appbarTitle: {
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 18
     },
     intro: {
         flex: 1,
-        padding: 25,
+        padding: 25
     },
     header: {
         marginBottom: 40,
-        paddingHorizontal: 5,
+        paddingHorizontal: 5
     },
     title: {
         fontSize: 32,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     subtitle: {
         fontSize: 16,
-        marginTop: 8,
+        marginTop: 8
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
     },
     tileWrapper: {
         width: '48%',
-        marginBottom: 15,
+        marginBottom: 15
     },
     tile: {
         height: 120,
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: 1
     },
     tileLabel: {
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 14
     },
     list: {
-        padding: 25,
+        padding: 25
     },
     spacer: {
-        height: 40,
-    },
+        height: 40
+    }
 });
 
+
 export default RecommendationScreen;
+

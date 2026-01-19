@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const CartContext = createContext();
 
@@ -17,28 +17,26 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
 
     const addToCart = (product, quantity = 1) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find(item => item.id === product.id);
-
-            if (existingItem) {
-                return prevItems.map(item =>
+        setCartItems(prev => {
+            const exists = prev.find(item => item.id === product.id);
+            if (exists) {
+                return prev.map(item =>
                     item.id === product.id
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
-
-            return [...prevItems, { ...product, quantity }];
+            return [...prev, { ...product, quantity }];
         });
     };
 
-    const removeFromCart = (productId) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    const removeFromCart = (id) => {
+        setCartItems(prev => prev.filter(item => item.id !== id));
     };
 
-    const updateQuantity = (productId, change) => {
-        setCartItems(prevItems => prevItems.map(item =>
-            item.id === productId
+    const updateQuantity = (id, change) => {
+        setCartItems(prev => prev.map(item =>
+            item.id === id
                 ? { ...item, quantity: Math.max(1, item.quantity + change) }
                 : item
         ));
@@ -48,24 +46,24 @@ export const CartProvider = ({ children }) => {
 
     const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const taxes = Math.round(subtotal * TAX_RATE);
-    const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    const grandTotal = subtotal + taxes + (cartItems.length > 0 ? SHIPPING_FEE : 0);
+    const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const total = subtotal + taxes + (cartItems.length > 0 ? SHIPPING_FEE : 0);
 
-    const cartValue = {
+    const value = {
         cartItems,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         getSubtotal: () => subtotal,
-        getGrandTotal: () => grandTotal,
-        getTotalItems: () => totalItems,
+        getGrandTotal: () => total,
+        getTotalItems: () => totalCount,
         taxes,
         SHIPPING_FEE
     };
 
     return (
-        <CartContext.Provider value={cartValue}>
+        <CartContext.Provider value={value}>
             {children}
         </CartContext.Provider>
     );

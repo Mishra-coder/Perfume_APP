@@ -6,16 +6,7 @@ import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 
 const CartScreen = ({ navigation }) => {
-    const {
-        cartItems,
-        removeFromCart,
-        updateQuantity,
-        getSubtotal,
-        getGrandTotal,
-        taxes,
-        SHIPPING_FEE
-    } = useCart();
-
+    const cart = useCart();
     const { user } = useUser();
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
@@ -24,17 +15,17 @@ const CartScreen = ({ navigation }) => {
         navigation.navigate(user.isLoggedIn ? 'Checkout' : 'Auth');
     };
 
-    const renderSummary = () => (
+    const SummarySection = () => (
         <Surface style={[styles.summary, { backgroundColor: colors.background, borderTopColor: isDarkMode ? '#222222' : '#f0f0f0' }]} elevation={0}>
-            <SummaryRow label="Subtotal" value={getSubtotal()} themeColors={colors} />
-            <SummaryRow label="GST (12%)" value={taxes} themeColors={colors} />
-            <SummaryRow label="Shipping" value={SHIPPING_FEE} themeColors={colors} />
+            <SummaryRow label="Subtotal" value={cart.getSubtotal()} />
+            <SummaryRow label="GST (12%)" value={cart.taxes} />
+            <SummaryRow label="Shipping" value={cart.SHIPPING_FEE} />
 
             <View style={[styles.divider, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
 
             <View style={styles.totalRow}>
                 <Text style={[styles.totalLabel, { color: colors.text }]}>Grand Total</Text>
-                <Text style={[styles.totalPrice, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{getGrandTotal()}</Text>
+                <Text style={[styles.totalPrice, { color: colors.primary }]}>₹{cart.getGrandTotal()}</Text>
             </View>
 
             <Button
@@ -49,7 +40,7 @@ const CartScreen = ({ navigation }) => {
         </Surface>
     );
 
-    const renderEmpty = () => (
+    const EmptyCart = () => (
         <View style={styles.emptyContainer}>
             <IconButton icon="cart-outline" size={80} iconColor={isDarkMode ? '#222222' : '#f0f0f0'} />
             <Text style={styles.emptyText}>Your bag is empty</Text>
@@ -64,47 +55,47 @@ const CartScreen = ({ navigation }) => {
         </View>
     );
 
+    const SummaryRow = ({ label, value }) => (
+        <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>{label}</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>₹{value}</Text>
+        </View>
+    );
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={[styles.header, { borderBottomColor: isDarkMode ? '#222222' : '#f0f0f0' }]}>
+            <View style={styles.header}>
                 <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
                 <Text style={[styles.title, { color: colors.text }]}>Shopping Bag</Text>
                 <View style={{ width: 48 }} />
             </View>
 
-            {cartItems.length > 0 ? (
+            {cart.cartItems.length > 0 ? (
                 <View style={{ flex: 1 }}>
                     <FlatList
-                        data={cartItems}
+                        data={cart.cartItems}
                         keyExtractor={item => item.id.toString()}
                         renderItem={({ item }) => (
                             <CartItem
                                 product={item}
                                 isDarkMode={isDarkMode}
                                 themeColors={colors}
-                                onRemove={() => removeFromCart(item.id)}
-                                onUpdate={(val) => updateQuantity(item.id, val)}
+                                onRemove={() => cart.removeFromCart(item.id)}
+                                onUpdate={(val) => cart.updateQuantity(item.id, val)}
                             />
                         )}
                         contentContainerStyle={styles.list}
                         showsVerticalScrollIndicator={false}
                     />
-                    {renderSummary()}
+                    <SummarySection />
                 </View>
-            ) : renderEmpty()}
+            ) : <EmptyCart />}
         </View>
     );
 };
 
-const SummaryRow = ({ label, value, themeColors }) => (
-    <View style={styles.summaryRow}>
-        <Text style={styles.summaryLabel}>{label}</Text>
-        <Text style={[styles.summaryValue, { color: themeColors.text }]}>₹{value}</Text>
-    </View>
-);
-
 const CartItem = ({ product, onRemove, onUpdate, isDarkMode, themeColors }) => (
-    <Surface style={[styles.card, { backgroundColor: themeColors.background }]} elevation={0}>
+    <Surface style={styles.card} elevation={0}>
         <Image source={product.image} style={[styles.thumb, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} />
         <View style={styles.info}>
             <View style={styles.topRow}>
@@ -135,143 +126,146 @@ const CartItem = ({ product, onRemove, onUpdate, isDarkMode, themeColors }) => (
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingTop: 50,
-        paddingHorizontal: 10,
-        borderBottomWidth: 1,
-        paddingBottom: 10,
+        paddingHorizontal: 15,
+        marginBottom: 10
     },
     title: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     list: {
-        padding: 25,
+        paddingHorizontal: 25,
+        paddingBottom: 25
     },
     card: {
         flexDirection: 'row',
         marginBottom: 25,
+        backgroundColor: 'transparent'
     },
     thumb: {
         width: 90,
         height: 90,
-        borderRadius: 15,
+        borderRadius: 15
     },
     info: {
         flex: 1,
-        marginLeft: 15,
+        marginLeft: 15
     },
     topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     name: {
         fontSize: 16,
         fontWeight: 'bold',
-        flex: 1,
+        flex: 1
     },
     meta: {
         fontSize: 12,
         color: '#999999',
-        marginTop: 2,
+        marginTop: 2
     },
     bottomRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 15,
+        marginTop: 15
     },
     itemPrice: {
         fontSize: 16,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     picker: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 10,
-        padding: 5,
+        padding: 5
     },
     pickerBtn: {
         width: 30,
         height: 30,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     pickerSymbol: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     pickerValue: {
         marginHorizontal: 12,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     summary: {
         padding: 25,
-        borderTopWidth: 1,
+        borderTopWidth: 1
     },
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 10
     },
     summaryLabel: {
         color: '#888888',
-        fontSize: 14,
+        fontSize: 14
     },
     summaryValue: {
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 14
     },
     divider: {
         height: 1,
-        marginVertical: 10,
+        marginVertical: 10
     },
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 5,
         marginBottom: 25,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     totalLabel: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
     totalPrice: {
         fontSize: 24,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     checkoutBtn: {
-        borderRadius: 15,
+        borderRadius: 15
     },
     checkoutBtnContent: {
-        height: 60,
+        height: 60
     },
     checkoutBtnLabel: {
         fontWeight: 'bold',
-        fontSize: 16,
+        fontSize: 16
     },
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 40,
+        padding: 40
     },
     emptyText: {
         fontSize: 18,
         color: '#999999',
-        marginVertical: 20,
+        marginVertical: 20
     },
     shopBtn: {
         borderRadius: 15,
-        width: '100%',
-    },
+        width: '100%'
+    }
 });
 
+
 export default CartScreen;
+

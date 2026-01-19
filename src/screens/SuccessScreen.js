@@ -17,104 +17,99 @@ const SuccessScreen = ({ navigation, route }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.center}>
-                <View style={[styles.iconBox, { backgroundColor: colors.primary }]}>
+            <View style={styles.main}>
+                <View style={[styles.check, { backgroundColor: colors.primary }]}>
                     <IconButton icon="check-bold" size={60} iconColor={isDarkMode ? '#000000' : '#ffffff'} />
                 </View>
 
-                <Text style={[styles.title, { color: colors.text }]}>Order Confirmed!</Text>
-                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
-                    Your luxury selection is being prepared. We'll notify you once it's on the way.
+                <Text style={[styles.title, { color: colors.text }]}>Order Placed!</Text>
+                <Text style={[styles.info, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                    Your luxury scent is being prepared for shipment.
                 </Text>
 
-                <View style={[styles.summary, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-                    <InfoRow label="Order ID" value={orderId} themeColors={colors} />
-                    <InfoRow label="Status" value="Processing" color={isDarkMode ? colors.primary : "#27ae60"} themeColors={colors} />
-                    <InfoRow label="Est. Delivery" value="3-5 Business Days" themeColors={colors} />
+                <View style={[styles.box, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
+                    <Row label="Order ID" val={orderId} />
+                    <Row label="Status" val="Processing" color={isDarkMode ? colors.primary : "#27ae60"} />
+                    <Row label="Delivery" val="3-5 Days" />
                 </View>
 
-                <Button
-                    mode="contained"
-                    style={[styles.btn, { backgroundColor: colors.primary }]}
-                    contentStyle={styles.btnContent}
-                    labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                    onPress={() => navigation.navigate('Main')}
-                >
-                    Return to Boutique
+                <Button mode="contained" style={styles.btn} contentStyle={styles.btnContent} labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]} onPress={() => navigation.navigate('Main')}>
+                    Continue Shopping
                 </Button>
             </View>
         </View>
     );
 };
 
-const InfoRow = ({ label, value, color, themeColors }) => (
-    <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={[styles.infoValue, { color: color || themeColors.text }]}>{value}</Text>
+const Row = ({ label, val, color }) => (
+    <View style={styles.row}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={[styles.rowVal, color && { color }]}>{val}</Text>
     </View>
 );
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
-    center: {
+    main: {
         alignItems: 'center',
-        padding: 30,
+        padding: 30
     },
-    iconBox: {
+    check: {
         width: 120,
         height: 120,
         borderRadius: 60,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 30,
-        elevation: 10,
+        marginBottom: 30
     },
     title: {
-        fontSize: 30,
+        fontSize: 32,
         fontWeight: '900',
-        marginBottom: 15,
+        marginBottom: 15
     },
-    subtitle: {
+    info: {
         fontSize: 16,
         textAlign: 'center',
         lineHeight: 24,
-        marginBottom: 40,
+        marginBottom: 40
     },
-    summary: {
+    box: {
         width: '100%',
         borderRadius: 20,
         padding: 25,
-        marginBottom: 40,
-        borderWidth: 1,
+        marginBottom: 45,
+        borderWidth: 1
     },
-    infoRow: {
+    row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 15,
+        marginBottom: 15
     },
-    infoLabel: {
+    rowLabel: {
         fontSize: 14,
         color: '#999999',
-        fontWeight: 'bold',
+        fontWeight: 'bold'
     },
-    infoValue: {
+    rowVal: {
         fontSize: 14,
-        fontWeight: '900',
+        fontWeight: '900'
     },
     btn: {
         width: '100%',
-        borderRadius: 15,
+        borderRadius: 15
     },
     btnContent: {
-        height: 60,
+        height: 60
     },
     btnLabel: {
         fontWeight: 'bold',
-        fontSize: 16,
-    },
+        fontSize: 16
+    }
 });
 
+
 export default SuccessScreen;
+
