@@ -69,9 +69,9 @@ const CheckoutScreen = ({ navigation }) => {
                 <View style={styles.section}>
                     <Text style={[styles.label, { color: colors.text }]}>Payment Method</Text>
                     <Surface style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} elevation={0}>
-                        <PaymentOption label="UPI" active={method === 'upi'} onSelect={() => setMethod('upi')} color={colors.primary} text={colors.text} />
-                        <PaymentOption label="Cash on Delivery" active={method === 'cod'} onSelect={() => setMethod('cod')} color={colors.primary} text={colors.text} />
-                        <PaymentOption label="Card" active={method === 'card'} onSelect={() => setMethod('card')} color={colors.primary} text={colors.text} />
+                        <PaymentOption label="UPI" active={method === 'upi'} onSelect={() => setMethod('upi')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
+                        <PaymentOption label="Cash on Delivery" active={method === 'cod'} onSelect={() => setMethod('cod')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
+                        <PaymentOption label="Card" active={method === 'card'} onSelect={() => setMethod('card')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
                     </Surface>
                 </View>
 
@@ -80,7 +80,20 @@ const CheckoutScreen = ({ navigation }) => {
                         <Text style={styles.summaryLabel}>Total Payable</Text>
                         <Text style={[styles.total, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{getGrandTotal()}</Text>
                     </View>
-                    <Button mode="contained" style={styles.btn} contentStyle={styles.btnContent} labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]} disabled={!isValid} onPress={handleConfirm}>
+                    <Button
+                        mode="contained"
+                        style={[
+                            styles.btn,
+                            { backgroundColor: isValid ? colors.primary : (isDarkMode ? '#333333' : '#e0e0e0') }
+                        ]}
+                        contentStyle={styles.btnContent}
+                        labelStyle={[
+                            styles.btnLabel,
+                            { color: isValid ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#666666' : '#999999') }
+                        ]}
+                        disabled={!isValid}
+                        onPress={handleConfirm}
+                    >
                         Confirm Order
                     </Button>
                 </View>
@@ -89,10 +102,20 @@ const CheckoutScreen = ({ navigation }) => {
     );
 };
 
-const PaymentOption = ({ label, active, onSelect, color, text }) => (
-    <TouchableOpacity style={styles.payRow} onPress={onSelect}>
+const PaymentOption = ({ label, active, onSelect, color, text, isDarkMode }) => (
+    <TouchableOpacity
+        style={[
+            styles.payRow,
+            active && {
+                backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)',
+                borderColor: color,
+                borderWidth: 1
+            }
+        ]}
+        onPress={onSelect}
+    >
         <RadioButton value="active" status={active ? 'checked' : 'unchecked'} color={color} onPress={onSelect} />
-        <Text style={{ color: text, marginLeft: 5 }}>{label}</Text>
+        <Text style={{ color: text, marginLeft: 5, fontWeight: active ? 'bold' : 'normal' }}>{label}</Text>
     </TouchableOpacity>
 );
 
