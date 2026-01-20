@@ -102,8 +102,15 @@ const ProductDetailScreen = ({ navigation, route }) => {
                 </View>
             </ScrollView>
 
-            <Snackbar visible={showAddedToast} onDismiss={() => setShowAddedToast(false)} duration={2000} style={styles.toast}>
-                <Text style={styles.toastText}>Successfully added to cart!</Text>
+            <Snackbar
+                visible={showAddedToast}
+                onDismiss={() => setShowAddedToast(false)}
+                duration={2000}
+                style={[styles.toast, { backgroundColor: isDarkMode ? '#f5f5f5' : '#1a1a1a' }]}
+            >
+                <Text style={[styles.toastText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
+                    Successfully added to cart!
+                </Text>
             </Snackbar>
         </View>
     );
