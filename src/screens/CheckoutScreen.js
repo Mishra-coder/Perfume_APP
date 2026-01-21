@@ -11,8 +11,8 @@ const CheckoutScreen = ({ navigation }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
-    const [method, setMethod] = useState('cod');
-    const [form, setForm] = useState({
+    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [addressForm, setAddressForm] = useState({
         name: user.name || '',
         phone: '',
         street: '',
@@ -20,103 +20,193 @@ const CheckoutScreen = ({ navigation }) => {
         zip: ''
     });
 
-    const isValid = form.name && form.phone.length === 10 && form.street && form.city && form.zip.length === 6;
+    const isFormValid =
+        addressForm.name &&
+        addressForm.phone.length === 10 &&
+        addressForm.street &&
+        addressForm.city &&
+        addressForm.zip.length === 6;
 
-    const handleConfirm = () => {
-        const id = `AL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const handleConfirmOrder = () => {
+        const orderId = `AL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
         saveOrder({
-            id,
+            id: orderId,
             items: cartItems,
             total: getGrandTotal(),
             date: new Date().toISOString(),
             status: 'Processing',
-            address: form,
-            method
+            address: addressForm,
+            method: paymentMethod
         });
-        navigation.navigate('Success', { orderId: id });
+        navigation.navigate('Success', { orderId });
     };
 
-    const update = (key, val) => {
+    const updateField = (key, value) => {
         if (['zip', 'phone'].includes(key)) {
-            const clean = val.replace(/[^0-9]/g, '');
-            if (key === 'zip' && clean.length > 6) return;
-            if (key === 'phone' && clean.length > 10) return;
-            setForm(prev => ({ ...prev, [key]: clean }));
+            const cleanValue = value.replace(/[^0-9]/g, '');
+            if (key === 'zip' && cleanValue.length > 6) return;
+            if (key === 'phone' && cleanValue.length > 10) return;
+            setAddressForm(prev => ({ ...prev, [key]: cleanValue }));
             return;
         }
-        setForm(prev => ({ ...prev, [key]: val }));
+        setAddressForm(prev => ({ ...prev, [key]: value }));
     };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f0f0f0' }]}>
                 <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
-                <Appbar.Content title="Checkout" titleStyle={[styles.title, { color: colors.text }]} />
+                <Appbar.Content title="Checkout" titleStyle={[styles.headerTitle, { color: colors.text }]} />
             </Appbar.Header>
 
-            <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                <View style={styles.section}>
-                    <Text style={[styles.label, { color: colors.text }]}>Shipping Address</Text>
-                    <TextInput label="Name" value={form.name} onChangeText={t => update('name', t)} mode="outlined" style={styles.input} activeOutlineColor={colors.primary} />
-                    <TextInput label="Phone" value={form.phone} onChangeText={t => update('phone', t)} mode="outlined" keyboardType="phone-pad" style={styles.input} activeOutlineColor={colors.primary} />
-                    <TextInput label="Street" value={form.street} onChangeText={t => update('street', t)} mode="outlined" style={styles.input} activeOutlineColor={colors.primary} />
-                    <View style={styles.row}>
-                        <TextInput label="City" value={form.city} onChangeText={t => update('city', t)} mode="outlined" style={[styles.input, { flex: 1.5, marginRight: 10 }]} activeOutlineColor={colors.primary} />
-                        <TextInput label="Zip" value={form.zip} onChangeText={t => update('zip', t)} mode="outlined" keyboardType="number-pad" style={[styles.input, { flex: 1 }]} activeOutlineColor={colors.primary} />
-                    </View>
-                </View>
+            <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
+                <AddressForm
+                    form={addressForm}
+                    onUpdate={updateField}
+                    colors={colors}
+                />
 
-                <View style={styles.section}>
-                    <Text style={[styles.label, { color: colors.text }]}>Payment Method</Text>
-                    <Surface style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} elevation={0}>
-                        <PaymentOption label="UPI" active={method === 'upi'} onSelect={() => setMethod('upi')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
-                        <PaymentOption label="Cash on Delivery" active={method === 'cod'} onSelect={() => setMethod('cod')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
-                        <PaymentOption label="Card" active={method === 'card'} onSelect={() => setMethod('card')} color={colors.primary} text={colors.text} isDarkMode={isDarkMode} />
-                    </Surface>
-                </View>
+                <PaymentSection
+                    selectedMethod={paymentMethod}
+                    onSelect={setPaymentMethod}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
 
-                <View style={styles.footer}>
-                    <View style={styles.summary}>
-                        <Text style={styles.summaryLabel}>Total Payable</Text>
-                        <Text style={[styles.total, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{getGrandTotal()}</Text>
-                    </View>
-                    <Button
-                        mode="contained"
-                        style={[
-                            styles.btn,
-                            { backgroundColor: isValid ? colors.primary : (isDarkMode ? '#333333' : '#e0e0e0') }
-                        ]}
-                        contentStyle={styles.btnContent}
-                        labelStyle={[
-                            styles.btnLabel,
-                            { color: isValid ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#666666' : '#999999') }
-                        ]}
-                        disabled={!isValid}
-                        onPress={handleConfirm}
-                    >
-                        Confirm Order
-                    </Button>
-                </View>
+                <OrderFooter
+                    total={getGrandTotal()}
+                    isValid={isFormValid}
+                    onConfirm={handleConfirmOrder}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
             </ScrollView>
         </View>
     );
 };
 
-const PaymentOption = ({ label, active, onSelect, color, text, isDarkMode }) => (
+const AddressForm = ({ form, onUpdate, colors }) => (
+    <View style={styles.sectionContainer}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>Shipping Address</Text>
+        <TextInput
+            label="Name"
+            value={form.name}
+            onChangeText={t => onUpdate('name', t)}
+            mode="outlined"
+            style={styles.inputField}
+            activeOutlineColor={colors.primary}
+        />
+        <TextInput
+            label="Phone"
+            value={form.phone}
+            onChangeText={t => onUpdate('phone', t)}
+            mode="outlined"
+            keyboardType="phone-pad"
+            style={styles.inputField}
+            activeOutlineColor={colors.primary}
+        />
+        <TextInput
+            label="Street"
+            value={form.street}
+            onChangeText={t => onUpdate('street', t)}
+            mode="outlined"
+            style={styles.inputField}
+            activeOutlineColor={colors.primary}
+        />
+        <View style={styles.rowContainer}>
+            <TextInput
+                label="City"
+                value={form.city}
+                onChangeText={t => onUpdate('city', t)}
+                mode="outlined"
+                style={[styles.inputField, { flex: 1.5, marginRight: 10 }]}
+                activeOutlineColor={colors.primary}
+            />
+            <TextInput
+                label="Zip"
+                value={form.zip}
+                onChangeText={t => onUpdate('zip', t)}
+                mode="outlined"
+                keyboardType="number-pad"
+                style={[styles.inputField, { flex: 1 }]}
+                activeOutlineColor={colors.primary}
+            />
+        </View>
+    </View>
+);
+
+const PaymentSection = ({ selectedMethod, onSelect, isDarkMode, colors }) => (
+    <View style={styles.sectionContainer}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>Payment Method</Text>
+        <Surface style={[styles.paymentCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} elevation={0}>
+            <PaymentOption
+                label="UPI"
+                value="upi"
+                active={selectedMethod === 'upi'}
+                onSelect={onSelect}
+                colors={colors}
+                isDarkMode={isDarkMode}
+            />
+            <PaymentOption
+                label="Cash on Delivery"
+                value="cod"
+                active={selectedMethod === 'cod'}
+                onSelect={onSelect}
+                colors={colors}
+                isDarkMode={isDarkMode}
+            />
+            <PaymentOption
+                label="Card"
+                value="card"
+                active={selectedMethod === 'card'}
+                onSelect={onSelect}
+                colors={colors}
+                isDarkMode={isDarkMode}
+            />
+        </Surface>
+    </View>
+);
+
+const PaymentOption = ({ label, value, active, onSelect, colors, isDarkMode }) => (
     <TouchableOpacity
         style={[
-            styles.payRow,
+            styles.paymentOptionRow,
             active && {
-                backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 215, 0, 0.1)',
-                borderColor: color,
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                borderColor: colors.primary,
                 borderWidth: 1
             }
         ]}
-        onPress={onSelect}
+        onPress={() => onSelect(value)}
     >
-        <RadioButton value="active" status={active ? 'checked' : 'unchecked'} color={color} onPress={onSelect} />
-        <Text style={{ color: text, marginLeft: 5, fontWeight: active ? 'bold' : 'normal' }}>{label}</Text>
+        <RadioButton value={value} status={active ? 'checked' : 'unchecked'} color={colors.primary} onPress={() => onSelect(value)} />
+        <Text style={{ color: colors.text, marginLeft: 5, fontWeight: active ? 'bold' : 'normal' }}>{label}</Text>
     </TouchableOpacity>
+);
+
+const OrderFooter = ({ total, isValid, onConfirm, isDarkMode, colors }) => (
+    <View style={styles.footerContainer}>
+        <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Total Payable</Text>
+            <Text style={[styles.totalAmount, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{total}</Text>
+        </View>
+        <Button
+            mode="contained"
+            style={[
+                styles.confirmButton,
+                { backgroundColor: isValid ? colors.primary : (isDarkMode ? '#333333' : '#e0e0e0') }
+            ]}
+            contentStyle={styles.confirmButtonContent}
+            labelStyle={[
+                styles.confirmButtonLabel,
+                { color: isValid ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#666666' : '#999999') }
+            ]}
+            disabled={!isValid}
+            onPress={onConfirm}
+        >
+            Confirm Order
+        </Button>
+    </View>
 );
 
 const styles = StyleSheet.create({
@@ -126,42 +216,42 @@ const styles = StyleSheet.create({
     appbar: {
         borderBottomWidth: 1
     },
-    title: {
+    headerTitle: {
         fontWeight: 'bold'
     },
-    scroll: {
+    contentContainer: {
         flex: 1,
         padding: 25
     },
-    section: {
+    sectionContainer: {
         marginBottom: 35
     },
-    label: {
+    sectionLabel: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 20
     },
-    input: {
+    inputField: {
         marginBottom: 15,
         backgroundColor: 'transparent'
     },
-    row: {
+    rowContainer: {
         flexDirection: 'row'
     },
-    card: {
+    paymentCard: {
         borderRadius: 15,
         padding: 5
     },
-    payRow: {
+    paymentOptionRow: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 12
     },
-    footer: {
+    footerContainer: {
         marginTop: 10,
         paddingBottom: 60
     },
-    summary: {
+    summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 25,
@@ -171,22 +261,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#666666'
     },
-    total: {
+    totalAmount: {
         fontSize: 26,
         fontWeight: '900'
     },
-    btn: {
+    confirmButton: {
         borderRadius: 15
     },
-    btnContent: {
+    confirmButtonContent: {
         height: 60
     },
-    btnLabel: {
+    confirmButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
     }
 });
 
-
 export default CheckoutScreen;
-

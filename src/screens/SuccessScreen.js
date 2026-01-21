@@ -17,23 +17,29 @@ const SuccessScreen = ({ navigation, route }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.main}>
-                <View style={[styles.check, { backgroundColor: colors.primary }]}>
+            <View style={styles.contentContainer}>
+                <View style={[styles.successIconContainer, { backgroundColor: colors.primary }]}>
                     <IconButton icon="check-bold" size={60} iconColor={isDarkMode ? '#000000' : '#ffffff'} />
                 </View>
 
                 <Text style={[styles.title, { color: colors.text }]}>Order Placed!</Text>
-                <Text style={[styles.info, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                <Text style={[styles.message, { color: isDarkMode ? '#888888' : '#666666' }]}>
                     Your luxury scent is being prepared for shipment.
                 </Text>
 
-                <View style={[styles.box, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-                    <Row label="Order ID" val={orderId} />
-                    <Row label="Status" val="Processing" color={isDarkMode ? colors.primary : "#27ae60"} />
-                    <Row label="Delivery" val="3-5 Days" />
+                <View style={[styles.detailsBox, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
+                    <DetailRow label="Order ID" value={orderId} />
+                    <DetailRow label="Status" value="Processing" color={isDarkMode ? colors.primary : "#27ae60"} />
+                    <DetailRow label="Delivery" value="3-5 Days" />
                 </View>
 
-                <Button mode="contained" style={styles.btn} contentStyle={styles.btnContent} labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]} onPress={() => navigation.navigate('Main')}>
+                <Button
+                    mode="contained"
+                    style={styles.continueButton}
+                    contentStyle={styles.continueButtonContent}
+                    labelStyle={[styles.continueButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                    onPress={() => navigation.navigate('Main')}
+                >
                     Continue Shopping
                 </Button>
             </View>
@@ -41,10 +47,10 @@ const SuccessScreen = ({ navigation, route }) => {
     );
 };
 
-const Row = ({ label, val, color }) => (
+const DetailRow = ({ label, value, color }) => (
     <View style={styles.row}>
         <Text style={styles.rowLabel}>{label}</Text>
-        <Text style={[styles.rowVal, color && { color }]}>{val}</Text>
+        <Text style={[styles.rowValue, color && { color }]}>{value}</Text>
     </View>
 );
 
@@ -53,11 +59,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center'
     },
-    main: {
+    contentContainer: {
         alignItems: 'center',
         padding: 30
     },
-    check: {
+    successIconContainer: {
         width: 120,
         height: 120,
         borderRadius: 60,
@@ -70,13 +76,13 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         marginBottom: 15
     },
-    info: {
+    message: {
         fontSize: 16,
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 40
     },
-    box: {
+    detailsBox: {
         width: '100%',
         borderRadius: 20,
         padding: 25,
@@ -93,23 +99,21 @@ const styles = StyleSheet.create({
         color: '#999999',
         fontWeight: 'bold'
     },
-    rowVal: {
+    rowValue: {
         fontSize: 14,
         fontWeight: '900'
     },
-    btn: {
+    continueButton: {
         width: '100%',
         borderRadius: 15
     },
-    btnContent: {
+    continueButtonContent: {
         height: 60
     },
-    btnLabel: {
+    continueButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
     }
 });
 
-
 export default SuccessScreen;
-

@@ -6,7 +6,16 @@ import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 
 const CartScreen = ({ navigation }) => {
-    const cart = useCart();
+    const {
+        cartItems,
+        removeFromCart,
+        updateQuantity,
+        subtotal,
+        taxAmount,
+        shipping,
+        finalTotal
+    } = useCart();
+
     const { user } = useUser();
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
@@ -15,113 +24,138 @@ const CartScreen = ({ navigation }) => {
         navigation.navigate(user.isLoggedIn ? 'Checkout' : 'Auth');
     };
 
-    const SummarySection = () => (
-        <Surface style={[styles.summary, { backgroundColor: colors.background, borderTopColor: isDarkMode ? '#222222' : '#f0f0f0' }]} elevation={0}>
-            <SummaryRow label="Subtotal" value={cart.getSubtotal()} />
-            <SummaryRow label="GST (12%)" value={cart.taxes} />
-            <SummaryRow label="Shipping" value={cart.SHIPPING_FEE} />
+    if (cartItems.length === 0) {
+        return <EmptyState navigation={navigation} isDarkMode={isDarkMode} colors={colors} />;
+    }
 
-            <View style={[styles.divider, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
+    return (
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <CartHeader navigation={navigation} colors={colors} />
 
-            <View style={styles.totalRow}>
-                <Text style={[styles.totalLabel, { color: colors.text }]}>Grand Total</Text>
-                <Text style={[styles.totalPrice, { color: colors.primary }]}>₹{cart.getGrandTotal()}</Text>
+            <View style={styles.contentContainer}>
+                <FlatList
+                    data={cartItems}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <CartItem
+                            product={item}
+                            isDarkMode={isDarkMode}
+                            themeColors={colors}
+                            onRemove={() => removeFromCart(item.id)}
+                            onUpdateQuantity={(val) => updateQuantity(item.id, val)}
+                        />
+                    )}
+                    contentContainerStyle={styles.listContainer}
+                    showsVerticalScrollIndicator={false}
+                />
+
+                <OrderSummary
+                    subtotal={subtotal}
+                    tax={taxAmount}
+                    shipping={shipping}
+                    total={finalTotal}
+                    onCheckout={handleCheckout}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
             </View>
-
-            <Button
-                mode="contained"
-                style={[styles.checkoutBtn, { backgroundColor: colors.primary }]}
-                contentStyle={styles.checkoutBtnContent}
-                labelStyle={[styles.checkoutBtnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                onPress={handleCheckout}
-            >
-                Proceed to Checkout
-            </Button>
-        </Surface>
+        </View>
     );
+};
 
-    const EmptyCart = () => (
+const CartHeader = ({ navigation, colors }) => (
+    <View style={styles.header}>
+        <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Shopping Bag</Text>
+        <View style={styles.headerSpacer} />
+    </View>
+);
+
+const EmptyState = ({ navigation, isDarkMode, colors }) => (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <CartHeader navigation={navigation} colors={colors} />
         <View style={styles.emptyContainer}>
             <IconButton icon="cart-outline" size={80} iconColor={isDarkMode ? '#222222' : '#f0f0f0'} />
             <Text style={styles.emptyText}>Your bag is empty</Text>
             <Button
                 mode="outlined"
                 onPress={() => navigation.navigate('Main')}
-                style={[styles.shopBtn, { borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}
+                style={[styles.shopButton, { borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]}
                 textColor={colors.text}
             >
                 Start Shopping
             </Button>
         </View>
-    );
+    </View>
+);
 
-    const SummaryRow = ({ label, value }) => (
-        <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>{label}</Text>
-            <Text style={[styles.summaryValue, { color: colors.text }]}>₹{value}</Text>
-        </View>
-    );
-
-    return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.header}>
-                <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
-                <Text style={[styles.title, { color: colors.text }]}>Shopping Bag</Text>
-                <View style={{ width: 48 }} />
-            </View>
-
-            {cart.cartItems.length > 0 ? (
-                <View style={{ flex: 1 }}>
-                    <FlatList
-                        data={cart.cartItems}
-                        keyExtractor={item => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <CartItem
-                                product={item}
-                                isDarkMode={isDarkMode}
-                                themeColors={colors}
-                                onRemove={() => cart.removeFromCart(item.id)}
-                                onUpdate={(val) => cart.updateQuantity(item.id, val)}
-                            />
-                        )}
-                        contentContainerStyle={styles.list}
-                        showsVerticalScrollIndicator={false}
-                    />
-                    <SummarySection />
-                </View>
-            ) : <EmptyCart />}
-        </View>
-    );
-};
-
-const CartItem = ({ product, onRemove, onUpdate, isDarkMode, themeColors }) => (
-    <Surface style={styles.card} elevation={0}>
-        <Image source={product.image} style={[styles.thumb, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} />
-        <View style={styles.info}>
-            <View style={styles.topRow}>
-                <Text style={[styles.name, { color: themeColors.text }]} numberOfLines={1}>{product.name}</Text>
+const CartItem = ({ product, onRemove, onUpdateQuantity, isDarkMode, themeColors }) => (
+    <Surface style={styles.itemCard} elevation={0}>
+        <Image
+            source={product.image}
+            style={[styles.itemImage, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}
+        />
+        <View style={styles.itemInfo}>
+            <View style={styles.itemHeader}>
+                <Text style={[styles.itemName, { color: themeColors.text }]} numberOfLines={1}>
+                    {product.name}
+                </Text>
                 <TouchableOpacity onPress={onRemove}>
                     <IconButton icon="delete-outline" size={20} iconColor={isDarkMode ? '#444444' : '#cccccc'} />
                 </TouchableOpacity>
             </View>
-            <Text style={styles.meta}>{product.category} • 200ml</Text>
-            <View style={styles.bottomRow}>
+
+            <Text style={styles.itemMeta}>{product.category} • 200ml</Text>
+
+            <View style={styles.itemFooter}>
                 <Text style={[styles.itemPrice, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>
                     ₹{product.price * product.quantity}
                 </Text>
 
-                <View style={[styles.picker, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
-                    <TouchableOpacity style={styles.pickerBtn} onPress={() => onUpdate(-1)}>
-                        <Text style={[styles.pickerSymbol, { color: themeColors.text }]}>−</Text>
+                <View style={[styles.quantitySelector, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
+                    <TouchableOpacity style={styles.quantityBtn} onPress={() => onUpdateQuantity(-1)}>
+                        <Text style={[styles.quantityBtnText, { color: themeColors.text }]}>−</Text>
                     </TouchableOpacity>
-                    <Text style={[styles.pickerValue, { color: themeColors.text }]}>{product.quantity}</Text>
-                    <TouchableOpacity style={styles.pickerBtn} onPress={() => onUpdate(1)}>
-                        <Text style={[styles.pickerSymbol, { color: themeColors.text }]}>+</Text>
+                    <Text style={[styles.quantityValue, { color: themeColors.text }]}>{product.quantity}</Text>
+                    <TouchableOpacity style={styles.quantityBtn} onPress={() => onUpdateQuantity(1)}>
+                        <Text style={[styles.quantityBtnText, { color: themeColors.text }]}>+</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         </View>
     </Surface>
+);
+
+const OrderSummary = ({ subtotal, tax, shipping, total, onCheckout, isDarkMode, colors }) => (
+    <Surface style={[styles.summaryContainer, { backgroundColor: colors.background, borderTopColor: isDarkMode ? '#222222' : '#f0f0f0' }]} elevation={0}>
+        <SummaryRow label="Subtotal" value={subtotal} colors={colors} />
+        <SummaryRow label="GST (12%)" value={tax} colors={colors} />
+        <SummaryRow label="Shipping" value={shipping} colors={colors} />
+
+        <View style={[styles.divider, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
+
+        <View style={styles.totalRow}>
+            <Text style={[styles.totalLabel, { color: colors.text }]}>Grand Total</Text>
+            <Text style={[styles.totalValue, { color: colors.primary }]}>₹{total}</Text>
+        </View>
+
+        <Button
+            mode="contained"
+            style={[styles.checkoutButton, { backgroundColor: colors.primary }]}
+            contentStyle={styles.checkoutButtonContent}
+            labelStyle={[styles.checkoutButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+            onPress={onCheckout}
+        >
+            Proceed to Checkout
+        </Button>
+    </Surface>
+);
+
+const SummaryRow = ({ label, value, colors }) => (
+    <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>{label}</Text>
+        <Text style={[styles.summaryValue, { color: colors.text }]}>₹{value}</Text>
+    </View>
 );
 
 const styles = StyleSheet.create({
@@ -136,44 +170,50 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         marginBottom: 10
     },
-    title: {
+    headerTitle: {
         fontSize: 18,
         fontWeight: 'bold'
     },
-    list: {
+    headerSpacer: {
+        width: 48
+    },
+    contentContainer: {
+        flex: 1
+    },
+    listContainer: {
         paddingHorizontal: 25,
         paddingBottom: 25
     },
-    card: {
+    itemCard: {
         flexDirection: 'row',
         marginBottom: 25,
         backgroundColor: 'transparent'
     },
-    thumb: {
+    itemImage: {
         width: 90,
         height: 90,
         borderRadius: 15
     },
-    info: {
+    itemInfo: {
         flex: 1,
         marginLeft: 15
     },
-    topRow: {
+    itemHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-    name: {
+    itemName: {
         fontSize: 16,
         fontWeight: 'bold',
         flex: 1
     },
-    meta: {
+    itemMeta: {
         fontSize: 12,
         color: '#999999',
         marginTop: 2
     },
-    bottomRow: {
+    itemFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -183,27 +223,27 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '900'
     },
-    picker: {
+    quantitySelector: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 10,
         padding: 5
     },
-    pickerBtn: {
+    quantityBtn: {
         width: 30,
         height: 30,
         justifyContent: 'center',
         alignItems: 'center'
     },
-    pickerSymbol: {
+    quantityBtnText: {
         fontSize: 18,
         fontWeight: 'bold'
     },
-    pickerValue: {
+    quantityValue: {
         marginHorizontal: 12,
         fontWeight: 'bold'
     },
-    summary: {
+    summaryContainer: {
         padding: 25,
         borderTopWidth: 1
     },
@@ -235,17 +275,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold'
     },
-    totalPrice: {
+    totalValue: {
         fontSize: 24,
         fontWeight: '900'
     },
-    checkoutBtn: {
+    checkoutButton: {
         borderRadius: 15
     },
-    checkoutBtnContent: {
+    checkoutButtonContent: {
         height: 60
     },
-    checkoutBtnLabel: {
+    checkoutButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
     },
@@ -260,12 +300,10 @@ const styles = StyleSheet.create({
         color: '#999999',
         marginVertical: 20
     },
-    shopBtn: {
+    shopButton: {
         borderRadius: 15,
         width: '100%'
     }
 });
 
-
 export default CartScreen;
-
