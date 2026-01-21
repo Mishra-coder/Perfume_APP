@@ -2,31 +2,32 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ThemeContext = createContext();
-
-const STORAGE_KEY = 'aroma_luxe_user_theme';
+const THEME_STORAGE_KEY = 'aroma_luxe_theme_preference';
 
 export const ThemeProvider = ({ children }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
-        const load = async () => {
+        const loadTheme = async () => {
             try {
-                const saved = await AsyncStorage.getItem(STORAGE_KEY);
-                if (saved) setIsDarkMode(saved === 'dark');
-            } catch (err) {
-                console.error(err);
+                const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+                if (savedTheme !== null) {
+                    setIsDarkMode(savedTheme === 'dark');
+                }
+            } catch (error) {
+                console.log('Error loading theme:', error);
             }
         };
-        load();
+        loadTheme();
     }, []);
 
     const toggleTheme = async () => {
-        const next = !isDarkMode;
-        setIsDarkMode(next);
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
         try {
-            await AsyncStorage.setItem(STORAGE_KEY, next ? 'dark' : 'light');
-        } catch (err) {
-            console.error(err);
+            await AsyncStorage.setItem(THEME_STORAGE_KEY, newMode ? 'dark' : 'light');
+        } catch (error) {
+            console.log('Error saving theme:', error);
         }
     };
 
@@ -37,4 +38,10 @@ export const ThemeProvider = ({ children }) => {
     );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+    const context = useContext(ThemeContext);
+    if (!context) {
+        throw new Error('useTheme must be used within a ThemeProvider');
+    }
+    return context;
+};
