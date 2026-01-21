@@ -2,6 +2,119 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserContext = createContext();
+const USER_STORAGE_KEY = 'aroma_luxe_user_data';
+
+export const UserProvider = ({ children }) => {
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+        isLoggedIn: false,
+        favoriteOccasions: [],
+        orders: [],
+        wishlist: []
+    });
+
+    useEffect(() => {
+        const loadUserData = async () => {
+            try {
+                const storedData = await AsyncStorage.getItem(USER_STORAGE_KEY);
+                if (storedData) {
+                    const parsedData = JSON.parse(storedData);
+                    setUserData(currentData => ({
+                        ...currentData,
+                        ...parsedData,
+                        wishlist: parsedData.wishlist || [],
+                        orders: parsedData.orders || [],
+                        favoriteOccasions: parsedData.favoriteOccasions || []
+                    }));
+                }
+            } catch (error) {
+                console.log('Failed to load user data:', error);
+            }
+        };
+        loadUserData();
+    }, []);
+
+    const saveUserData = async (newData) => {
+        setUserData(newData);
+        try {
+            await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newData));
+        } catch (error) {
+            console.log('Failed to save user data:', error);
+        }
+    };
+
+    const loginUser = (userProfile) => {
+        saveUserData({
+            ...userData,
+            ...userProfile,
+            isLoggedIn: true
+        });
+    };
+
+    const logoutUser = () => {
+        saveUserData({
+            name: '',
+            email: '',
+            isLoggedIn: false,
+            favoriteOccasions: [],
+            orders: userData.orders,
+            wishlist: []
+        });
+    };
+
+    const updateUserProfile = (name, favoriteOccasions = []) => {
+        saveUserData({
+            ...userData,
+            name,
+            favoriteOccasions
+        });
+    };
+
+    const saveNewOrder = (order) => {
+        saveUserData({
+            ...userData,
+            orders: [order, ...userData.orders]
+        });
+    };
+
+    const toggleWishlistItem = (product) => {
+        const currentWishlist = userData.wishlist || [];
+        const isAlreadyInWishlist = currentWishlist.some(item => item.id === product.id);
+
+        let updatedWishlist;
+        if (isAlreadyInWishlist) {
+            updatedWishlist = currentWishlist.filter(item => item.id !== product.id);
+        } else {
+            updatedWishlist = [...currentWishlist, product];
+        }
+
+        saveUserData({
+            ...userData,
+            wishlist: updatedWishlist
+        });
+    };
+
+    const checkIsItemInWishlist = (productId) => {
+        return (userData.wishlist || []).some(item => item.id === productId);
+    };
+
+    const contextValue = {
+        user: userData,
+        login: loginUser,
+        logout: logoutUser,
+        setUserProfile: updateUserProfile,
+        saveOrder: saveNewOrder,
+        toggleWishlist: toggleWishlistItem,
+        isInWishlist: checkIsItemInWishlist
+    };
+
+    return (
+        <UserContext.Provider value={contextValue}>
+            {children}
+        </UserContext.Provider>
+    );
+};
 
 export const useUser = () => {
     const context = useContext(UserContext);
@@ -10,110 +123,3 @@ export const useUser = () => {
     }
     return context;
 };
-
-const STORAGE_KEY = 'aroma_luxe_user_session';
-
-export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState({
-        name: '',
-        email: '',
-        favoriteOccasions: [],
-        orders: [],
-        wishlist: [],
-        isLoggedIn: false
-    });
-
-    useEffect(() => {
-        const loadSession = async () => {
-            try {
-                const stored = await AsyncStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    setUser(prev => ({
-                        ...prev,
-                        ...parsed,
-                        wishlist: parsed.wishlist || [],
-                        orders: parsed.orders || [],
-                        favoriteOccasions: parsed.favoriteOccasions || []
-                    }));
-                }
-            } catch (error) {
-                console.error('Error loading session:', error);
-            }
-        };
-        loadSession();
-    }, []);
-
-    const saveSession = async (updatedUser) => {
-        setUser(updatedUser);
-        try {
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
-        } catch (error) {
-            console.error('Error saving session:', error);
-        }
-    };
-
-    const login = (profile) => {
-        saveSession({
-            ...user,
-            ...profile,
-            isLoggedIn: true
-        });
-    };
-
-    const logout = () => {
-        saveSession({
-            name: '',
-            email: '',
-            favoriteOccasions: [],
-            orders: user.orders,
-            wishlist: [],
-            isLoggedIn: false
-        });
-    };
-
-    const updateProfile = (name, favoriteOccasions = []) => {
-        saveSession({
-            ...user,
-            name,
-            favoriteOccasions
-        });
-    };
-
-    const addOrder = (order) => {
-        saveSession({
-            ...user,
-            orders: [order, ...user.orders]
-        });
-    };
-
-    const toggleWishlist = (product) => {
-        const currentWishlist = user.wishlist || [];
-        const exists = currentWishlist.find(item => item.id === product.id);
-        const updatedWishlist = exists
-            ? currentWishlist.filter(item => item.id !== product.id)
-            : [...currentWishlist, product];
-
-        saveSession({
-            ...user,
-            wishlist: updatedWishlist
-        });
-    };
-
-    const value = {
-        user,
-        login,
-        logout,
-        setUserProfile: updateProfile,
-        saveOrder: addOrder,
-        toggleWishlist,
-        isInWishlist: (productId) => (user.wishlist || []).some(item => item.id === productId)
-    };
-
-    return (
-        <UserContext.Provider value={value}>
-            {children}
-        </UserContext.Provider>
-    );
-};
-
