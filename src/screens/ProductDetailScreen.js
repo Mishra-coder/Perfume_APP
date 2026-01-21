@@ -15,100 +15,75 @@ const ProductDetailScreen = ({ navigation, route }) => {
     const { toggleWishlist, isInWishlist } = useUser();
 
     const [quantity, setQuantity] = useState(1);
-    const [showAddedToast, setShowAddedToast] = useState(false);
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
     const [activeImage, setActiveImage] = useState(product.image);
 
-    const handleAdd = () => {
+    const handleAddToCart = () => {
         addToCart(product, quantity);
-        setShowAddedToast(true);
+        setIsSnackbarVisible(true);
     };
 
-    const isFavorite = isInWishlist(product.id);
+    const isProductInWishlist = isInWishlist(product.id);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.header}>
-                <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
-                <View style={styles.headerActions}>
-                    <IconButton
-                        icon={isFavorite ? "heart" : "heart-outline"}
-                        size={24}
-                        iconColor={isFavorite ? colors.primary : colors.text}
-                        onPress={() => toggleWishlist(product)}
-                    />
-                    <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.cartIcon}>
-                        <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
-                        {getTotalItems() > 0 && (
-                            <Badge style={[styles.badge, { backgroundColor: colors.primary, color: isDarkMode ? '#000000' : '#ffffff' }]} size={18}>
-                                {getTotalItems()}
-                            </Badge>
-                        )}
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <Header
+                navigation={navigation}
+                isFavorite={isProductInWishlist}
+                onToggleWishlist={() => toggleWishlist(product)}
+                cartItemCount={getTotalItems()}
+                isDarkMode={isDarkMode}
+                colors={colors}
+            />
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <View style={[styles.imageSection, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
-                    <Image source={activeImage} style={styles.heroImage} />
-                    <View style={[styles.gallery, { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.7)' }]}>
-                        {[product.image, product.image, product.image].map((img, i) => (
-                            <TouchableOpacity
-                                key={i}
-                                style={[styles.thumbnail, activeImage === img && { borderColor: colors.primary }]}
-                                onPress={() => setActiveImage(img)}
-                            >
-                                <Image source={img} style={styles.thumbnailImg} />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
+                <ImageGallery
+                    activeImage={activeImage}
+                    images={[product.image, product.image, product.image]}
+                    onSelectImage={setActiveImage}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
 
-                <View style={[styles.detailsSection, { backgroundColor: colors.background }]}>
-                    <View style={styles.titleRow}>
-                        <View style={styles.brandInfo}>
-                            <Text style={[styles.name, { color: colors.text }]}>{product.name}</Text>
-                            <Text style={styles.specs}>{product.category} • Eau De Parfum</Text>
-                        </View>
-                        <Text style={[styles.price, { color: isDarkMode ? colors.primary : '#000000' }]}>₹{product.price}</Text>
-                    </View>
+                <View style={[styles.detailsContainer, { backgroundColor: colors.background }]}>
+                    <ProductHeader
+                        name={product.name}
+                        category={product.category}
+                        price={product.price}
+                        isDarkMode={isDarkMode}
+                        colors={colors}
+                    />
 
-                    <Rating themeColors={colors} isDarkMode={isDarkMode} />
+                    <RatingSection isDarkMode={isDarkMode} colors={colors} />
 
-                    <Text style={[styles.sectionLabel, { color: colors.text }]}>The Scent Profile</Text>
-                    <Text style={[styles.description, { color: isDarkMode ? '#aaaaaa' : '#666666' }]}>{product.description}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>The Scent Profile</Text>
+                    <Text style={[styles.description, { color: isDarkMode ? '#aaaaaa' : '#666666' }]}>
+                        {product.description}
+                    </Text>
 
-                    <View style={styles.quantityRow}>
-                        <Text style={[styles.quantityLabel, { color: colors.text }]}>Quantity</Text>
-                        <View style={[styles.counter, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
-                            <TouchableOpacity onPress={() => setQuantity(q => Math.max(1, q - 1))} style={styles.counterBtn}>
-                                <Text style={[styles.counterSymbol, { color: colors.text }]}>−</Text>
-                            </TouchableOpacity>
-                            <Text style={[styles.countValue, { color: colors.text }]}>{quantity}</Text>
-                            <TouchableOpacity onPress={() => setQuantity(q => q + 1)} style={styles.counterBtn}>
-                                <Text style={[styles.counterSymbol, { color: colors.text }]}>+</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <QuantitySelector
+                        quantity={quantity}
+                        onIncrease={() => setQuantity(q => q + 1)}
+                        onDecrease={() => setQuantity(q => Math.max(1, q - 1))}
+                        isDarkMode={isDarkMode}
+                        colors={colors}
+                    />
 
-                    <Button
-                        mode="contained"
-                        style={[styles.buyBtn, { backgroundColor: colors.primary }]}
-                        contentStyle={styles.buyBtnContent}
-                        labelStyle={[styles.buyBtnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                        onPress={handleAdd}
-                    >
-                        Add to Cart
-                    </Button>
+                    <AddToCartButton
+                        onPress={handleAddToCart}
+                        isDarkMode={isDarkMode}
+                        colors={colors}
+                    />
                 </View>
             </ScrollView>
 
             <Snackbar
-                visible={showAddedToast}
-                onDismiss={() => setShowAddedToast(false)}
+                visible={isSnackbarVisible}
+                onDismiss={() => setIsSnackbarVisible(false)}
                 duration={2000}
-                style={[styles.toast, { backgroundColor: isDarkMode ? '#f5f5f5' : '#1a1a1a' }]}
+                style={[styles.snackbar, { backgroundColor: isDarkMode ? '#f5f5f5' : '#1a1a1a' }]}
             >
-                <Text style={[styles.toastText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
+                <Text style={[styles.snackbarText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
                     Successfully added to cart!
                 </Text>
             </Snackbar>
@@ -116,15 +91,91 @@ const ProductDetailScreen = ({ navigation, route }) => {
     );
 };
 
-const Rating = ({ themeColors, isDarkMode }) => (
-    <View style={styles.rating}>
-        <View style={styles.stars}>
+const Header = ({ navigation, isFavorite, onToggleWishlist, cartItemCount, isDarkMode, colors }) => (
+    <View style={styles.header}>
+        <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
+        <View style={styles.headerRight}>
+            <IconButton
+                icon={isFavorite ? "heart" : "heart-outline"}
+                size={24}
+                iconColor={isFavorite ? colors.primary : colors.text}
+                onPress={onToggleWishlist}
+            />
+            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.cartButton}>
+                <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
+                {cartItemCount > 0 && (
+                    <Badge style={[styles.badge, { backgroundColor: colors.primary, color: isDarkMode ? '#000000' : '#ffffff' }]} size={18}>
+                        {cartItemCount}
+                    </Badge>
+                )}
+            </TouchableOpacity>
+        </View>
+    </View>
+);
+
+const ImageGallery = ({ activeImage, images, onSelectImage, isDarkMode, colors }) => (
+    <View style={[styles.galleryContainer, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
+        <Image source={activeImage} style={styles.mainImage} />
+        <View style={[styles.thumbnailsRow, { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.7)' }]}>
+            {images.map((img, index) => (
+                <TouchableOpacity
+                    key={index}
+                    style={[styles.thumbnail, activeImage === img && { borderColor: colors.primary }]}
+                    onPress={() => onSelectImage(img)}
+                >
+                    <Image source={img} style={styles.thumbnailImage} />
+                </TouchableOpacity>
+            ))}
+        </View>
+    </View>
+);
+
+const ProductHeader = ({ name, category, price, isDarkMode, colors }) => (
+    <View style={styles.titleRow}>
+        <View style={styles.titleInfo}>
+            <Text style={[styles.productName, { color: colors.text }]}>{name}</Text>
+            <Text style={styles.productCategory}>{category} • Eau De Parfum</Text>
+        </View>
+        <Text style={[styles.productPrice, { color: isDarkMode ? colors.primary : '#000000' }]}>₹{price}</Text>
+    </View>
+);
+
+const RatingSection = ({ isDarkMode, colors }) => (
+    <View style={styles.ratingContainer}>
+        <View style={styles.starsRow}>
             {[1, 2, 3, 4, 5].map(i => (
-                <IconButton key={i} icon="star" size={14} iconColor={isDarkMode ? themeColors.primary : "#000000"} style={styles.star} />
+                <IconButton key={i} icon="star" size={14} iconColor={isDarkMode ? colors.primary : "#000000"} style={styles.starIcon} />
             ))}
         </View>
         <Text style={styles.ratingText}>(4.9 • 120 reviews)</Text>
     </View>
+);
+
+const QuantitySelector = ({ quantity, onIncrease, onDecrease, isDarkMode, colors }) => (
+    <View style={styles.quantityContainer}>
+        <Text style={[styles.quantityLabel, { color: colors.text }]}>Quantity</Text>
+        <View style={[styles.counterBox, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
+            <TouchableOpacity onPress={onDecrease} style={styles.counterButton}>
+                <Text style={[styles.counterText, { color: colors.text }]}>−</Text>
+            </TouchableOpacity>
+            <Text style={[styles.quantityValue, { color: colors.text }]}>{quantity}</Text>
+            <TouchableOpacity onPress={onIncrease} style={styles.counterButton}>
+                <Text style={[styles.counterText, { color: colors.text }]}>+</Text>
+            </TouchableOpacity>
+        </View>
+    </View>
+);
+
+const AddToCartButton = ({ onPress, isDarkMode, colors }) => (
+    <Button
+        mode="contained"
+        style={[styles.addButton, { backgroundColor: colors.primary }]}
+        contentStyle={styles.addButtonContent}
+        labelStyle={[styles.addButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+        onPress={onPress}
+    >
+        Add to Cart
+    </Button>
 );
 
 const styles = StyleSheet.create({
@@ -143,11 +194,11 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 10
     },
-    headerActions: {
+    headerRight: {
         flexDirection: 'row',
         alignItems: 'center'
     },
-    cartIcon: {
+    cartButton: {
         marginLeft: 5
     },
     badge: {
@@ -158,17 +209,17 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 50
     },
-    imageSection: {
+    galleryContainer: {
         width: '100%',
         height: SCREEN_WIDTH * 1.2,
         justifyContent: 'flex-end'
     },
-    heroImage: {
+    mainImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover'
     },
-    gallery: {
+    thumbnailsRow: {
         flexDirection: 'row',
         position: 'absolute',
         bottom: 20,
@@ -185,11 +236,11 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'transparent'
     },
-    thumbnailImg: {
+    thumbnailImage: {
         width: '100%',
         height: '100%'
     },
-    detailsSection: {
+    detailsContainer: {
         padding: 25,
         marginTop: -30,
         borderTopLeftRadius: 30,
@@ -200,32 +251,32 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'flex-start'
     },
-    brandInfo: {
+    titleInfo: {
         flex: 1
     },
-    name: {
+    productName: {
         fontSize: 28,
         fontWeight: '900',
         letterSpacing: -0.5
     },
-    specs: {
+    productCategory: {
         fontSize: 14,
         color: '#888888',
         marginTop: 5
     },
-    price: {
+    productPrice: {
         fontSize: 24,
         fontWeight: '900'
     },
-    rating: {
+    ratingContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 15
     },
-    stars: {
+    starsRow: {
         flexDirection: 'row'
     },
-    star: {
+    starIcon: {
         margin: 0
     },
     ratingText: {
@@ -233,7 +284,7 @@ const styles = StyleSheet.create({
         color: '#aaaaaa',
         marginLeft: 5
     },
-    sectionLabel: {
+    sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         marginTop: 30,
@@ -243,7 +294,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         lineHeight: 24
     },
-    quantityRow: {
+    quantityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -254,45 +305,43 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold'
     },
-    counter: {
+    counterBox: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 15,
         padding: 5
     },
-    counterBtn: {
+    counterButton: {
         width: 40,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center'
     },
-    counterSymbol: {
+    counterText: {
         fontSize: 20,
         fontWeight: 'bold'
     },
-    countValue: {
+    quantityValue: {
         fontSize: 16,
         fontWeight: 'bold',
         marginHorizontal: 15
     },
-    buyBtn: {
+    addButton: {
         borderRadius: 15
     },
-    buyBtnContent: {
+    addButtonContent: {
         height: 60
     },
-    buyBtnLabel: {
+    addButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
     },
-    toast: {
+    snackbar: {
         borderRadius: 10
     },
-    toastText: {
+    snackbarText: {
         textAlign: 'center'
     }
 });
 
-
 export default ProductDetailScreen;
-
