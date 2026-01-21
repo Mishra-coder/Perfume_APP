@@ -9,92 +9,92 @@ const AuthScreen = ({ navigation }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
-    const [isLogin, setIsLogin] = useState(true);
-    const [form, setForm] = useState({ name: '', email: '', password: '' });
+    const [isLoginMode, setIsLoginMode] = useState(true);
+    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
-    const isValid = isLogin
-        ? (form.email && form.password)
-        : (form.name && form.email && form.password);
+    const isFormValid = isLoginMode
+        ? (formData.email && formData.password)
+        : (formData.name && formData.email && formData.password);
 
-    const handleAuth = () => {
-        const name = form.name || form.email.split('@')[0];
-        login({ name, email: form.email });
+    const handleAuthentication = () => {
+        const userName = formData.name || formData.email.split('@')[0];
+        login({ name: userName, email: formData.email });
         navigation.goBack();
     };
 
-    const update = (key, val) => setForm({ ...form, [key]: val });
+    const updateField = (key, value) => setFormData({ ...formData, [key]: value });
 
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={[styles.container, { backgroundColor: colors.background }]}
         >
-            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>
                     <IconButton icon="arrow-left" size={24} onPress={() => navigation.goBack()} iconColor={colors.text} />
                 </View>
 
-                <View style={styles.hero}>
+                <View style={styles.heroSection}>
                     <Text style={[styles.title, { color: colors.text }]}>
-                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                        {isLoginMode ? 'Welcome Back' : 'Create Account'}
                     </Text>
                     <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
-                        {isLogin ? 'Sign in to continue your journey.' : 'Join for exclusive access.'}
+                        {isLoginMode ? 'Sign in to continue your journey.' : 'Join for exclusive access.'}
                     </Text>
                 </View>
 
-                <View style={styles.form}>
-                    {!isLogin && (
+                <View style={styles.formContainer}>
+                    {!isLoginMode && (
                         <TextInput
                             label="Full Name"
-                            value={form.name}
-                            onChangeText={val => update('name', val)}
+                            value={formData.name}
+                            onChangeText={val => updateField('name', val)}
                             mode="outlined"
-                            style={styles.input}
+                            style={styles.inputField}
                             activeOutlineColor={colors.primary}
                         />
                     )}
 
                     <TextInput
                         label="Email"
-                        value={form.email}
-                        onChangeText={val => update('email', val)}
+                        value={formData.email}
+                        onChangeText={val => updateField('email', val)}
                         mode="outlined"
                         autoCapitalize="none"
-                        style={styles.input}
+                        style={styles.inputField}
                         activeOutlineColor={colors.primary}
                     />
 
                     <TextInput
                         label="Password"
-                        value={form.password}
-                        onChangeText={val => update('password', val)}
+                        value={formData.password}
+                        onChangeText={val => updateField('password', val)}
                         mode="outlined"
                         secureTextEntry
-                        style={styles.input}
+                        style={styles.inputField}
                         activeOutlineColor={colors.primary}
                     />
 
                     <Button
                         mode="contained"
-                        style={styles.btn}
-                        contentStyle={styles.btnContent}
-                        labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                        disabled={!isValid}
-                        onPress={handleAuth}
+                        style={styles.authButton}
+                        contentStyle={styles.authButtonContent}
+                        labelStyle={[styles.authButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                        disabled={!isFormValid}
+                        onPress={handleAuthentication}
                         buttonColor={colors.primary}
                     >
-                        {isLogin ? 'Login' : 'Sign Up'}
+                        {isLoginMode ? 'Login' : 'Sign Up'}
                     </Button>
                 </View>
 
                 <View style={styles.footer}>
                     <Text style={{ color: '#999999' }}>
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                        {isLoginMode ? "Don't have an account? " : "Already have an account? "}
                     </Text>
-                    <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-                        <Text style={[styles.link, { color: colors.primary }]}>
-                            {isLogin ? 'Join Now' : 'Login'}
+                    <TouchableOpacity onPress={() => setIsLoginMode(!isLoginMode)}>
+                        <Text style={[styles.linkText, { color: colors.primary }]}>
+                            {isLoginMode ? 'Join Now' : 'Login'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    scroll: {
+    scrollContent: {
         paddingHorizontal: 25,
         paddingBottom: 40
     },
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         marginLeft: -10
     },
-    hero: {
+    heroSection: {
         marginTop: 20,
         marginBottom: 40
     },
@@ -127,21 +127,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 10
     },
-    form: {
+    formContainer: {
         marginTop: 10
     },
-    input: {
+    inputField: {
         marginBottom: 15,
         backgroundColor: 'transparent'
     },
-    btn: {
+    authButton: {
         marginTop: 20,
         borderRadius: 15
     },
-    btnContent: {
+    authButtonContent: {
         height: 56
     },
-    btnLabel: {
+    authButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
     },
@@ -150,12 +150,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 50
     },
-    link: {
+    linkText: {
         fontWeight: 'bold',
         textDecorationLine: 'underline'
     }
 });
 
-
 export default AuthScreen;
-
