@@ -7,46 +7,69 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
-    const bg = isDarkMode ? '#1a1a1a' : '#ffffff';
-    const border = isDarkMode ? '#333333' : '#f0f0f0';
+    const backgroundColor = isDarkMode ? '#1a1a1a' : '#ffffff';
+    const borderColor = isDarkMode ? '#333333' : '#f0f0f0';
+    const imageContainerBg = isDarkMode ? '#0a0a0a' : '#f9f9f9';
+    const matchBadgeBg = isDarkMode ? colors.primary : '#1a1a1a';
+    const matchTextColor = isDarkMode ? '#000000' : '#ffffff';
+    const separatorColor = isDarkMode ? '#222222' : '#f5f5f5';
+    const noteBadgeBg = isDarkMode ? '#333333' : '#f8f8f8';
+    const tipBoxBg = isDarkMode ? '#0a0a0a' : '#f9f9f9';
+    const tipTextColor = isDarkMode ? '#aaaaaa' : '#333333';
 
     return (
-        <Surface style={[styles.card, { backgroundColor: bg, borderColor: border }]} elevation={0}>
+        <Surface style={[styles.cardContainer, { backgroundColor, borderColor }]} elevation={0}>
             <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-                <View style={[styles.imgBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]}>
-                    <Image source={perfume.image} style={styles.img} />
-                    <View style={[styles.match, { backgroundColor: isDarkMode ? colors.primary : '#1a1a1a' }]}>
-                        <Text style={[styles.matchText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>{score}% MATCH</Text>
+
+                <View style={[styles.imageContainer, { backgroundColor: imageContainerBg }]}>
+                    <Image source={perfume.image} style={styles.productImage} />
+
+                    <View style={[styles.matchBadge, { backgroundColor: matchBadgeBg }]}>
+                        <Text style={[styles.matchText, { color: matchTextColor }]}>
+                            {score}% MATCH
+                        </Text>
                     </View>
                 </View>
 
-                <View style={styles.body}>
-                    <Text style={[styles.name, { color: colors.text }]}>{perfume.name}</Text>
+                <View style={styles.contentContainer}>
+                    <Text style={[styles.productName, { color: colors.text }]}>
+                        {perfume.name}
+                    </Text>
 
-                    <View style={styles.meta}>
-                        <Text style={[styles.price, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{perfume.price}</Text>
-                        <Text style={styles.tag}>Eau De Parfum</Text>
+                    <View style={styles.metaInfoRow}>
+                        <Text style={[styles.productPrice, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>
+                            ₹{perfume.price}
+                        </Text>
+                        <Text style={styles.productType}>Eau De Parfum</Text>
                     </View>
 
-                    <View style={[styles.line, { backgroundColor: isDarkMode ? '#222222' : '#f5f5f5' }]} />
+                    <View style={[styles.separator, { backgroundColor: separatorColor }]} />
 
-                    <View style={styles.notes}>
-                        <Text style={styles.label}>Signature Notes</Text>
-                        <View style={styles.list}>
-                            {perfume.notes.top.slice(0, 3).map((n, i) => (
-                                <View key={i} style={[styles.note, { backgroundColor: isDarkMode ? '#333333' : '#f8f8f8' }]}>
-                                    <Text style={{ color: colors.text, fontSize: 12 }}>{n}</Text>
+                    <View style={styles.notesSection}>
+                        <Text style={styles.sectionLabel}>Signature Notes</Text>
+                        <View style={styles.notesList}>
+                            {perfume.notes.top.slice(0, 3).map((note, index) => (
+                                <View key={index} style={[styles.noteBadge, { backgroundColor: noteBadgeBg }]}>
+                                    <Text style={{ color: colors.text, fontSize: 12 }}>{note}</Text>
                                 </View>
                             ))}
                         </View>
                     </View>
 
-                    <Surface style={[styles.tip, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]} elevation={0}>
-                        <Text style={[styles.tipTitle, { color: colors.text }]}>Why it works</Text>
-                        <Text style={[styles.tipBody, { color: isDarkMode ? '#aaaaaa' : '#333333' }]}>{reasoning}</Text>
+                    <Surface style={[styles.tipContainer, { backgroundColor: tipBoxBg }]} elevation={0}>
+                        <Text style={[styles.tipHeader, { color: colors.text }]}>Why it works</Text>
+                        <Text style={[styles.tipContent, { color: tipTextColor }]}>
+                            {reasoning}
+                        </Text>
                     </Surface>
 
-                    <Button mode="contained" style={styles.btn} contentStyle={styles.btnContent} labelStyle={[styles.btnLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]} onPress={onPress}>
+                    <Button
+                        mode="contained"
+                        style={styles.actionButton}
+                        contentStyle={styles.actionButtonContent}
+                        labelStyle={[styles.actionButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
+                        onPress={onPress}
+                    >
                         Discover Scents
                     </Button>
                 </View>
@@ -56,22 +79,22 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-    card: {
+    cardContainer: {
         marginBottom: 25,
         borderRadius: 25,
         overflow: 'hidden',
         borderWidth: 1
     },
-    imgBox: {
+    imageContainer: {
         height: 200,
         justifyContent: 'center',
         alignItems: 'center'
     },
-    img: {
+    productImage: {
         width: 150,
         height: 150
     },
-    match: {
+    matchBadge: {
         position: 'absolute',
         top: 15,
         right: 15,
@@ -82,76 +105,74 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '900'
     },
-    body: {
+    contentContainer: {
         padding: 25
     },
-    name: {
+    productName: {
         fontSize: 22,
         fontWeight: 'bold'
     },
-    meta: {
+    metaInfoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 10
     },
-    price: {
+    productPrice: {
         fontSize: 18,
         fontWeight: '900'
     },
-    tag: {
+    productType: {
         fontSize: 12,
         color: '#666666'
     },
-    line: {
+    separator: {
         height: 1,
         marginVertical: 20
     },
-    notes: {
+    notesSection: {
         marginBottom: 20
     },
-    label: {
+    sectionLabel: {
         fontSize: 12,
         fontWeight: 'bold',
         color: '#999999',
         marginBottom: 10,
         textTransform: 'uppercase'
     },
-    list: {
+    notesList: {
         flexDirection: 'row'
     },
-    note: {
+    noteBadge: {
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
         marginRight: 8
     },
-    tip: {
+    tipContainer: {
         padding: 15,
         borderRadius: 15,
         marginBottom: 25
     },
-    tipTitle: {
+    tipHeader: {
         fontSize: 13,
         fontWeight: 'bold',
         marginBottom: 5
     },
-    tipBody: {
+    tipContent: {
         fontSize: 13,
         lineHeight: 18
     },
-    btn: {
+    actionButton: {
         borderRadius: 12
     },
-    btnContent: {
+    actionButtonContent: {
         height: 50
     },
-    btnLabel: {
+    actionButtonLabel: {
         fontWeight: 'bold',
         fontSize: 14
     }
 });
 
-
 export default RecommendationCard;
-

@@ -1,76 +1,85 @@
-const PROFILES = {
+const PERFUME_PROFILES = {
     date: {
-        matches: ["sweet"],
-        notes: ["Vanilla", "Musk", "Amber", "Rose", "Jasmine"],
-        strengths: [3, 4, 5],
-        label: "Romantic & Sensual"
+        preferredProfiles: ["sweet"],
+        preferredNotes: ["Vanilla", "Musk", "Amber", "Rose", "Jasmine"],
+        preferredStrengths: [3, 4, 5],
+        displayLabel: "Romantic & Sensual"
     },
     college: {
-        matches: ["fresh"],
-        notes: ["Citrus", "Aqua", "Green Tea", "Bergamot", "Lemon"],
-        strengths: [1, 2, 3],
-        label: "Fresh & Energetic"
+        preferredProfiles: ["fresh"],
+        preferredNotes: ["Citrus", "Aqua", "Green Tea", "Bergamot", "Lemon"],
+        preferredStrengths: [1, 2, 3],
+        displayLabel: "Fresh & Energetic"
     },
     party: {
-        matches: ["strong"],
-        notes: ["Oud", "Spices", "Leather", "Amber", "Black Currant"],
-        strengths: [4, 5],
-        label: "Bold & Statement"
+        preferredProfiles: ["strong"],
+        preferredNotes: ["Oud", "Spices", "Leather", "Amber", "Black Currant"],
+        preferredStrengths: [4, 5],
+        displayLabel: "Bold & Statement"
     },
     office: {
-        matches: ["mild"],
-        notes: ["Lavender", "Cedar", "Sandalwood", "Sage", "Vetiver"],
-        strengths: [2, 3, 4],
-        label: "Polished & Professional"
+        preferredProfiles: ["mild"],
+        preferredNotes: ["Lavender", "Cedar", "Sandalwood", "Sage", "Vetiver"],
+        preferredStrengths: [2, 3, 4],
+        displayLabel: "Polished & Professional"
     },
     gym: {
-        matches: ["fresh"],
-        notes: ["Mint", "Lemon", "Aqua", "Marine Notes", "Verbena"],
-        strengths: [1, 2],
-        label: "Fresh & Sporty"
+        preferredProfiles: ["fresh"],
+        preferredNotes: ["Mint", "Lemon", "Aqua", "Marine Notes", "Verbena"],
+        preferredStrengths: [1, 2],
+        displayLabel: "Fresh & Sporty"
     },
     festival: {
-        matches: ["strong"],
-        notes: ["Rose", "Jasmine", "Sandalwood", "Oud", "Saffron"],
-        strengths: [4, 5],
-        label: "Elegant & Traditional"
+        preferredProfiles: ["strong"],
+        preferredNotes: ["Rose", "Jasmine", "Sandalwood", "Oud", "Saffron"],
+        preferredStrengths: [4, 5],
+        displayLabel: "Elegant & Traditional"
     }
 };
 
-const getScore = (perfume, occasion) => {
-    const profile = PROFILES[occasion];
-    if (!profile) return 0;
+const calculateMatchScore = (perfume, occasion) => {
+    const targetProfile = PERFUME_PROFILES[occasion];
+    if (!targetProfile) return 0;
 
-    let score = 0;
+    let totalScore = 0;
 
-    if (perfume.occasions.includes(occasion)) score += 40;
-    if (profile.matches.includes(perfume.profile)) score += 20;
-    if (profile.strengths.includes(perfume.strength)) score += 15;
+    if (perfume.occasions.includes(occasion)) totalScore += 40;
+    if (targetProfile.preferredProfiles.includes(perfume.profile)) totalScore += 20;
+    if (targetProfile.preferredStrengths.includes(perfume.strength)) totalScore += 15;
 
-    const notes = [...perfume.notes.top, ...perfume.notes.middle, ...perfume.notes.base].map(n => n.toLowerCase());
-    const weight = 25 / profile.notes.length;
+    const allPerfumeNotes = [
+        ...perfume.notes.top,
+        ...perfume.notes.middle,
+        ...perfume.notes.base
+    ].map(note => note.toLowerCase());
 
-    profile.notes.forEach(note => {
-        if (notes.some(n => n.includes(note.toLowerCase()))) score += weight;
+    const noteWeight = 25 / targetProfile.preferredNotes.length;
+
+    targetProfile.preferredNotes.forEach(targetNote => {
+        if (allPerfumeNotes.some(perfumeNote => perfumeNote.includes(targetNote.toLowerCase()))) {
+            totalScore += noteWeight;
+        }
     });
 
-    return Math.round(score);
+    return Math.round(totalScore);
 };
 
-const getReason = (perfume, occasion) => {
-    const profile = PROFILES[occasion];
-    const top = perfume.notes.top[0];
-    const base = perfume.notes.base[0];
-    return `The perfect choice for your ${occasion}. It opens with refreshing ${top} and settles into a lasting ${base} base, making it a very ${profile.label.toLowerCase()} fragrance.`;
+const generateRecommendationReason = (perfume, occasion) => {
+    const targetProfile = PERFUME_PROFILES[occasion];
+    const topNote = perfume.notes.top[0];
+    const baseNote = perfume.notes.base[0];
+
+    return `The perfect choice for your ${occasion}. It opens with refreshing ${topNote} and settles into a lasting ${baseNote} base, making it a very ${targetProfile.displayLabel.toLowerCase()} fragrance.`;
 };
 
-export const getRecommendations = (products, occasion) => {
-    return products
-        .map(p => ({
-            ...p,
-            matchPercentage: getScore(p, occasion),
-            reasoning: getReason(p, occasion)
-        }))
-        .sort((a, b) => b.matchPercentage - a.matchPercentage)
-        .slice(0, 3);
+export const getRecommendations = (allProducts, selectedOccasion) => {
+    const scoredProducts = allProducts.map(product => ({
+        ...product,
+        matchPercentage: calculateMatchScore(product, selectedOccasion),
+        reasoning: generateRecommendationReason(product, selectedOccasion)
+    }));
+
+    const sortedRecommendations = scoredProducts.sort((a, b) => b.matchPercentage - a.matchPercentage);
+
+    return sortedRecommendations.slice(0, 3);
 };
