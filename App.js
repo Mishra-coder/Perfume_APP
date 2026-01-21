@@ -7,23 +7,20 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { CartProvider } from './src/context/CartContext';
 import { UserProvider } from './src/context/UserContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
-
 import MainNavigator from './src/navigation/MainNavigator';
-
 import { lightTheme, darkTheme, NavLightTheme, NavDarkTheme } from './src/theme/theme';
 
 const AppContent = () => {
   const { isDarkMode } = useTheme();
 
-  const paperTheme = isDarkMode ? darkTheme : lightTheme;
-  const navigationTheme = isDarkMode ? NavDarkTheme : NavLightTheme;
+  const currentPaperTheme = isDarkMode ? darkTheme : lightTheme;
+  const currentNavTheme = isDarkMode ? NavDarkTheme : NavLightTheme;
 
   return (
-    <PaperProvider theme={paperTheme}>
-      <NavigationContainer theme={navigationTheme}>
+    <PaperProvider theme={currentPaperTheme}>
+      <NavigationContainer theme={currentNavTheme}>
         <MainNavigator />
       </NavigationContainer>
-
       <StatusBar style={isDarkMode ? "light" : "dark"} />
     </PaperProvider>
   );
