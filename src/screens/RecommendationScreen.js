@@ -10,10 +10,10 @@ const RecommendationScreen = ({ navigation }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
-    const [matches, setMatches] = useState(null);
-    const [occasion, setOccasion] = useState("");
+    const [matchedProducts, setMatchedProducts] = useState(null);
+    const [selectedOccasion, setSelectedOccasion] = useState("");
 
-    const options = [
+    const OCCASION_OPTIONS = [
         { label: 'Date', key: 'date', icon: 'heart-outline' },
         { label: 'College', key: 'college', icon: 'school-outline' },
         { label: 'Party', key: 'party', icon: 'glass-cocktail' },
@@ -22,82 +22,94 @@ const RecommendationScreen = ({ navigation }) => {
         { label: 'Festival', key: 'festival', icon: 'party-popper' }
     ];
 
-    const handleSelect = (item) => {
-        setOccasion(item.label);
-        setMatches(getRecommendations(products, item.key));
+    const onSelectOccasion = (item) => {
+        setSelectedOccasion(item.label);
+        setMatchedProducts(getRecommendations(products, item.key));
     };
 
-    const reset = () => {
-        setMatches(null);
-        setOccasion("");
+    const resetSelection = () => {
+        setMatchedProducts(null);
+        setSelectedOccasion("");
     };
-
-    const WelcomeSection = () => (
-        <View style={styles.intro}>
-            <View style={styles.header}>
-                <Text style={[styles.title, { color: colors.text }]}>Where next?</Text>
-                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
-                    Choose an occasion for a tailored scent.
-                </Text>
-            </View>
-
-            <View style={styles.grid}>
-                {options.map(item => (
-                    <OccasionTile
-                        key={item.key}
-                        item={item}
-                        isDarkMode={isDarkMode}
-                        themeColors={colors}
-                        onPress={() => handleSelect(item)}
-                    />
-                ))}
-            </View>
-        </View>
-    );
-
-    const ResultsList = () => (
-        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-            <View style={styles.header}>
-                <Text style={[styles.title, { color: colors.text }]}>Matched for {occasion}</Text>
-                <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
-                    Top picks based on notes and vibes.
-                </Text>
-            </View>
-
-            {matches.map((item, i) => (
-                <RecommendationCard
-                    key={item.id}
-                    perfume={item}
-                    reasoning={item.reasoning}
-                    score={item.matchPercentage}
-                    isPremium={i === 0}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                    onPress={() => navigation.navigate('ProductDetail', { product: item })}
-                />
-            ))}
-            <View style={styles.spacer} />
-        </ScrollView>
-    );
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background }]}>
                 <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
                 <Appbar.Content title="Scent Discovery" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
-                {matches && <Appbar.Action icon="close" onPress={reset} color={colors.text} />}
+                {matchedProducts && <Appbar.Action icon="close" onPress={resetSelection} color={colors.text} />}
             </Appbar.Header>
 
-            {!matches ? <WelcomeSection /> : <ResultsList />}
+            {!matchedProducts ? (
+                <OccasionSelectionView
+                    options={OCCASION_OPTIONS}
+                    onSelect={onSelectOccasion}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
+            ) : (
+                <RecommendationResults
+                    matches={matchedProducts}
+                    occasion={selectedOccasion}
+                    navigation={navigation}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
+            )}
         </View>
     );
 };
 
-const OccasionTile = ({ item, isDarkMode, themeColors, onPress }) => (
+const OccasionSelectionView = ({ options, onSelect, isDarkMode, colors }) => (
+    <View style={styles.contentContainer}>
+        <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.text }]}>Where next?</Text>
+            <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                Choose an occasion for a tailored scent.
+            </Text>
+        </View>
+
+        <View style={styles.gridContainer}>
+            {options.map(item => (
+                <OccasionTile
+                    key={item.key}
+                    item={item}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                    onPress={() => onSelect(item)}
+                />
+            ))}
+        </View>
+    </View>
+);
+
+const RecommendationResults = ({ matches, occasion, navigation, isDarkMode, colors }) => (
+    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+            <Text style={[styles.title, { color: colors.text }]}>Matched for {occasion}</Text>
+            <Text style={[styles.subtitle, { color: isDarkMode ? '#888888' : '#666666' }]}>
+                Top picks based on notes and vibes.
+            </Text>
+        </View>
+
+        {matches.map((item, index) => (
+            <RecommendationCard
+                key={item.id}
+                perfume={item}
+                reasoning={item.reasoning}
+                score={item.matchPercentage}
+                onPress={() => navigation.navigate('ProductDetail', { product: item })}
+            />
+        ))}
+        <View style={styles.bottomSpacer} />
+    </ScrollView>
+);
+
+const OccasionTile = ({ item, isDarkMode, colors, onPress }) => (
     <TouchableOpacity style={styles.tileWrapper} onPress={onPress} activeOpacity={0.7}>
-        <Surface style={[styles.tile, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]} elevation={0}>
-            <IconButton icon={item.icon} size={30} iconColor={isDarkMode ? themeColors.primary : "#1a1a1a"} />
-            <Text style={[styles.tileLabel, { color: themeColors.text }]}>{item.label}</Text>
+        <Surface style={[styles.tileSurface, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc', borderColor: isDarkMode ? '#333333' : '#f0f0f0' }]} elevation={0}>
+            <IconButton icon={item.icon} size={30} iconColor={isDarkMode ? colors.primary : "#1a1a1a"} />
+            <Text style={[styles.tileLabel, { color: colors.text }]}>{item.label}</Text>
         </Surface>
     </TouchableOpacity>
 );
@@ -107,13 +119,14 @@ const styles = StyleSheet.create({
         flex: 1
     },
     appbar: {
-        borderBottomWidth: 0
+        borderBottomWidth: 0,
+        elevation: 0
     },
     appbarTitle: {
         fontWeight: 'bold',
         fontSize: 18
     },
-    intro: {
+    contentContainer: {
         flex: 1,
         padding: 25
     },
@@ -129,7 +142,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 8
     },
-    grid: {
+    gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between'
@@ -138,7 +151,7 @@ const styles = StyleSheet.create({
         width: '48%',
         marginBottom: 15
     },
-    tile: {
+    tileSurface: {
         height: 120,
         borderRadius: 20,
         justifyContent: 'center',
@@ -149,14 +162,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 14
     },
-    list: {
+    scrollContent: {
         padding: 25
     },
-    spacer: {
+    bottomSpacer: {
         height: 40
     }
 });
 
-
 export default RecommendationScreen;
-

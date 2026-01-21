@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions, TextInput } from 'react-native';
-import { Text, IconButton, Avatar, Badge, useTheme as usePaperTheme } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, Dimensions, TextInput, ScrollView } from 'react-native';
+import { Text, IconButton, Avatar, Badge, Chip, useTheme as usePaperTheme } from 'react-native-paper';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
+import FilterModal from '../components/FilterModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -18,117 +19,154 @@ const HomeScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showDiscoveryButton, setShowDiscoveryButton] = useState(false);
 
-    const filteredProducts = useMemo(() => {
-        const query = searchQuery.toLowerCase().trim();
-        if (!query) return products;
+    const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+    const [filters, setFilters] = useState({
+        priceRange: null,
+        categories: [],
+        occasions: [],
+        strengths: [],
+        profiles: [],
+        sortBy: 'default'
+    });
 
-        return products.filter(p =>
-            p.name.toLowerCase().includes(query) ||
-            p.category.toLowerCase().includes(query)
-        );
-    }, [searchQuery]);
+    const filteredProducts = useMemo(() => {
+        let result = [...products];
+        const query = searchQuery.toLowerCase().trim();
+
+        if (query) {
+            result = result.filter(product =>
+                product.name.toLowerCase().includes(query) ||
+                product.category.toLowerCase().includes(query)
+            );
+        }
+
+        if (filters.priceRange) {
+            result = result.filter(product =>
+                product.price >= filters.priceRange.min &&
+                product.price <= filters.priceRange.max
+            );
+        }
+
+        if (filters.categories.length > 0) {
+            result = result.filter(product =>
+                filters.categories.includes(product.category)
+            );
+        }
+
+        if (filters.occasions.length > 0) {
+            result = result.filter(product =>
+                product.occasions.some(occasion => filters.occasions.includes(occasion))
+            );
+        }
+
+        if (filters.strengths.length > 0) {
+            result = result.filter(product => {
+                if (filters.strengths.includes('light') && product.strength <= 2) return true;
+                if (filters.strengths.includes('medium') && product.strength === 3) return true;
+                if (filters.strengths.includes('strong') && product.strength >= 4) return true;
+                return false;
+            });
+        }
+
+        if (filters.profiles.length > 0) {
+            result = result.filter(product =>
+                filters.profiles.includes(product.profile.toLowerCase())
+            );
+        }
+
+        switch (filters.sortBy) {
+            case 'price-asc':
+                result.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-desc':
+                result.sort((a, b) => b.price - a.price);
+                break;
+            case 'name':
+                result.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            default:
+                break;
+        }
+
+        return result;
+    }, [searchQuery, filters]);
 
     const featuredItems = filteredProducts.slice(0, 3);
     const remainingItems = filteredProducts.slice(3);
 
-    const renderHeader = () => {
-        if (isSearchActive) {
-            return (
-                <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-                    <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => setIsSearchActive(false)} />
-                    <TextInput
-                        placeholder="Search luxury scents..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        autoFocus
-                        style={[styles.searchInput, { color: colors.text }]}
-                        placeholderTextColor={isDarkMode ? "#666666" : "#aaaaaa"}
-                    />
-                    {searchQuery.length > 0 && (
-                        <IconButton icon="close-circle" size={20} iconColor={colors.primary} onPress={() => setSearchQuery('')} />
-                    )}
-                </View>
-            );
-        }
-
-        return (
-            <View style={styles.standardHeader}>
-                <IconButton icon="menu" size={24} iconColor={colors.text} onPress={() => navigation.navigate('Recommendation')} />
-                <View style={styles.headerActions}>
-                    <IconButton icon="magnify" size={24} iconColor={colors.text} onPress={() => setIsSearchActive(true)} />
-
-                    <BadgeIcon
-                        icon="heart-outline"
-                        count={(user.wishlist || []).length}
-                        onPress={() => navigation.navigate('Wishlist')}
-                        themeColors={colors}
-                        isDarkMode={isDarkMode}
-                    />
-
-                    <BadgeIcon
-                        icon="shopping-outline"
-                        count={getTotalItems()}
-                        onPress={() => navigation.navigate('Cart')}
-                        themeColors={colors}
-                        isDarkMode={isDarkMode}
-                    />
-
-                    <BadgeIcon
-                        icon="package-variant-closed"
-                        count={(user.orders || []).length}
-                        onPress={() => navigation.navigate('Orders')}
-                        themeColors={colors}
-                        isDarkMode={isDarkMode}
-                    />
-
-                    <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                        <Avatar.Icon size={36} icon="account" backgroundColor={isDarkMode ? '#1a1a1a' : '#f5f5f5'} color={colors.text} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
+    const getActiveFilterCount = () => {
+        let count = 0;
+        if (filters.priceRange) count++;
+        count += filters.categories.length;
+        count += filters.occasions.length;
+        count += filters.strengths.length;
+        count += filters.profiles.length;
+        if (filters.sortBy !== 'default') count++;
+        return count;
     };
 
-    const renderListHeader = () => (
-        <View>
-            <View style={styles.heroSection}>
-                <Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text>
-                <Text style={styles.heroSubtitle}>Curated Premium Fragrances</Text>
-            </View>
+    const handleApplyFilters = (newFilters) => {
+        setFilters(newFilters);
+    };
 
-            {featuredItems.length > 0 && (
-                <FlatList
-                    data={featuredItems}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <FeaturedCard
-                            product={item}
-                            isDarkMode={isDarkMode}
-                            themeColors={colors}
-                            onPress={() => navigation.navigate('ProductDetail', { product: item })}
-                        />
-                    )}
-                    style={styles.featuredList}
-                />
-            )}
+    const clearAllFilters = () => {
+        setFilters({
+            priceRange: null,
+            categories: [],
+            occasions: [],
+            strengths: [],
+            profiles: [],
+            sortBy: 'default'
+        });
+    };
 
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Our Collection</Text>
-        </View>
-    );
+    const handleScroll = (event) => {
+        const scrollOffset = event.nativeEvent.contentOffset.y;
+        setShowDiscoveryButton(scrollOffset > 100);
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            {renderHeader()}
+            {isSearchActive ? (
+                <SearchHeader
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onClose={() => setIsSearchActive(false)}
+                    onClear={() => setSearchQuery('')}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
+            ) : (
+                <StandardHeader
+                    navigation={navigation}
+                    onSearchPress={() => setIsSearchActive(true)}
+                    onFilterPress={() => setIsFilterModalVisible(true)}
+                    filterCount={getActiveFilterCount()}
+                    cartCount={getTotalItems()}
+                    wishlistCount={(user.wishlist || []).length}
+                    ordersCount={(user.orders || []).length}
+                    isDarkMode={isDarkMode}
+                    colors={colors}
+                />
+            )}
 
             <FlatList
                 data={remainingItems}
                 keyExtractor={item => item.id.toString()}
                 showsVerticalScrollIndicator={false}
-                onScroll={(e) => setShowDiscoveryButton(e.nativeEvent.contentOffset.y > 100)}
+                onScroll={handleScroll}
                 scrollEventThrottle={16}
-                ListHeaderComponent={renderListHeader()}
+                ListHeaderComponent={
+                    <ListHeader
+                        featuredItems={featuredItems}
+                        filters={filters}
+                        setFilters={setFilters}
+                        clearAllFilters={clearAllFilters}
+                        navigation={navigation}
+                        isDarkMode={isDarkMode}
+                        colors={colors}
+                    />
+                }
                 renderItem={({ item }) => (
                     <ProductRow
                         product={item}
@@ -154,9 +192,165 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={[styles.fabText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>FIND</Text>
                 </TouchableOpacity>
             )}
+
+            <FilterModal
+                visible={isFilterModalVisible}
+                onDismiss={() => setIsFilterModalVisible(false)}
+                filters={filters}
+                onApplyFilters={handleApplyFilters}
+                isDarkMode={isDarkMode}
+                themeColors={colors}
+            />
         </View>
     );
 };
+
+const StandardHeader = ({ navigation, onSearchPress, onFilterPress, filterCount, cartCount, wishlistCount, ordersCount, isDarkMode, colors }) => (
+    <View style={styles.standardHeader}>
+        <IconButton icon="menu" size={24} iconColor={colors.text} onPress={() => navigation.navigate('Recommendation')} />
+        <View style={styles.headerActions}>
+            <IconButton icon="magnify" size={24} iconColor={colors.text} onPress={onSearchPress} />
+
+            <BadgeIcon
+                icon="filter-variant"
+                count={filterCount}
+                onPress={onFilterPress}
+                themeColors={colors}
+                isDarkMode={isDarkMode}
+            />
+
+            <BadgeIcon
+                icon="heart-outline"
+                count={wishlistCount}
+                onPress={() => navigation.navigate('Wishlist')}
+                themeColors={colors}
+                isDarkMode={isDarkMode}
+            />
+
+            <BadgeIcon
+                icon="shopping-outline"
+                count={cartCount}
+                onPress={() => navigation.navigate('Cart')}
+                themeColors={colors}
+                isDarkMode={isDarkMode}
+            />
+
+            <BadgeIcon
+                icon="package-variant-closed"
+                count={ordersCount}
+                onPress={() => navigation.navigate('Orders')}
+                themeColors={colors}
+                isDarkMode={isDarkMode}
+            />
+
+            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                <Avatar.Icon size={36} icon="account" backgroundColor={isDarkMode ? '#1a1a1a' : '#f5f5f5'} color={colors.text} />
+            </TouchableOpacity>
+        </View>
+    </View>
+);
+
+const SearchHeader = ({ searchQuery, onSearchChange, onClose, onClear, isDarkMode, colors }) => (
+    <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
+        <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={onClose} />
+        <TextInput
+            placeholder="Search luxury scents..."
+            value={searchQuery}
+            onChangeText={onSearchChange}
+            autoFocus
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholderTextColor={isDarkMode ? "#666666" : "#aaaaaa"}
+        />
+        {searchQuery.length > 0 && (
+            <IconButton icon="close-circle" size={20} iconColor={colors.primary} onPress={onClear} />
+        )}
+    </View>
+);
+
+const ListHeader = ({ featuredItems, filters, setFilters, clearAllFilters, navigation, isDarkMode, colors }) => (
+    <View>
+        <View style={styles.heroSection}>
+            <Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text>
+            <Text style={styles.heroSubtitle}>Curated Premium Fragrances</Text>
+        </View>
+
+        {featuredItems.length > 0 && (
+            <FlatList
+                data={featuredItems}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => (
+                    <FeaturedCard
+                        product={item}
+                        isDarkMode={isDarkMode}
+                        themeColors={colors}
+                        onPress={() => navigation.navigate('ProductDetail', { product: item })}
+                    />
+                )}
+                style={styles.featuredList}
+            />
+        )}
+
+        {hasActiveFilters(filters) && (
+            <View style={styles.activeFiltersContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeFiltersContent}>
+                    {filters.priceRange && (
+                        <ActiveFilterChip
+                            label={filters.priceRange.label}
+                            onClose={() => setFilters(prev => ({ ...prev, priceRange: null }))}
+                            colors={colors}
+                        />
+                    )}
+                    {filters.categories.map(cat => (
+                        <ActiveFilterChip
+                            key={cat}
+                            label={cat}
+                            onClose={() => setFilters(prev => ({ ...prev, categories: prev.categories.filter(c => c !== cat) }))}
+                            colors={colors}
+                        />
+                    ))}
+                    {filters.occasions.map(occ => (
+                        <ActiveFilterChip
+                            key={occ}
+                            label={occ}
+                            onClose={() => setFilters(prev => ({ ...prev, occasions: prev.occasions.filter(o => o !== occ) }))}
+                            colors={colors}
+                        />
+                    ))}
+                    <Chip
+                        icon="close-circle-outline"
+                        onPress={clearAllFilters}
+                        style={[styles.activeFilterChip, { backgroundColor: isDarkMode ? '#333' : '#e0e0e0' }]}
+                        textStyle={{ color: colors.text }}
+                    >
+                        Clear All
+                    </Chip>
+                </ScrollView>
+            </View>
+        )}
+
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Our Collection</Text>
+    </View>
+);
+
+const hasActiveFilters = (filters) => {
+    return filters.priceRange ||
+        filters.categories.length > 0 ||
+        filters.occasions.length > 0 ||
+        filters.strengths.length > 0 ||
+        filters.profiles.length > 0;
+};
+
+const ActiveFilterChip = ({ label, onClose, colors }) => (
+    <Chip
+        onClose={onClose}
+        style={styles.activeFilterChip}
+        textStyle={{ color: colors.text }}
+    >
+        {label}
+    </Chip>
+);
 
 const BadgeIcon = ({ icon, count, onPress, themeColors, isDarkMode }) => (
     <TouchableOpacity onPress={onPress} style={styles.badgeWrapper}>
@@ -349,9 +543,17 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '900',
         letterSpacing: 1
+    },
+    activeFiltersContainer: {
+        marginBottom: 20
+    },
+    activeFiltersContent: {
+        paddingHorizontal: 25,
+        gap: 8
+    },
+    activeFilterChip: {
+        marginRight: 8
     }
 });
 
-
 export default HomeScreen;
-
