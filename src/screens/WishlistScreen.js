@@ -9,6 +9,10 @@ const WishlistScreen = ({ navigation }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
+    if (!user.isLoggedIn) {
+        return <AuthRequiredState navigation={navigation} isDarkMode={isDarkMode} colors={colors} />;
+    }
+
     const wishlistItems = user.wishlist || [];
 
     if (wishlistItems.length === 0) {
@@ -57,6 +61,25 @@ const EmptyWishlist = ({ navigation, isDarkMode, colors }) => (
             >
                 <Text style={[styles.shopButtonText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
                     Explore Scents
+                </Text>
+            </TouchableOpacity>
+        </View>
+    </View>
+);
+
+const AuthRequiredState = ({ navigation, isDarkMode, colors }) => (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <WishlistHeader navigation={navigation} colors={colors} />
+        <View style={styles.emptyContainer}>
+            <IconButton icon="lock-outline" size={80} iconColor={isDarkMode ? '#333333' : '#eeeeee'} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Sign in Required</Text>
+            <Text style={[styles.emptyText, { textAlign: 'center' }]}>Please sign in to view your luxury fragrance wishlist.</Text>
+            <TouchableOpacity
+                style={[styles.shopButton, { backgroundColor: colors.primary, marginTop: 20 }]}
+                onPress={() => navigation.navigate('Auth')}
+            >
+                <Text style={[styles.shopButtonText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
+                    Sign In
                 </Text>
             </TouchableOpacity>
         </View>
@@ -147,6 +170,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 50
+    },
+    emptyTitle: {
+        fontSize: 22,
+        fontWeight: 'bold'
     },
     emptyText: {
         fontSize: 18,

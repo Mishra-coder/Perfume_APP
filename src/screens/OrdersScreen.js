@@ -9,6 +9,10 @@ const OrdersScreen = ({ navigation }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
+    if (!user.isLoggedIn) {
+        return <AuthRequiredState navigation={navigation} isDarkMode={isDarkMode} colors={colors} />;
+    }
+
     const orderList = user.orders || [];
 
     return (
@@ -48,6 +52,26 @@ const EmptyOrderState = ({ isDarkMode, colors }) => (
         <IconButton icon="package-variant" size={70} iconColor={isDarkMode ? '#222222' : '#eeeeee'} />
         <Text style={[styles.emptyTitle, { color: colors.text }]}>No orders yet</Text>
         <Text style={styles.emptyText}>Your luxury collection will start here once you place an order.</Text>
+    </View>
+);
+
+const AuthRequiredState = ({ navigation, isDarkMode, colors }) => (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <OrdersHeader navigation={navigation} colors={colors} />
+        <View style={styles.emptyContainer}>
+            <IconButton icon="lock-outline" size={80} iconColor={isDarkMode ? '#333333' : '#eeeeee'} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Sign in Required</Text>
+            <Text style={styles.emptyText}>Please sign in to view your luxury order history.</Text>
+            <IconButton
+                icon="login"
+                mode="contained"
+                containerColor={colors.primary}
+                iconColor={isDarkMode ? '#000000' : '#ffffff'}
+                size={30}
+                onPress={() => navigation.navigate('Auth')}
+                style={{ marginTop: 20 }}
+            />
+        </View>
     </View>
 );
 
