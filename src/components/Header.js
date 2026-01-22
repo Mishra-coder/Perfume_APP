@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { IconButton, Badge, Avatar } from 'react-native-paper';
+import { IconButton, Avatar } from 'react-native-paper';
 
 const Header = ({
     isSearchActive,
