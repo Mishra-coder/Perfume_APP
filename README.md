@@ -6,7 +6,8 @@ This is **Aroma Luxe**, a mobile app I built for shopping luxury perfumes. The i
 
 ---
 ## Scan this and Install the App
-<img width="282" height="281" alt="Screenshot 2026-01-18 at 2 44 38 AM" src="https://github.com/user-attachments/assets/d528015e-5b52-4a4c-b9d9-d3183fda45fc" />
+<img width="275" height="278" alt="Screenshot 2026-01-22 at 2 54 17 PM" src="https://github.com/user-attachments/assets/fb22d682-ac03-41c3-9452-c721467495d1" />
+
 ---
 
 ## Demo video of the app
