@@ -7,71 +7,37 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
 
-    const backgroundColor = isDarkMode ? '#1a1a1a' : '#ffffff';
-    const borderColor = isDarkMode ? '#333333' : '#f0f0f0';
-    const imageContainerBg = isDarkMode ? '#0a0a0a' : '#f9f9f9';
-    const matchBadgeBg = isDarkMode ? colors.primary : '#1a1a1a';
-    const matchTextColor = isDarkMode ? '#000000' : '#ffffff';
-    const separatorColor = isDarkMode ? '#222222' : '#f5f5f5';
-    const noteBadgeBg = isDarkMode ? '#333333' : '#f8f8f8';
-    const tipBoxBg = isDarkMode ? '#0a0a0a' : '#f9f9f9';
-    const tipTextColor = isDarkMode ? '#aaaaaa' : '#333333';
-
     return (
-        <Surface style={[styles.cardContainer, { backgroundColor, borderColor }]} elevation={0}>
+        <Surface style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fff' }]} elevation={0}>
             <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-
-                <View style={[styles.imageContainer, { backgroundColor: imageContainerBg }]}>
-                    <Image source={perfume.image} style={styles.productImage} />
-
-                    <View style={[styles.matchBadge, { backgroundColor: matchBadgeBg }]}>
-                        <Text style={[styles.matchText, { color: matchTextColor }]}>
-                            {score}% MATCH
-                        </Text>
+                <View style={[styles.imgBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f9f9f9' }]}>
+                    <Image source={perfume.image} style={styles.img} />
+                    <View style={[styles.badge, { backgroundColor: isDarkMode ? colors.primary : '#1a1a1a' }]}>
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: isDarkMode ? '#000' : '#fff' }}>{score}% MATCH</Text>
                     </View>
                 </View>
 
-                <View style={styles.contentContainer}>
-                    <Text style={[styles.productName, { color: colors.text }]}>
-                        {perfume.name}
-                    </Text>
-
-                    <View style={styles.metaInfoRow}>
-                        <Text style={[styles.productPrice, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>
-                            ₹{perfume.price}
-                        </Text>
-                        <Text style={styles.productType}>Eau De Parfum</Text>
+                <View style={styles.pad}>
+                    <Text style={[styles.name, { color: colors.text }]}>{perfume.name}</Text>
+                    <View style={styles.row}>
+                        <Text style={[styles.price, { color: isDarkMode ? colors.primary : '#000' }]}>₹{perfume.price}</Text>
+                        <Text style={styles.type}>Eau De Parfum</Text>
                     </View>
 
-                    <View style={[styles.separator, { backgroundColor: separatorColor }]} />
-
-                    <View style={styles.notesSection}>
-                        <Text style={styles.sectionLabel}>Signature Notes</Text>
-                        <View style={styles.notesList}>
-                            {perfume.notes.top.slice(0, 3).map((note, index) => (
-                                <View key={index} style={[styles.noteBadge, { backgroundColor: noteBadgeBg }]}>
-                                    <Text style={{ color: colors.text, fontSize: 12 }}>{note}</Text>
-                                </View>
-                            ))}
-                        </View>
+                    <View style={styles.notes}>
+                        {perfume.notes.top.slice(0, 3).map((n, i) => (
+                            <View key={i} style={[styles.note, { backgroundColor: isDarkMode ? '#333' : '#f5f5f5' }]}>
+                                <Text style={{ fontSize: 11, color: colors.text }}>{n}</Text>
+                            </View>
+                        ))}
                     </View>
 
-                    <Surface style={[styles.tipContainer, { backgroundColor: tipBoxBg }]} elevation={0}>
-                        <Text style={[styles.tipHeader, { color: colors.text }]}>Why it works</Text>
-                        <Text style={[styles.tipContent, { color: tipTextColor }]}>
-                            {reasoning}
-                        </Text>
-                    </Surface>
+                    <View style={[styles.tip, { backgroundColor: isDarkMode ? '#0a0a0a' : '#f5f5f5' }]}>
+                        <Text style={[styles.tipTitle, { color: colors.text }]}>Why it works</Text>
+                        <Text style={styles.tipText} numberOfLines={2}>{reasoning}</Text>
+                    </View>
 
-                    <Button
-                        mode="contained"
-                        style={styles.actionButton}
-                        contentStyle={styles.actionButtonContent}
-                        labelStyle={[styles.actionButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-                        onPress={onPress}
-                    >
-                        Discover Scents
-                    </Button>
+                    <Button mode="contained" onPress={onPress} style={{ borderRadius: 12 }} buttonColor={colors.primary} labelStyle={{ color: isDarkMode ? '#000' : '#fff' }}>Discover</Button>
                 </View>
             </TouchableOpacity>
         </Surface>
@@ -79,100 +45,20 @@ const RecommendationCard = ({ perfume, reasoning, score, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-    cardContainer: {
-        marginBottom: 25,
-        borderRadius: 25,
-        overflow: 'hidden',
-        borderWidth: 1
-    },
-    imageContainer: {
-        height: 200,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    productImage: {
-        width: 150,
-        height: 150
-    },
-    matchBadge: {
-        position: 'absolute',
-        top: 15,
-        right: 15,
-        padding: 6,
-        borderRadius: 10
-    },
-    matchText: {
-        fontSize: 10,
-        fontWeight: '900'
-    },
-    contentContainer: {
-        padding: 25
-    },
-    productName: {
-        fontSize: 22,
-        fontWeight: 'bold'
-    },
-    metaInfoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 10
-    },
-    productPrice: {
-        fontSize: 18,
-        fontWeight: '900'
-    },
-    productType: {
-        fontSize: 12,
-        color: '#666666'
-    },
-    separator: {
-        height: 1,
-        marginVertical: 20
-    },
-    notesSection: {
-        marginBottom: 20
-    },
-    sectionLabel: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#999999',
-        marginBottom: 10,
-        textTransform: 'uppercase'
-    },
-    notesList: {
-        flexDirection: 'row'
-    },
-    noteBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
-        marginRight: 8
-    },
-    tipContainer: {
-        padding: 15,
-        borderRadius: 15,
-        marginBottom: 25
-    },
-    tipHeader: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        marginBottom: 5
-    },
-    tipContent: {
-        fontSize: 13,
-        lineHeight: 18
-    },
-    actionButton: {
-        borderRadius: 12
-    },
-    actionButtonContent: {
-        height: 50
-    },
-    actionButtonLabel: {
-        fontWeight: 'bold',
-        fontSize: 14
-    }
+    card: { marginBottom: 25, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#eee' },
+    imgBox: { height: 180, justifyContent: 'center', alignItems: 'center' },
+    img: { width: 140, height: 140 },
+    badge: { position: 'absolute', top: 12, right: 12, padding: 6, borderRadius: 8 },
+    pad: { padding: 20 },
+    name: { fontSize: 20, fontWeight: 'bold' },
+    row: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 },
+    price: { fontSize: 16, fontWeight: '900' },
+    type: { fontSize: 12, color: '#888' },
+    notes: { flexDirection: 'row', marginVertical: 15 },
+    note: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, marginRight: 8 },
+    tip: { padding: 12, borderRadius: 12, marginBottom: 20 },
+    tipTitle: { fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
+    tipText: { fontSize: 12, color: '#888', lineHeight: 16 }
 });
 
 export default RecommendationCard;

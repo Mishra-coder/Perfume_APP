@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -11,48 +11,25 @@ import { lightTheme, darkTheme, NavLightTheme, NavDarkTheme } from './src/theme/
 import * as Updates from 'expo-updates';
 import { Alert } from 'react-native';
 
-const AppContent = () => {
+const Root = () => {
   const { isDarkMode } = useTheme();
 
-  React.useEffect(() => {
-    async function onFetchUpdateAsync() {
-      try {
-        const update = await Updates.checkForUpdateAsync();
-
-        if (update.isAvailable) {
-          Alert.alert(
-            'Update Available',
-            'A new version of Aroma Luxe is ready. Would you like to update now?',
-            [
-              { text: 'Later', style: 'cancel' },
-              {
-                text: 'Update Now',
-                onPress: async () => {
-                  await Updates.fetchUpdateAsync();
-                  await Updates.reloadAsync();
-                },
-              },
-            ]
-          );
-        }
-      } catch (error) {
-        console.log('Error fetching latest updates:', error);
+  useEffect(() => {
+    if (__DEV__) return;
+    (async () => {
+      const u = await Updates.checkForUpdateAsync();
+      if (u.isAvailable) {
+        Alert.alert('Update', 'New version ready.', [{ text: 'Wait' }, { text: 'Update', onPress: async () => { await Updates.fetchUpdateAsync(); await Updates.reloadAsync(); } }]);
       }
-    }
-
-    if (!__DEV__) {
-      onFetchUpdateAsync();
-    }
+    })();
   }, []);
 
-  const currentPaperTheme = isDarkMode ? darkTheme : lightTheme;
-  const currentNavTheme = isDarkMode ? NavDarkTheme : NavLightTheme;
+  const paper = isDarkMode ? darkTheme : lightTheme;
+  const nav = isDarkMode ? NavDarkTheme : NavLightTheme;
 
   return (
-    <PaperProvider theme={currentPaperTheme}>
-      <NavigationContainer theme={currentNavTheme}>
-        <MainNavigator />
-      </NavigationContainer>
+    <PaperProvider theme={paper}>
+      <NavigationContainer theme={nav}><MainNavigator /></NavigationContainer>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
     </PaperProvider>
   );
@@ -61,11 +38,7 @@ const AppContent = () => {
 export default function App() {
   return (
     <ThemeProvider>
-      <UserProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </UserProvider>
+      <UserProvider><CartProvider><Root /></CartProvider></UserProvider>
     </ThemeProvider>
   );
 }

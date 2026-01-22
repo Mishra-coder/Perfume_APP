@@ -1,136 +1,39 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { IconButton, Avatar } from 'react-native-paper';
+import { IconButton, Avatar, Badge } from 'react-native-paper';
 
-const Header = ({
-    isSearchActive,
-    searchQuery,
-    onSearchChange,
-    onCloseSearch,
-    onClearSearch,
-    onSearchPress,
-    onFilterPress,
-    navigation,
-    filterCount = 0,
-    cartCount = 0,
-    wishlistCount = 0,
-    ordersCount = 0,
-    isDarkMode,
-    colors
-}) => {
-    if (isSearchActive) {
-        return (
-            <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-                <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={onCloseSearch} />
-                <TextInput
-                    placeholder="Search luxury scents..."
-                    value={searchQuery}
-                    onChangeText={onSearchChange}
-                    autoFocus
-                    style={[styles.searchInput, { color: colors.text }]}
-                    placeholderTextColor={isDarkMode ? "#666666" : "#aaaaaa"}
-                />
-                {searchQuery.length > 0 && (
-                    <IconButton icon="close-circle" size={20} iconColor={colors.primary} onPress={onClearSearch} />
-                )}
-            </View>
-        );
-    }
+const Header = ({ isSearch, query, onQuery, onClose, onClear, onSearch, nav, isDark, colors, cartCount = 0 }) => {
+    if (isSearch) return (
+        <View style={[styles.search, { borderBottomColor: isDark ? '#333' : '#eee' }]}>
+            <IconButton icon="arrow-left" size={24} onPress={onClose} />
+            <TextInput placeholder="Search..." value={query} onChangeText={onQuery} autoFocus style={[styles.input, { color: colors.text }]} placeholderTextColor="#888" />
+            {query.length > 0 && <IconButton icon="close-circle" size={20} onPress={onClear} />}
+        </View>
+    );
 
     return (
-        <View style={styles.standardHeader}>
-            <IconButton
-                icon="menu"
-                size={28}
-                iconColor={colors.text}
-                onPress={() => navigation.navigate('Recommendation')}
-            />
-
-            <View style={styles.headerActions}>
-                <IconButton
-                    icon="magnify"
-                    size={28}
-                    iconColor={colors.text}
-                    onPress={onSearchPress}
-                />
-
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Profile')}
-                    style={styles.profileButton}
-                >
-                    <Avatar.Icon
-                        size={32}
-                        icon="account"
-                        backgroundColor={isDarkMode ? '#2a2a2a' : '#f0f0f0'}
-                        color={colors.text}
-                    />
+        <View style={styles.box}>
+            <IconButton icon="menu" size={28} onPress={() => nav.navigate('Recommendation')} />
+            <View style={styles.actions}>
+                <IconButton icon="magnify" size={28} onPress={onSearch} />
+                <TouchableOpacity onPress={() => nav.navigate('Cart')}>
+                    <IconButton icon="shopping-outline" size={28} iconColor={colors.text} />
+                    {cartCount > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]} size={18}>{cartCount}</Badge>}
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => nav.navigate('Profile')}>
+                    <Avatar.Icon size={34} icon="account" backgroundColor={isDark ? '#222' : '#f5f5f5'} color={colors.text} />
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
 
-const BadgeIcon = ({ icon, count, onPress, themeColors, isDarkMode }) => (
-    <TouchableOpacity onPress={onPress} style={styles.badgeWrapper} activeOpacity={0.7}>
-        <IconButton
-            icon={icon}
-            size={24}
-            iconColor={themeColors.text}
-            style={{ margin: 0 }}
-        />
-        {count > 0 && (
-            <Badge
-                style={[
-                    styles.badge,
-                    {
-                        backgroundColor: themeColors.primary,
-                        color: isDarkMode ? '#000000' : '#ffffff',
-                        borderWidth: 1.5,
-                        borderColor: isDarkMode ? '#000000' : '#ffffff'
-                    }
-                ]}
-                size={16}
-            >
-                {count}
-            </Badge>
-        )}
-    </TouchableOpacity>
-);
-
 const styles = StyleSheet.create({
-    standardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 50,
-        paddingHorizontal: 15,
-        paddingBottom: 10,
-    },
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    searchHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 50,
-        paddingHorizontal: 15,
-        borderBottomWidth: 1,
-        paddingBottom: 10
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 16,
-        paddingVertical: 8,
-        paddingHorizontal: 10,
-    },
-    profileButton: {
-        marginLeft: 8,
-        borderWidth: 1,
-        borderColor: 'transparent', // Placeholder for potential border
-        borderRadius: 20,
-    }
+    box: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 50, paddingHorizontal: 15, paddingBottom: 10 },
+    actions: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+    search: { flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingHorizontal: 15, borderBottomWidth: 1, paddingBottom: 10 },
+    input: { flex: 1, fontSize: 16, paddingHorizontal: 10 },
+    badge: { position: 'absolute', top: 5, right: 5 }
 });
 
 export default Header;

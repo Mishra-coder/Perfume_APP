@@ -3,78 +3,37 @@ import { View, StyleSheet, Animated } from 'react-native';
 import { Text } from 'react-native-paper';
 
 const SplashScreen = ({ navigation }) => {
-    const fadeAnimation = useRef(new Animated.Value(0)).current;
-    const scaleAnimation = useRef(new Animated.Value(0.9)).current;
+    const fade = useRef(new Animated.Value(0)).current;
+    const scale = useRef(new Animated.Value(0.95)).current;
 
     useEffect(() => {
         Animated.parallel([
-            Animated.timing(fadeAnimation, {
-                toValue: 1,
-                duration: 1500,
-                useNativeDriver: true,
-            }),
-            Animated.spring(scaleAnimation, {
-                toValue: 1,
-                tension: 10,
-                friction: 8,
-                useNativeDriver: true,
-            }),
+            Animated.timing(fade, { toValue: 1, duration: 1200, useNativeDriver: true }),
+            Animated.spring(scale, { toValue: 1, friction: 8, useNativeDriver: true })
         ]).start();
 
-        const navigationTimer = setTimeout(() => {
-            navigation.replace('Main');
-        }, 3000);
-
-        return () => clearTimeout(navigationTimer);
+        const timer = setTimeout(() => navigation.replace('Main'), 2500);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
-        <View style={styles.container}>
-            <Animated.View style={[styles.brandingContainer, { opacity: fadeAnimation, transform: [{ scale: scaleAnimation }] }]}>
-                <Text style={styles.brandTitle}>AROMA</Text>
-                <Text style={styles.brandSubtitle}>LUXE</Text>
-                <View style={styles.separatorLine} />
-                <Text style={styles.brandTagline}>Luxury in every drop</Text>
+        <View style={styles.box}>
+            <Animated.View style={{ opacity: fade, transform: [{ scale }], alignItems: 'center' }}>
+                <Text style={styles.title}>AROMA</Text>
+                <Text style={styles.sub}>LUXE</Text>
+                <View style={styles.line} />
+                <Text style={styles.tag}>Luxury in every drop</Text>
             </Animated.View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#ffffff',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    brandingContainer: {
-        alignItems: 'center'
-    },
-    brandTitle: {
-        fontSize: 56,
-        fontWeight: '900',
-        color: '#1a1a1a',
-        letterSpacing: 8
-    },
-    brandSubtitle: {
-        fontSize: 20,
-        fontWeight: '300',
-        color: '#888888',
-        letterSpacing: 12,
-        marginTop: -5
-    },
-    separatorLine: {
-        width: 40,
-        height: 2,
-        backgroundColor: '#000000',
-        marginVertical: 30
-    },
-    brandTagline: {
-        fontSize: 13,
-        color: '#bbbbbb',
-        letterSpacing: 2,
-        textTransform: 'uppercase'
-    }
+    box: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
+    title: { fontSize: 50, fontWeight: '900', letterSpacing: 10, color: '#000' },
+    sub: { fontSize: 18, fontWeight: '300', letterSpacing: 15, color: '#888', marginTop: -5 },
+    line: { width: 40, height: 2, backgroundColor: '#000', marginVertical: 30 },
+    tag: { fontSize: 12, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase' }
 });
 
 export default SplashScreen;

@@ -1,233 +1,96 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, Image } from 'react-native';
-import { Appbar, Text, Surface, IconButton, Chip, useTheme as usePaperTheme } from 'react-native-paper';
+import { View, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { Appbar, Text, Surface, IconButton, Chip, useTheme as usePaperTheme, Button, Badge } from 'react-native-paper';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
+import { useCart } from '../context/CartContext';
 
 const OrdersScreen = ({ navigation }) => {
     const { user } = useUser();
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
+    const { count } = useCart();
 
-    if (!user.isLoggedIn) {
-        return <AuthRequiredState navigation={navigation} isDarkMode={isDarkMode} colors={colors} />;
-    }
+    if (!user.isLoggedIn) return (
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Header nav={navigation} colors={colors} count={count} />
+            <View style={styles.empty}>
+                <IconButton icon="lock" size={60} iconColor="#ccc" />
+                <Text style={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}>Sign in Required</Text>
+                <Button mode="contained" onPress={() => navigation.navigate('Auth')} style={{ marginTop: 20 }} buttonColor={colors.primary}>Login</Button>
+            </View>
+        </View>
+    );
 
-    const orderList = user.orders || [];
+    const orders = user.orders || [];
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <OrdersHeader navigation={navigation} colors={colors} />
-
-            {orderList.length > 0 ? (
+            <Header nav={navigation} colors={colors} count={count} />
+            {orders.length > 0 ? (
                 <FlatList
-                    data={orderList}
-                    keyExtractor={order => order.id.toString()}
-                    renderItem={({ item }) => (
-                        <OrderCard
-                            order={item}
-                            isDarkMode={isDarkMode}
-                            themeColors={colors}
-                        />
-                    )}
-                    contentContainerStyle={styles.listContainer}
-                    showsVerticalScrollIndicator={false}
+                    data={orders}
+                    keyExtractor={o => o.id.toString()}
+                    renderItem={({ item }) => <OrderCard order={item} isDark={isDarkMode} colors={colors} />}
+                    contentContainerStyle={{ padding: 20 }}
                 />
             ) : (
-                <EmptyOrderState isDarkMode={isDarkMode} colors={colors} />
+                <View style={styles.empty}>
+                    <IconButton icon="package-variant" size={60} iconColor="#eee" />
+                    <Text style={{ color: '#aaa' }}>No orders found</Text>
+                </View>
             )}
         </View>
     );
 };
 
-const OrdersHeader = ({ navigation, colors }) => (
-    <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background }]}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
-        <Appbar.Content title="Order History" titleStyle={[styles.appbarTitle, { color: colors.text }]} />
+const Header = ({ nav, colors, count }) => (
+    <Appbar.Header style={{ backgroundColor: colors.background }}>
+        <Appbar.BackAction onPress={() => nav.goBack()} color={colors.text} />
+        <Appbar.Content title="My Orders" titleStyle={{ fontWeight: 'bold' }} />
+        <TouchableOpacity onPress={() => nav.navigate('Cart')} style={{ marginRight: 10 }}>
+            <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
+            {count > 0 && <Badge style={{ position: 'absolute', top: 5, right: 5, backgroundColor: colors.primary }} size={16}>{count}</Badge>}
+        </TouchableOpacity>
     </Appbar.Header>
 );
 
-const EmptyOrderState = ({ isDarkMode, colors }) => (
-    <View style={styles.emptyContainer}>
-        <IconButton icon="package-variant" size={70} iconColor={isDarkMode ? '#222222' : '#eeeeee'} />
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>No orders yet</Text>
-        <Text style={styles.emptyText}>Your luxury collection will start here once you place an order.</Text>
-    </View>
-);
-
-const AuthRequiredState = ({ navigation, isDarkMode, colors }) => (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <OrdersHeader navigation={navigation} colors={colors} />
-        <View style={styles.emptyContainer}>
-            <IconButton icon="lock-outline" size={80} iconColor={isDarkMode ? '#333333' : '#eeeeee'} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>Sign in Required</Text>
-            <Text style={styles.emptyText}>Please sign in to view your luxury order history.</Text>
-            <IconButton
-                icon="login"
-                mode="contained"
-                containerColor={colors.primary}
-                iconColor={isDarkMode ? '#000000' : '#ffffff'}
-                size={30}
-                onPress={() => navigation.navigate('Auth')}
-                style={{ marginTop: 20 }}
-            />
+const OrderCard = ({ order, isDark, colors }) => (
+    <Surface style={[styles.card, { borderColor: isDark ? '#333' : '#eee' }]} elevation={0}>
+        <View style={styles.cardTop}>
+            <View>
+                <Text style={[styles.oid, { color: colors.text }]}>Order #{order.id}</Text>
+                <Text style={styles.date}>{new Date(order.date).toLocaleDateString()}</Text>
+            </View>
+            <Chip style={{ backgroundColor: isDark ? '#121' : '#efe' }} textStyle={{ color: isDark ? colors.primary : '#27ae60', fontSize: 10 }}>{order.status}</Chip>
         </View>
-    </View>
+
+        <View style={styles.items}>
+            {order.items.slice(0, 3).map((item, i) => (
+                <Image key={i} source={item.image} style={styles.thumb} />
+            ))}
+            {order.items.length > 3 && <View style={styles.more}><Text style={{ fontSize: 10 }}>+{order.items.length - 3}</Text></View>}
+        </View>
+
+        <View style={[styles.cardBot, { borderTopColor: isDark ? '#222' : '#f9f9f9' }]}>
+            <Text style={{ color: '#999' }}>Paid Amount</Text>
+            <Text style={[styles.total, { color: isDark ? colors.primary : '#000' }]}>₹{order.total}</Text>
+        </View>
+    </Surface>
 );
-
-const OrderCard = ({ order, isDarkMode, themeColors }) => {
-    const formattedDate = new Date(order.purchaseDate || order.date).toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    });
-
-    const displayItems = order.items.slice(0, 3);
-    const remainingCount = Math.max(0, order.items.length - 3);
-
-    return (
-        <Surface style={[styles.card, { borderColor: isDarkMode ? '#333333' : '#f2f2f2' }]} elevation={0}>
-            <View style={styles.cardHeader}>
-                <View>
-                    <Text style={[styles.orderId, { color: themeColors.text }]}>Order #{order.id}</Text>
-                    <Text style={styles.orderDate}>{formattedDate}</Text>
-                </View>
-                <Chip
-                    style={[styles.statusChip, { backgroundColor: isDarkMode ? '#112211' : '#eefcf1' }]}
-                    textStyle={[styles.statusText, { color: isDarkMode ? themeColors.primary : '#27ae60' }]}
-                >
-                    {order.orderStatus || order.status}
-                </Chip>
-            </View>
-
-            <View style={styles.gallery}>
-                {displayItems.map((item, index) => (
-                    <View key={index} style={[styles.thumbBox, { backgroundColor: isDarkMode ? '#0a0a0a' : '#fafafa' }]}>
-                        <Image source={item.image} style={styles.thumbImage} />
-                    </View>
-                ))}
-
-                {remainingCount > 0 && (
-                    <View style={[styles.moreBadge, { backgroundColor: isDarkMode ? '#333333' : '#f5f5f5' }]}>
-                        <Text style={[styles.moreText, { color: isDarkMode ? '#ffffff' : '#666666' }]}>
-                            +{remainingCount}
-                        </Text>
-                    </View>
-                )}
-            </View>
-
-            <View style={[styles.cardFooter, { borderTopColor: isDarkMode ? '#222222' : '#f9f9f9' }]}>
-                <Text style={styles.summaryLabel}>Total Paid</Text>
-                <Text style={[styles.summaryValue, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>
-                    ₹{order.totalAmount || order.total}
-                </Text>
-            </View>
-        </Surface>
-    );
-};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    appbar: {
-        borderBottomWidth: 0,
-        elevation: 0
-    },
-    appbarTitle: {
-        fontWeight: 'bold'
-    },
-    listContainer: {
-        padding: 20
-    },
-    card: {
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 20,
-        borderWidth: 1,
-        backgroundColor: 'transparent'
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20
-    },
-    orderId: {
-        fontSize: 16,
-        fontWeight: 'bold'
-    },
-    orderDate: {
-        fontSize: 12,
-        color: '#aaaaaa',
-        marginTop: 2
-    },
-    statusChip: {
-        borderRadius: 8
-    },
-    statusText: {
-        fontSize: 12,
-        fontWeight: 'bold'
-    },
-    gallery: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20
-    },
-    thumbBox: {
-        width: 60,
-        height: 60,
-        borderRadius: 12,
-        marginRight: 10,
-        overflow: 'hidden'
-    },
-    thumbImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover'
-    },
-    moreBadge: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    moreText: {
-        fontSize: 13,
-        fontWeight: 'bold'
-    },
-    cardFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingTop: 15,
-        borderTopWidth: 1,
-        alignItems: 'center'
-    },
-    summaryLabel: {
-        color: '#999999',
-        fontSize: 14
-    },
-    summaryValue: {
-        fontSize: 18,
-        fontWeight: '900'
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 100
-    },
-    emptyTitle: {
-        fontSize: 22,
-        fontWeight: 'bold'
-    },
-    emptyText: {
-        fontSize: 15,
-        color: '#999999',
-        marginTop: 8,
-        textAlign: 'center',
-        paddingHorizontal: 40
-    }
+    container: { flex: 1 },
+    empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    card: { borderRadius: 16, padding: 15, marginBottom: 15, borderWidth: 1, backgroundColor: 'transparent' },
+    cardTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
+    oid: { fontWeight: 'bold' },
+    date: { fontSize: 11, color: '#aaa' },
+    items: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+    thumb: { width: 50, height: 50, borderRadius: 10, marginRight: 8 },
+    more: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center' },
+    cardBot: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, borderTopWidth: 1, alignItems: 'center' },
+    total: { fontSize: 18, fontWeight: '900' }
 });
 
 export default OrdersScreen;

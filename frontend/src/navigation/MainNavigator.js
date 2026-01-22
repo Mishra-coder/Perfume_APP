@@ -1,39 +1,34 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import SplashScreen from '../screens/SplashScreen';
-import HomeScreen from '../screens/HomeScreen';
-import ProductDetailScreen from '../screens/ProductDetailScreen';
-import CartScreen from '../screens/CartScreen';
-import RecommendationScreen from '../screens/RecommendationScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import CheckoutScreen from '../screens/CheckoutScreen';
-import SuccessScreen from '../screens/SuccessScreen';
-import OrdersScreen from '../screens/OrdersScreen';
-import AuthScreen from '../screens/AuthScreen';
-import WishlistScreen from '../screens/WishlistScreen';
+import Splash from '../screens/SplashScreen';
+import Home from '../screens/HomeScreen';
+import Detail from '../screens/ProductDetailScreen';
+import Cart from '../screens/CartScreen';
+import Recs from '../screens/RecommendationScreen';
+import Profile from '../screens/ProfileScreen';
+import Check from '../screens/CheckoutScreen';
+import Done from '../screens/SuccessScreen';
+import Hist from '../screens/OrdersScreen';
+import Auth from '../screens/AuthScreen';
+import Wish from '../screens/WishlistScreen';
 
 const Stack = createStackNavigator();
 
-const MainNavigator = () => {
-    return (
-        <Stack.Navigator
-            initialRouteName="Splash"
-            screenOptions={{ headerShown: false }}
-        >
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Main" component={HomeScreen} />
-            <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-            <Stack.Screen name="Cart" component={CartScreen} />
-            <Stack.Screen name="Recommendation" component={RecommendationScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
-            <Stack.Screen name="Success" component={SuccessScreen} />
-            <Stack.Screen name="Orders" component={OrdersScreen} />
-            <Stack.Screen name="Auth" component={AuthScreen} />
-            <Stack.Screen name="Wishlist" component={WishlistScreen} />
-        </Stack.Navigator>
-    );
-};
+const MainNavigator = () => (
+    <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="Main" component={Home} />
+        <Stack.Screen name="ProductDetail" component={Detail} />
+        <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="Recommendation" component={Recs} />
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Checkout" component={Check} />
+        <Stack.Screen name="Success" component={Done} />
+        <Stack.Screen name="Orders" component={Hist} />
+        <Stack.Screen name="Auth" component={Auth} />
+        <Stack.Screen name="Wishlist" component={Wish} />
+    </Stack.Navigator>
+);
 
 export default MainNavigator;

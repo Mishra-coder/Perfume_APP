@@ -9,339 +9,88 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ProductDetailScreen = ({ navigation, route }) => {
     const { product } = route.params;
-    const { addToCart, getTotalItems } = useCart();
+    const { addToCart, count } = useCart();
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
     const { toggleWishlist, isInWishlist } = useUser();
 
-    const [quantity, setQuantity] = useState(1);
-    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
-    const [activeImage, setActiveImage] = useState(product.image);
+    const [qty, setQty] = useState(1);
+    const [snack, setSnack] = useState(false);
+    const [activeImg, setActiveImg] = useState(product.image);
 
-    const handleAddToCart = () => {
-        addToCart(product, quantity);
-        setIsSnackbarVisible(true);
+    const onAdd = () => {
+        addToCart(product, qty);
+        setSnack(true);
     };
 
-    const isProductInWishlist = isInWishlist(product.id);
+    const isFav = isInWishlist(product.id);
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Header
-                navigation={navigation}
-                isFavorite={isProductInWishlist}
-                onToggleWishlist={() => toggleWishlist(product)}
-                cartItemCount={getTotalItems()}
-                isDarkMode={isDarkMode}
-                colors={colors}
-            />
+            <View style={styles.header}>
+                <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <IconButton icon={isFav ? "heart" : "heart-outline"} size={24} iconColor={isFav ? colors.primary : colors.text} onPress={() => toggleWishlist(product)} />
+                    <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                        <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
+                        {count > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]} size={16}>{count}</Badge>}
+                    </TouchableOpacity>
+                </View>
+            </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <ImageGallery
-                    activeImage={activeImage}
-                    images={[product.image, product.image, product.image]}
-                    onSelectImage={setActiveImage}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                />
+            <ScrollView contentContainerStyle={{ paddingBottom: 50 }} showsVerticalScrollIndicator={false}>
+                <View style={[styles.gallery, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
+                    <Image source={activeImg} style={styles.mainImg} />
+                </View>
 
-                <View style={[styles.detailsContainer, { backgroundColor: colors.background }]}>
-                    <ProductHeader
-                        name={product.name}
-                        category={product.category}
-                        price={product.price}
-                        isDarkMode={isDarkMode}
-                        colors={colors}
-                    />
+                <View style={styles.content}>
+                    <View style={styles.row}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={[styles.name, { color: colors.text }]}>{product.name}</Text>
+                            <Text style={styles.cat}>{product.category} • EDP</Text>
+                        </View>
+                        <Text style={[styles.price, { color: colors.primary }]}>₹{product.price}</Text>
+                    </View>
 
-                    <RatingSection isDarkMode={isDarkMode} colors={colors} />
+                    <Text style={[styles.section, { color: colors.text }]}>The Scent</Text>
+                    <Text style={[styles.desc, { color: isDarkMode ? '#aaa' : '#666' }]}>{product.description}</Text>
 
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>The Scent Profile</Text>
-                    <Text style={[styles.description, { color: isDarkMode ? '#aaaaaa' : '#666666' }]}>
-                        {product.description}
-                    </Text>
+                    <View style={styles.counterRow}>
+                        <Text style={{ fontWeight: 'bold', color: colors.text }}>Quantity</Text>
+                        <View style={[styles.counter, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
+                            <TouchableOpacity onPress={() => setQty(q => Math.max(1, q - 1))} style={styles.countBtn}><Text style={{ color: colors.text }}>−</Text></TouchableOpacity>
+                            <Text style={[styles.countVal, { color: colors.text }]}>{qty}</Text>
+                            <TouchableOpacity onPress={() => setQty(q => q + 1)} style={styles.countBtn}><Text style={{ color: colors.text }}>+</Text></TouchableOpacity>
+                        </View>
+                    </View>
 
-                    <QuantitySelector
-                        quantity={quantity}
-                        onIncrease={() => setQuantity(q => q + 1)}
-                        onDecrease={() => setQuantity(q => Math.max(1, q - 1))}
-                        isDarkMode={isDarkMode}
-                        colors={colors}
-                    />
-
-                    <AddToCartButton
-                        onPress={handleAddToCart}
-                        isDarkMode={isDarkMode}
-                        colors={colors}
-                    />
+                    <Button mode="contained" onPress={onAdd} style={styles.buyBtn} contentStyle={{ height: 56 }} buttonColor={colors.primary} labelStyle={{ color: isDarkMode ? '#000' : '#fff' }}>Add to Bag</Button>
                 </View>
             </ScrollView>
 
-            <Snackbar
-                visible={isSnackbarVisible}
-                onDismiss={() => setIsSnackbarVisible(false)}
-                duration={2000}
-                style={[styles.snackbar, { backgroundColor: isDarkMode ? '#f5f5f5' : '#1a1a1a' }]}
-            >
-                <Text style={[styles.snackbarText, { color: isDarkMode ? '#000000' : '#ffffff' }]}>
-                    Successfully added to cart!
-                </Text>
-            </Snackbar>
+            <Snackbar visible={snack} onDismiss={() => setSnack(false)} duration={1500}>Added to bag!</Snackbar>
         </View>
     );
 };
 
-const Header = ({ navigation, isFavorite, onToggleWishlist, cartItemCount, isDarkMode, colors }) => (
-    <View style={styles.header}>
-        <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
-        <View style={styles.headerRight}>
-            <IconButton
-                icon={isFavorite ? "heart" : "heart-outline"}
-                size={24}
-                iconColor={isFavorite ? colors.primary : colors.text}
-                onPress={onToggleWishlist}
-            />
-            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.cartButton}>
-                <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
-                {cartItemCount > 0 && (
-                    <Badge style={[styles.badge, { backgroundColor: colors.primary, color: isDarkMode ? '#000000' : '#ffffff' }]} size={18}>
-                        {cartItemCount}
-                    </Badge>
-                )}
-            </TouchableOpacity>
-        </View>
-    </View>
-);
-
-const ImageGallery = ({ activeImage, images, onSelectImage, isDarkMode, colors }) => (
-    <View style={[styles.galleryContainer, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
-        <Image source={activeImage} style={styles.mainImage} />
-        <View style={[styles.thumbnailsRow, { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.7)' }]}>
-            {images.map((img, index) => (
-                <TouchableOpacity
-                    key={index}
-                    style={[styles.thumbnail, activeImage === img && { borderColor: colors.primary }]}
-                    onPress={() => onSelectImage(img)}
-                >
-                    <Image source={img} style={styles.thumbnailImage} />
-                </TouchableOpacity>
-            ))}
-        </View>
-    </View>
-);
-
-const ProductHeader = ({ name, category, price, isDarkMode, colors }) => (
-    <View style={styles.titleRow}>
-        <View style={styles.titleInfo}>
-            <Text style={[styles.productName, { color: colors.text }]}>{name}</Text>
-            <Text style={styles.productCategory}>{category} • Eau De Parfum</Text>
-        </View>
-        <Text style={[styles.productPrice, { color: isDarkMode ? colors.primary : '#000000' }]}>₹{price}</Text>
-    </View>
-);
-
-const RatingSection = ({ isDarkMode, colors }) => (
-    <View style={styles.ratingContainer}>
-        <View style={styles.starsRow}>
-            {[1, 2, 3, 4, 5].map(i => (
-                <IconButton key={i} icon="star" size={14} iconColor={isDarkMode ? colors.primary : "#000000"} style={styles.starIcon} />
-            ))}
-        </View>
-        <Text style={styles.ratingText}>(4.9 • 120 reviews)</Text>
-    </View>
-);
-
-const QuantitySelector = ({ quantity, onIncrease, onDecrease, isDarkMode, colors }) => (
-    <View style={styles.quantityContainer}>
-        <Text style={[styles.quantityLabel, { color: colors.text }]}>Quantity</Text>
-        <View style={[styles.counterBox, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
-            <TouchableOpacity onPress={onDecrease} style={styles.counterButton}>
-                <Text style={[styles.counterText, { color: colors.text }]}>−</Text>
-            </TouchableOpacity>
-            <Text style={[styles.quantityValue, { color: colors.text }]}>{quantity}</Text>
-            <TouchableOpacity onPress={onIncrease} style={styles.counterButton}>
-                <Text style={[styles.counterText, { color: colors.text }]}>+</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-);
-
-const AddToCartButton = ({ onPress, isDarkMode, colors }) => (
-    <Button
-        mode="contained"
-        style={[styles.addButton, { backgroundColor: colors.primary }]}
-        contentStyle={styles.addButtonContent}
-        labelStyle={[styles.addButtonLabel, { color: isDarkMode ? '#000000' : '#ffffff' }]}
-        onPress={onPress}
-    >
-        Add to Cart
-    </Button>
-);
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 50,
-        paddingHorizontal: 15,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10
-    },
-    headerRight: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    cartButton: {
-        marginLeft: 5
-    },
-    badge: {
-        position: 'absolute',
-        top: 5,
-        right: 5
-    },
-    scrollContent: {
-        paddingBottom: 50
-    },
-    galleryContainer: {
-        width: '100%',
-        height: SCREEN_WIDTH * 1.2,
-        justifyContent: 'flex-end'
-    },
-    mainImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover'
-    },
-    thumbnailsRow: {
-        flexDirection: 'row',
-        position: 'absolute',
-        bottom: 20,
-        alignSelf: 'center',
-        borderRadius: 20,
-        padding: 8
-    },
-    thumbnail: {
-        width: 50,
-        height: 50,
-        borderRadius: 12,
-        overflow: 'hidden',
-        marginHorizontal: 5,
-        borderWidth: 2,
-        borderColor: 'transparent'
-    },
-    thumbnailImage: {
-        width: '100%',
-        height: '100%'
-    },
-    detailsContainer: {
-        padding: 25,
-        marginTop: -30,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30
-    },
-    titleRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start'
-    },
-    titleInfo: {
-        flex: 1
-    },
-    productName: {
-        fontSize: 28,
-        fontWeight: '900',
-        letterSpacing: -0.5
-    },
-    productCategory: {
-        fontSize: 14,
-        color: '#888888',
-        marginTop: 5
-    },
-    productPrice: {
-        fontSize: 24,
-        fontWeight: '900'
-    },
-    ratingContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 15
-    },
-    starsRow: {
-        flexDirection: 'row'
-    },
-    starIcon: {
-        margin: 0
-    },
-    ratingText: {
-        fontSize: 12,
-        color: '#aaaaaa',
-        marginLeft: 5
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 30,
-        marginBottom: 12
-    },
-    description: {
-        fontSize: 15,
-        lineHeight: 24
-    },
-    quantityContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 40,
-        marginBottom: 30
-    },
-    quantityLabel: {
-        fontSize: 16,
-        fontWeight: 'bold'
-    },
-    counterBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 15,
-        padding: 5
-    },
-    counterButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    counterText: {
-        fontSize: 20,
-        fontWeight: 'bold'
-    },
-    quantityValue: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginHorizontal: 15
-    },
-    addButton: {
-        borderRadius: 15
-    },
-    addButtonContent: {
-        height: 60
-    },
-    addButtonLabel: {
-        fontWeight: 'bold',
-        fontSize: 16
-    },
-    snackbar: {
-        borderRadius: 10
-    },
-    snackbarText: {
-        textAlign: 'center'
-    }
+    container: { flex: 1 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15, paddingTop: 50, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
+    badge: { position: 'absolute', top: 5, right: 5 },
+    gallery: { width: '100%', height: SCREEN_WIDTH * 1, justifyContent: 'center', alignItems: 'center' },
+    mainImg: { width: '80%', height: '80%', resizeMode: 'contain' },
+    content: { padding: 25, borderTopLeftRadius: 30, borderTopRightRadius: 30, marginTop: -30, backgroundColor: 'transparent' },
+    row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+    name: { fontSize: 26, fontWeight: '900' },
+    cat: { fontSize: 13, color: '#888', marginTop: 4 },
+    price: { fontSize: 22, fontWeight: '900' },
+    section: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10 },
+    desc: { fontSize: 15, lineHeight: 22 },
+    counterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 35 },
+    counter: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 4 },
+    countBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+    countVal: { fontSize: 16, fontWeight: 'bold', marginHorizontal: 15 },
+    buyBtn: { borderRadius: 15 }
 });
 
 export default ProductDetailScreen;

@@ -22,5 +22,23 @@
     "name": "Ba",
     "email": "s@gmail.com",
     "password": "$2b$10$7c5RAWt3Co2dFzhRHGv2KelqRUUnSm9Yb.ykGvEYXqTjmTtATwtfu"
+  },
+  {
+    "id": 1769121033820,
+    "name": "sdew",
+    "email": "ub@gmail.com",
+    "password": "$2b$10$y8zD.j9C1ygSzSLsUxb0Y.gv/4ACwW4n9d469vI6RzP6.3HREI.Ta"
+  },
+  {
+    "id": 1769121123841,
+    "name": "Devw",
+    "email": "ka@gmail.com",
+    "password": "$2b$10$ka1yXEh6NLwFqTps31Y5yuuQiNGYYjgNDKUQHfseyJeBZRDC/NiDu"
+  },
+  {
+    "id": 1769121320787,
+    "name": "I’d ",
+    "email": "c@gmail.com",
+    "password": "$2b$10$cVljoNmXlIkzXOIUHXcUS.G2iUrEcXIFgY2Y9qG.X9euprkqPKzf2"
   }
 ]
