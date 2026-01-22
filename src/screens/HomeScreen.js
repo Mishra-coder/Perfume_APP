@@ -148,6 +148,7 @@ const HomeScreen = ({ navigation }) => {
             <FlatList
                 data={remainingItems}
                 keyExtractor={item => item.id.toString()}
+                numColumns={2}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
@@ -164,13 +165,14 @@ const HomeScreen = ({ navigation }) => {
                     />
                 }
                 renderItem={({ item }) => (
-                    <ProductRow
+                    <ProductGridItem
                         product={item}
                         isDarkMode={isDarkMode}
                         themeColors={colors}
                         onPress={() => navigation.navigate('ProductDetail', { product: item })}
                     />
                 )}
+                columnWrapperStyle={styles.columnWrapper}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No scents found matching your search.</Text>
@@ -310,19 +312,37 @@ const FeaturedCard = ({ product, onPress, isDarkMode, themeColors }) => (
     </TouchableOpacity>
 );
 
-const ProductRow = ({ product, onPress, isDarkMode, themeColors }) => (
-    <TouchableOpacity style={styles.productRow} onPress={onPress} activeOpacity={0.8}>
-        <View style={[styles.thumbnailWrapper, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
-            <Image source={product.image} style={styles.thumbnail} />
-        </View>
-        <View style={styles.productInfo}>
-            <Text style={[styles.productName, { color: themeColors.text }]}>{product.name}</Text>
-            <Text style={styles.productCategory}>{product.category} • Eau De Parfum</Text>
-            <Text style={[styles.productPrice, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>₹{product.price}</Text>
-        </View>
-        <IconButton icon="chevron-right" size={20} iconColor={isDarkMode ? '#333333' : '#eeeeee'} />
-    </TouchableOpacity>
-);
+const ProductGridItem = ({ product, onPress, isDarkMode, themeColors }) => {
+    const itemWidth = (SCREEN_WIDTH - 60) / 2;
+
+    return (
+        <TouchableOpacity
+            style={[styles.gridItem, { width: itemWidth }]}
+            onPress={onPress}
+            activeOpacity={0.8}
+        >
+            <View style={[styles.gridImageWrapper, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
+                <Image source={product.image} style={styles.gridImage} />
+                <View style={styles.gridBadge}>
+                    <Text style={styles.gridBadgeText}>PARFUM</Text>
+                </View>
+            </View>
+            <View style={styles.gridInfo}>
+                <Text style={[styles.gridName, { color: themeColors.text }]} numberOfLines={1}>{product.name}</Text>
+                <Text style={styles.gridCategory} numberOfLines={1}>{product.category} • EDP</Text>
+                <View style={styles.gridFooter}>
+                    <Text style={[styles.gridPrice, { color: isDarkMode ? themeColors.primary : '#1a1a1a' }]}>₹{product.price}</Text>
+                    <IconButton
+                        icon="arrow-right-thin"
+                        size={18}
+                        iconColor={isDarkMode ? '#555555' : '#cccccc'}
+                        style={styles.gridArrow}
+                    />
+                </View>
+            </View>
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -389,40 +409,66 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
-    productRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    columnWrapper: {
+        justifyContent: 'space-between',
         paddingHorizontal: 25,
         marginBottom: 20
     },
-    thumbnailWrapper: {
-        width: 80,
-        height: 80,
-        borderRadius: 20,
-        overflow: 'hidden'
+    gridItem: {
+        marginBottom: 10
     },
-    thumbnail: {
+    gridImageWrapper: {
+        height: 180,
+        borderRadius: 24,
+        overflow: 'hidden',
+        position: 'relative'
+    },
+    gridImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover'
     },
-    productInfo: {
-        flex: 1,
-        marginLeft: 15
+    gridBadge: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6
     },
-    productName: {
-        fontSize: 16,
-        fontWeight: 'bold'
+    gridBadgeText: {
+        color: '#ffffff',
+        fontSize: 8,
+        fontWeight: 'bold',
+        letterSpacing: 1
     },
-    productCategory: {
-        fontSize: 12,
-        color: '#666666',
+    gridInfo: {
+        marginTop: 12,
+        paddingHorizontal: 4
+    },
+    gridName: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        letterSpacing: -0.3
+    },
+    gridCategory: {
+        fontSize: 11,
+        color: '#888888',
+        marginTop: 2
+    },
+    gridFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 4
     },
-    productPrice: {
-        fontSize: 15,
-        fontWeight: '900',
-        marginTop: 6
+    gridPrice: {
+        fontSize: 16,
+        fontWeight: '900'
+    },
+    gridArrow: {
+        margin: -8
     },
     emptyContainer: {
         padding: 50,
