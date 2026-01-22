@@ -11,10 +11,22 @@ const AuthScreen = ({ navigation }) => {
 
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [errors, setErrors] = useState({});
+
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const hasCapital = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        return hasCapital && hasNumber;
+    };
 
     const isFormValid = isLoginMode
         ? (formData.email && formData.password)
-        : (formData.name && formData.email && formData.password);
+        : (formData.name && validateEmail(formData.email) && validatePassword(formData.password));
 
     const handleAuthentication = () => {
         const userName = formData.name || formData.email.split('@')[0];
@@ -22,7 +34,21 @@ const AuthScreen = ({ navigation }) => {
         navigation.goBack();
     };
 
-    const updateField = (key, value) => setFormData({ ...formData, [key]: value });
+    const updateField = (key, value) => {
+        setFormData({ ...formData, [key]: value });
+
+        // Dynamic error checking for Sign Up
+        if (!isLoginMode) {
+            let newErrors = { ...errors };
+            if (key === 'email') {
+                newErrors.email = value && !validateEmail(value) ? 'Invalid email format' : null;
+            }
+            if (key === 'password') {
+                newErrors.password = value && !validatePassword(value) ? 'Need 1 capital & 1 number' : null;
+            }
+            setErrors(newErrors);
+        }
+    };
 
     return (
         <KeyboardAvoidingView
@@ -63,7 +89,9 @@ const AuthScreen = ({ navigation }) => {
                         autoCapitalize="none"
                         style={styles.inputField}
                         activeOutlineColor={colors.primary}
+                        error={!!errors.email}
                     />
+                    {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
                     <TextInput
                         label="Password"
@@ -73,7 +101,9 @@ const AuthScreen = ({ navigation }) => {
                         secureTextEntry
                         style={styles.inputField}
                         activeOutlineColor={colors.primary}
+                        error={!!errors.password}
                     />
+                    {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
                     <Button
                         mode="contained"
@@ -153,6 +183,13 @@ const styles = StyleSheet.create({
     linkText: {
         fontWeight: 'bold',
         textDecorationLine: 'underline'
+    },
+    errorText: {
+        color: '#d32f2f',
+        fontSize: 11,
+        marginTop: -10,
+        marginBottom: 10,
+        marginLeft: 4
     }
 });
 
