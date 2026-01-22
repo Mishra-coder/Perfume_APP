@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1769119152249,
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2b$10$X4Kd1gNUDAVSKZrImUtD/OLBjKHc/wuCOeSofxZyFFrcUELaj6r0O"
+  },
+  {
+    "id": 1769119231591,
+    "name": "Dev",
+    "email": "a@gmail.com",
+    "password": "$2b$10$mRa8IaSTbb.5BCt4pK0goO4Rk5fcYnu1Tf3SeJfPrmJM8RuLh1SAy"
+  },
+  {
+    "id": 1769119416620,
+    "name": "Saw",
+    "email": "q@gmail.com",
+    "password": "$2b$10$W9I2zMWF4wQpZuIiRXKfpubUOkg6d1SmtgI91t2PutHA9OFH0jO6m"
+  },
+  {
+    "id": 1769119529717,
+    "name": "Ba",
+    "email": "s@gmail.com",
+    "password": "$2b$10$7c5RAWt3Co2dFzhRHGv2KelqRUUnSm9Yb.ykGvEYXqTjmTtATwtfu"
+  }
+]
