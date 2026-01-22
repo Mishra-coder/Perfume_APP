@@ -114,6 +114,15 @@ const SettingsMenu = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, navigatio
         <Text style={[styles.sectionTitle, { color: colors.primary, marginTop: 25 }]}>More</Text>
 
         <MenuItem
+            icon="cart-outline"
+            title="My Cart"
+            subtitle="View your shopping cart"
+            onPress={() => navigation.navigate('Cart')}
+            colors={colors}
+            isDarkMode={isDarkMode}
+        />
+
+        <MenuItem
             icon="heart-outline"
             title="My Wishlist"
             subtitle="View your saved fragrances"

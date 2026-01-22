@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import FilterModal from '../components/FilterModal';
+import Header from '../components/Header';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -127,28 +128,22 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            {isSearchActive ? (
-                <SearchHeader
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    onClose={() => setIsSearchActive(false)}
-                    onClear={() => setSearchQuery('')}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                />
-            ) : (
-                <StandardHeader
-                    navigation={navigation}
-                    onSearchPress={() => setIsSearchActive(true)}
-                    onFilterPress={() => setIsFilterModalVisible(true)}
-                    filterCount={getActiveFilterCount()}
-                    cartCount={getTotalItems()}
-                    wishlistCount={(user.wishlist || []).length}
-                    ordersCount={(user.orders || []).length}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                />
-            )}
+            <Header
+                isSearchActive={isSearchActive}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onCloseSearch={() => setIsSearchActive(false)}
+                onClearSearch={() => setSearchQuery('')}
+                onSearchPress={() => setIsSearchActive(true)}
+                onFilterPress={() => setIsFilterModalVisible(true)}
+                navigation={navigation}
+                filterCount={getActiveFilterCount()}
+                cartCount={getTotalItems()}
+                wishlistCount={(user.wishlist || []).length}
+                ordersCount={(user.orders || []).length}
+                isDarkMode={isDarkMode}
+                colors={colors}
+            />
 
             <FlatList
                 data={remainingItems}
@@ -159,6 +154,7 @@ const HomeScreen = ({ navigation }) => {
                 ListHeaderComponent={
                     <ListHeader
                         featuredItems={featuredItems}
+                        setIsFilterModalVisible={setIsFilterModalVisible}
                         filters={filters}
                         setFilters={setFilters}
                         clearAllFilters={clearAllFilters}
@@ -205,69 +201,9 @@ const HomeScreen = ({ navigation }) => {
     );
 };
 
-const StandardHeader = ({ navigation, onSearchPress, onFilterPress, filterCount, cartCount, wishlistCount, ordersCount, isDarkMode, colors }) => (
-    <View style={styles.standardHeader}>
-        <IconButton icon="menu" size={24} iconColor={colors.text} onPress={() => navigation.navigate('Recommendation')} />
-        <View style={styles.headerActions}>
-            <IconButton icon="magnify" size={24} iconColor={colors.text} onPress={onSearchPress} />
 
-            <BadgeIcon
-                icon="filter-variant"
-                count={filterCount}
-                onPress={onFilterPress}
-                themeColors={colors}
-                isDarkMode={isDarkMode}
-            />
 
-            <BadgeIcon
-                icon="heart-outline"
-                count={wishlistCount}
-                onPress={() => navigation.navigate('Wishlist')}
-                themeColors={colors}
-                isDarkMode={isDarkMode}
-            />
-
-            <BadgeIcon
-                icon="shopping-outline"
-                count={cartCount}
-                onPress={() => navigation.navigate('Cart')}
-                themeColors={colors}
-                isDarkMode={isDarkMode}
-            />
-
-            <BadgeIcon
-                icon="package-variant-closed"
-                count={ordersCount}
-                onPress={() => navigation.navigate('Orders')}
-                themeColors={colors}
-                isDarkMode={isDarkMode}
-            />
-
-            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                <Avatar.Icon size={36} icon="account" backgroundColor={isDarkMode ? '#1a1a1a' : '#f5f5f5'} color={colors.text} />
-            </TouchableOpacity>
-        </View>
-    </View>
-);
-
-const SearchHeader = ({ searchQuery, onSearchChange, onClose, onClear, isDarkMode, colors }) => (
-    <View style={[styles.searchHeader, { borderBottomColor: isDarkMode ? '#333333' : '#f0f0f0' }]}>
-        <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={onClose} />
-        <TextInput
-            placeholder="Search luxury scents..."
-            value={searchQuery}
-            onChangeText={onSearchChange}
-            autoFocus
-            style={[styles.searchInput, { color: colors.text }]}
-            placeholderTextColor={isDarkMode ? "#666666" : "#aaaaaa"}
-        />
-        {searchQuery.length > 0 && (
-            <IconButton icon="close-circle" size={20} iconColor={colors.primary} onPress={onClear} />
-        )}
-    </View>
-);
-
-const ListHeader = ({ featuredItems, filters, setFilters, clearAllFilters, navigation, isDarkMode, colors }) => (
+const ListHeader = ({ featuredItems, filters, setFilters, clearAllFilters, navigation, isDarkMode, colors, setIsFilterModalVisible }) => (
     <View>
         <View style={styles.heroSection}>
             <Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text>
@@ -330,7 +266,17 @@ const ListHeader = ({ featuredItems, filters, setFilters, clearAllFilters, navig
             </View>
         )}
 
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Our Collection</Text>
+        <View style={styles.collectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Our Collection</Text>
+            <IconButton
+                icon="filter-variant"
+                mode="contained"
+                containerColor={isDarkMode ? '#333' : '#f0f0f0'}
+                iconColor={colors.text}
+                size={20}
+                onPress={() => setIsFilterModalVisible(true)}
+            />
+        </View>
     </View>
 );
 
@@ -352,16 +298,7 @@ const ActiveFilterChip = ({ label, onClose, colors }) => (
     </Chip>
 );
 
-const BadgeIcon = ({ icon, count, onPress, themeColors, isDarkMode }) => (
-    <TouchableOpacity onPress={onPress} style={styles.badgeWrapper}>
-        <IconButton icon={icon} size={24} iconColor={themeColors.text} />
-        {count > 0 && (
-            <Badge style={[styles.badge, { backgroundColor: themeColors.primary, color: isDarkMode ? '#000000' : '#ffffff' }]} size={18}>
-                {count}
-            </Badge>
-        )}
-    </TouchableOpacity>
-);
+
 
 const FeaturedCard = ({ product, onPress, isDarkMode, themeColors }) => (
     <TouchableOpacity style={[styles.featuredCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fafafa' }]} onPress={onPress} activeOpacity={0.9}>
@@ -391,40 +328,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    standardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 50,
-        paddingHorizontal: 15
-    },
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    searchHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 50,
-        paddingHorizontal: 15,
-        borderBottomWidth: 1,
-        paddingBottom: 10
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 16,
-        paddingVertical: 8
-    },
-    badgeWrapper: {
-        marginRight: 5
-    },
-    badge: {
-        position: 'absolute',
-        top: 5,
-        right: 5
-    },
     listContent: {
-        paddingBottom: 100
+        paddingBottom: 100,
+        paddingTop: 10 // Add slight top padding for content
     },
     heroSection: {
         padding: 25
@@ -471,11 +377,17 @@ const styles = StyleSheet.create({
         marginTop: 5,
         fontWeight: '900'
     },
+    collectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 25,
+        marginBottom: 15,
+        marginTop: 10
+    },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginHorizontal: 25,
-        marginBottom: 20
     },
     productRow: {
         flexDirection: 'row',
