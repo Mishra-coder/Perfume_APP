@@ -1,17 +1,24 @@
 import { Image } from 'react-native';
 
-const perfumeImg1 = require('../assets/perfumes/p1.jpg');
-const perfumeImg2 = require('../assets/perfumes/p2.jpg');
-const perfumeImg3 = require('../assets/perfumes/p3.jpg');
-const perfumeImg4 = require('../assets/perfumes/p4.jpg');
-const perfumeImg5 = require('../assets/perfumes/p5.jpg');
-const perfumeImg6 = require('../assets/perfumes/p6.jpg');
-const perfumeImg7 = require('../assets/perfumes/p7.jpg');
+const perfumeImg1 = require('../assets/perfumes/5k_7b55f6f3-7569-44da-9b21-5f1acb38c378.jpeg');
+const perfumeImg2 = require('../assets/perfumes/A6mrGrFx_4f49e7e57a6e49b8aa84bf2f2e3a6573.jpg');
+const perfumeImg3 = require('../assets/perfumes/Davidoff-cool-water-parfum-Men.jpg.webp');
+const perfumeImg4 = require('../assets/perfumes/HugoBossBottledTonicEDTForMen100ml.webp');
+const perfumeImg5 = require('../assets/perfumes/pexels-dhally-romy-16363250-15096784.jpg');
+const perfumeImg6 = require('../assets/perfumes/pexels-jay-soundo-2148060180-33820361.jpg');
+const perfumeImg7 = require('../assets/perfumes/pexels-maram-145487840-26838653.jpg');
 const perfumeImg8 = require('../assets/perfumes/p8.jpg');
 const perfumeImg9 = require('../assets/perfumes/p9.jpg');
 const perfumeImg10 = require('../assets/perfumes/p10.jpg');
 const perfumeImg11 = require('../assets/perfumes/p11.jpg');
 const perfumeImg12 = require('../assets/perfumes/p12.jpg');
+const perfumeImg13 = require('../assets/perfumes/p1.jpg');
+const perfumeImg14 = require('../assets/perfumes/p2.jpg');
+const perfumeImg15 = require('../assets/perfumes/p3.jpg');
+const perfumeImg16 = require('../assets/perfumes/p4.jpg');
+const perfumeImg17 = require('../assets/perfumes/p5.jpg');
+const perfumeImg18 = require('../assets/perfumes/p6.jpg');
+const perfumeImg19 = require('../assets/perfumes/p7.jpg');
 
 export const products = [
   {
@@ -241,5 +248,138 @@ export const products = [
     seasons: ["all"],
     strength: 3,
     profile: "mild"
+  },
+  {
+    id: 13,
+    name: "Midnight Oud Classic",
+    price: 11999,
+    image: perfumeImg13,
+    description: "The classic rendition of our signature oud. Deep, resinous, and timelessly elegant.",
+    category: "Oriental",
+    type: "Parfum",
+    notes: {
+      top: ["Saffron", "Pink Pepper"],
+      middle: ["Oud Wood", "Bulgarian Rose"],
+      base: ["Sandalwood", "Amber"]
+    },
+    occasions: ["party", "festival"],
+    timeOfDay: ["night"],
+    seasons: ["winter"],
+    strength: 5,
+    profile: "strong"
+  },
+  {
+    id: 14,
+    name: "Velvet Rose Original",
+    price: 7999,
+    image: perfumeImg14,
+    description: "The original floral masterpiece. Damask rose entwined with rich clove and praline.",
+    category: "Floral",
+    type: "EDP",
+    notes: {
+      top: ["Cloves", "Lemon"],
+      middle: ["Damask Rose", "Peony"],
+      base: ["Praline", "Agarwood"]
+    },
+    occasions: ["date", "party"],
+    timeOfDay: ["night"],
+    seasons: ["all"],
+    strength: 4,
+    profile: "sweet"
+  },
+  {
+    id: 15,
+    name: "Aqua Allegoria Classic",
+    price: 5999,
+    image: perfumeImg15,
+    description: "A fresh burst of Mediterranean citrus. Clean, light, and invigorating.",
+    category: "Fresh",
+    type: "EDT",
+    notes: {
+      top: ["Bergamot", "Grapefruit"],
+      middle: ["Sea Salt", "Lavender"],
+      base: ["Musk", "Cedar"]
+    },
+    occasions: ["gym", "office"],
+    timeOfDay: ["day"],
+    seasons: ["summer"],
+    strength: 2,
+    profile: "fresh"
+  },
+  {
+    id: 16,
+    name: "Emperor Noir Classic",
+    price: 14999,
+    image: perfumeImg16,
+    description: "The power scent that started it all. Fruity top notes with a smoky, mossy base.",
+    category: "Woody",
+    type: "EDP",
+    notes: {
+      top: ["Pineapple", "Black Currant"],
+      middle: ["Birch", "Patchouli"],
+      base: ["Musk", "Oakmoss"]
+    },
+    occasions: ["office", "date"],
+    timeOfDay: ["day", "night"],
+    seasons: ["all"],
+    strength: 4,
+    profile: "mild"
+  },
+  {
+    id: 17,
+    name: "N°5 Timeless",
+    price: 9999,
+    image: perfumeImg17,
+    description: "The timeless aldehyde floral. An icon of elegance and sophistication.",
+    category: "Aromatic",
+    type: "EDT",
+    notes: {
+      top: ["Aldehydes", "Neroli"],
+      middle: ["Jasmine", "May Rose"],
+      base: ["Sandalwood", "Vanilla"]
+    },
+    occasions: ["office", "college"],
+    timeOfDay: ["day"],
+    seasons: ["all"],
+    strength: 2,
+    profile: "mild"
+  },
+  {
+    id: 18,
+    name: "Rouge Crystal Classic",
+    price: 17999,
+    image: perfumeImg18,
+    description: "The original radiant amber floral. Jasmine and saffron on a base of cedar.",
+    category: "Oriental",
+    type: "Parfum",
+    notes: {
+      top: ["Jasmine", "Saffron"],
+      middle: ["Amberwood", "Ambergris"],
+      base: ["Fir Resin", "Cedar"]
+    },
+    occasions: ["party", "date"],
+    timeOfDay: ["night"],
+    seasons: ["winter"],
+    strength: 5,
+    profile: "strong"
+  },
+  {
+    id: 19,
+    name: "Sea Mist Original",
+    price: 6999,
+    image: perfumeImg19,
+    description: "Windswept shore and sea salt. The original mineral scent of rugged cliffs.",
+    category: "Fresh",
+    type: "EDT",
+    notes: {
+      top: ["Ambrette Seeds"],
+      middle: ["Sea Salt", "Grapefruit"],
+      base: ["Sage", "Red Algae"]
+    },
+    occasions: ["gym", "beach"],
+    timeOfDay: ["day"],
+    seasons: ["summer"],
+    strength: 2,
+    profile: "fresh"
   }
 ];
