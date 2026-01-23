@@ -8,6 +8,7 @@
 
 <table>
   <tr>
+<<<<<<< HEAD
     <td><img src="assets/home_screen.png" width="200" alt="Home Screen"/></td>
     <td><img src="assets/product_detail.png" width="200" alt="Product Detail"/></td>
     <td><img src="assets/cart_screen.png" width="200" alt="Cart Screen"/></td>
@@ -16,6 +17,16 @@
     <td><img src="assets/checkout_screen.png" width="200" alt="Checkout"/></td>
     <td><img src="assets/success_screen.png" width="200" alt="Success"/></td>
     <td></td>
+=======
+    <td><img src="assets/splash.png" width="200" alt="Splash Screen"/></td>
+    <td><img src="assets/home.png" width="200" alt="Home Screen"/></td>
+    <td><img src="assets/detail.png" width="200" alt="Product Detail"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/cart.png" width="200" alt="Cart Screen"/></td>
+    <td><img src="assets/checkout.png" width="200" alt="Checkout"/></td>
+    <td><img src="assets/app_qr_code.png" width="120" alt="Download QR"/></td>
+>>>>>>> b2d2626 (Final cle)
   </tr>
 </table>
 
@@ -25,7 +36,11 @@
 
 Scan the QR code below to download the app directly to your Android device:
 
+<<<<<<< HEAD
 ![Aroma Luxe QR Code](assets/app_qr_code.png)
+=======
+<img src="assets/app_qr_code.png" width="150" alt="Aroma Luxe QR Code"/>
+>>>>>>> b2d2626 (Final cle)
 
 ---
 

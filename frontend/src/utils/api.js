@@ -1,4 +1,3 @@
-// Using Vercel production URL for global connectivity
 const BASE_URL = 'https://perfume-app-tau.vercel.app/api';
 
 const request = async (endpoint, method = 'GET', data = null) => {
@@ -11,7 +10,7 @@ const request = async (endpoint, method = 'GET', data = null) => {
 
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
-        // Handle empty responses
+  
         const text = await response.text();
         let result = {};
         try {
