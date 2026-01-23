@@ -2,46 +2,23 @@
 
 > This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
+
 ---
-
 ## Project Showcase
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" />
+<img width="540" height="1388" alt="image" src="https://github.com/user-attachments/assets/34448a22-f3c2-4528-b95e-a9347761b6a2" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/ed9b7cc5-7284-48d3-9c44-ed11de5c2ab3" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/51681285-3ef0-4a66-b918-54c207b23f60" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/33db004d-9d5e-4b5c-89f7-8e6e5e12fc88" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" />
 
-<table>
-  <tr>
-<<<<<<< HEAD
-    <td><img src="assets/home_screen.png" width="200" alt="Home Screen"/></td>
-    <td><img src="assets/product_detail.png" width="200" alt="Product Detail"/></td>
-    <td><img src="assets/cart_screen.png" width="200" alt="Cart Screen"/></td>
-  </tr>
-  <tr>
-    <td><img src="assets/checkout_screen.png" width="200" alt="Checkout"/></td>
-    <td><img src="assets/success_screen.png" width="200" alt="Success"/></td>
-    <td></td>
-=======
-    <td><img src="assets/splash.png" width="200" alt="Splash Screen"/></td>
-    <td><img src="assets/home.png" width="200" alt="Home Screen"/></td>
-    <td><img src="assets/detail.png" width="200" alt="Product Detail"/></td>
-  </tr>
-  <tr>
-    <td><img src="assets/cart.png" width="200" alt="Cart Screen"/></td>
-    <td><img src="assets/checkout.png" width="200" alt="Checkout"/></td>
-    <td><img src="assets/app_qr_code.png" width="120" alt="Download QR"/></td>
->>>>>>> b2d2626 (Final cle)
-  </tr>
-</table>
 
 ---
 
 ## Download the App
-
 Scan the QR code below to download the app directly to your Android device:
-
-<<<<<<< HEAD
-![Aroma Luxe QR Code](assets/app_qr_code.png)
-=======
 <img src="assets/app_qr_code.png" width="150" alt="Aroma Luxe QR Code"/>
->>>>>>> b2d2626 (Final cle)
-
 ---
 
 ## Features
