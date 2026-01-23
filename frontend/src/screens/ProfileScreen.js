@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Appbar, TextInput, Button, Avatar, Text, Surface, IconButton, Switch, Badge, useTheme as usePaperTheme } from 'react-native-paper';
+import * as Updates from 'expo-updates';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
@@ -58,7 +59,20 @@ const ProfileHero = ({ user, editing, setEditing, onUpdate, isDarkMode, colors }
         <View style={styles.hero}>
             <Avatar.Icon size={80} icon="account" backgroundColor={colors.primary} />
             <TextInput label="Name" value={name} onChangeText={setName} mode="outlined" style={styles.input} />
-            <Button mode="contained" onPress={() => { onUpdate(name); setEditing(false); }} buttonColor={colors.primary}>Save</Button>
+            <Button
+                mode="contained"
+                onPress={() => {
+                    if (typeof onUpdate === 'function') {
+                        onUpdate(name);
+                        setEditing(false);
+                    } else {
+                        Alert.alert("System Error", "Update function missing. Please force close and restart the app to apply updates.");
+                    }
+                }}
+                buttonColor={colors.primary}
+            >
+                Save
+            </Button>
         </View>
     );
 
@@ -88,6 +102,21 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
             <Item icon="logout" title="Sign Out" onPress={onLogout} colors={colors} danger /> :
             <Item icon="login" title="Sign In" nav={nav} to="Auth" colors={colors} />
         }
+
+        <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
+            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA_FIX_v2)</Text>
+            <TouchableOpacity onPress={async () => {
+                const u = await Updates.checkForUpdateAsync();
+                if (u.isAvailable) {
+                    await Updates.fetchUpdateAsync();
+                    Alert.alert("Update Found", "Restarting to apply fix...", [{ text: "OK", onPress: () => Updates.reloadAsync() }]);
+                } else {
+                    Alert.alert("No Update", "You are on the latest version.");
+                }
+            }}>
+                <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
+            </TouchableOpacity>
+        </View>
     </View>
 );
 
