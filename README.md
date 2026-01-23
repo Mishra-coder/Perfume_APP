@@ -1,13 +1,31 @@
 # Aroma Luxe - Premium Perfume Boutique
 
->This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
-
-
+> This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
 ---
 
-## 📸 Project Showcase
-*(Aap yahan apne app ki main screenshots ya demo image add kar sakte hain)*
+## Project Showcase
+
+<table>
+  <tr>
+    <td><img src="assets/home_screen.png" width="200" alt="Home Screen"/></td>
+    <td><img src="assets/product_detail.png" width="200" alt="Product Detail"/></td>
+    <td><img src="assets/cart_screen.png" width="200" alt="Cart Screen"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/checkout_screen.png" width="200" alt="Checkout"/></td>
+    <td><img src="assets/success_screen.png" width="200" alt="Success"/></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
+## Download the App
+
+Scan the QR code below to download the app directly to your Android device:
+
+![Aroma Luxe QR Code](assets/app_qr_code.png)
 
 ---
 
@@ -46,6 +64,7 @@
 - **Framework**: Express.js
 - **Security**: JSON Web Tokens (JWT), BcryptJS
 - **Middleware**: CORS, Body-Parser, Dotenv
+- **Database**: MongoDB Atlas (Cloud)
 
 ---
 
@@ -66,11 +85,6 @@ cd Perfume_APP
 ```bash
 cd backend
 npm install
-```
-Create a `.env` file in the `backend` folder:
-```bash
-PORT=3000
-JWT_SECRET=your_jwt_secret_here
 ```
 Start the backend server:
 ```bash
@@ -140,3 +154,5 @@ npx expo start
 **Devendra Mishra**
 
 *Redefining perfume shopping through digital elegance.*
+
+---
