@@ -1,5 +1,5 @@
-// Using local IP for physical device connectivity
-const BASE_URL = 'http://10.254.205.98:3000/api';
+// Using Vercel production URL for global connectivity
+const BASE_URL = 'https://perfume-app-tau.vercel.app/api';
 
 const request = async (endpoint, method = 'GET', data = null) => {
     try {

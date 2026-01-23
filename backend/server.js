@@ -26,4 +26,12 @@ app.use('/api/user', userRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'Aroma Luxe API Active' }));
 
-app.listen(PORT, '0.0.0.0', () => console.log(`Server live on http://10.254.205.98:${PORT}`));
+const startServer = () => {
+    app.listen(PORT, '0.0.0.0', () => console.log(`Server live on http://10.254.205.98:${PORT}`));
+};
+
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;
