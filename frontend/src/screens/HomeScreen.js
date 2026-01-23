@@ -49,14 +49,14 @@ const HomeScreen = ({ navigation }) => {
                 onScroll={e => setShowFab(e.nativeEvent.contentOffset.y > 100)}
                 ListHeaderComponent={
                     <View>
-                        <View style={styles.hero}><Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text><Text style={styles.heroSub}>Premium Curation</Text></View>
+                        <View style={styles.hero}><Text style={[styles.heroTitle, { color: colors.text }]}>Aroma Luxe</Text><Text style={styles.heroSubtitle}>Premium Curation</Text></View>
                         {featured.length > 0 && (
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featured}>
                                 {featured.map(item => <FeaturedItem key={item.id} item={item} isDark={isDarkMode} colors={colors} onPress={() => navigation.navigate('ProductDetail', { product: item })} />)}
                             </ScrollView>
                         )}
-                        <View style={styles.sec}>
-                            <Text style={[styles.secTitle, { color: colors.text }]}>Latest Arrivals</Text>
+                        <View style={styles.sectionHeader}>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Latest Arrivals</Text>
                             <IconButton icon="filter-variant" mode="contained" containerColor={isDarkMode ? '#222' : '#f5f5f5'} iconColor={colors.text} size={20} onPress={() => setFilterVis(true)} />
                         </View>
                     </View>
@@ -147,18 +147,18 @@ const ProductItem = ({ item, onPress, isDarkMode, colors }) => (
 const styles = StyleSheet.create({
     container: { flex: 1 },
     list: { paddingBottom: 100 },
-    hero: { padding: 25 },
+    hero: { paddingHorizontal: 20, paddingTop: 25, paddingBottom: 15 },
     heroTitle: { fontSize: 36, fontWeight: '900' },
     heroSubtitle: { fontSize: 15, color: '#888', marginTop: 5 },
-    featured: { paddingLeft: 25, marginBottom: 30 },
+    featured: { paddingLeft: 20, marginBottom: 30 },
     featuredCard: { width: SCREEN_WIDTH * 0.7, height: 350, marginRight: 20, borderRadius: 25, overflow: 'hidden' },
     featuredImg: { width: '100%', height: '100%' },
     featuredInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 },
     featuredName: { fontSize: 18, fontWeight: 'bold' },
     featuredPrice: { fontSize: 16, fontWeight: '900', marginTop: 4 },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, marginBottom: 15 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 15 },
     sectionTitle: { fontSize: 20, fontWeight: 'bold' },
-    row: { justifyContent: 'space-between', paddingHorizontal: 25, marginBottom: 20 },
+    row: { justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 20 },
     card: { marginBottom: 10 },
     imgWrapper: { height: 180, borderRadius: 20, overflow: 'hidden' },
     img: { width: '100%', height: '100%' },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     price: { fontSize: 15, fontWeight: '900' },
     fab: { position: 'absolute', bottom: 30, right: 20, width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', elevation: 5 },
     fabText: { fontSize: 12, fontWeight: 'bold' },
-    chips: { paddingHorizontal: 25, marginBottom: 20, gap: 8 },
+    chips: { paddingHorizontal: 20, marginBottom: 20, gap: 8 },
     chip: { marginRight: 8 }
 });
 

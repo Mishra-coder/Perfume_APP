@@ -12,6 +12,7 @@ import Done from '../screens/SuccessScreen';
 import Hist from '../screens/OrdersScreen';
 import Auth from '../screens/AuthScreen';
 import Wish from '../screens/WishlistScreen';
+import OrderDetail from '../screens/OrderDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ const MainNavigator = () => (
         <Stack.Screen name="Checkout" component={Check} />
         <Stack.Screen name="Success" component={Done} />
         <Stack.Screen name="Orders" component={Hist} />
+        <Stack.Screen name="OrderDetail" component={OrderDetail} />
         <Stack.Screen name="Auth" component={Auth} />
         <Stack.Screen name="Wishlist" component={Wish} />
     </Stack.Navigator>

@@ -31,7 +31,11 @@ const OrdersScreen = ({ navigation }) => {
                 <FlatList
                     data={orders}
                     keyExtractor={o => o.id.toString()}
-                    renderItem={({ item }) => <OrderCard order={item} isDark={isDarkMode} colors={colors} />}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => navigation.navigate('OrderDetail', { order: item })}>
+                            <OrderCard order={item} isDark={isDarkMode} colors={colors} />
+                        </TouchableOpacity>
+                    )}
                     contentContainerStyle={{ padding: 20 }}
                 />
             ) : (

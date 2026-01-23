@@ -40,5 +40,17 @@
     "name": "I’d ",
     "email": "c@gmail.com",
     "password": "$2b$10$cVljoNmXlIkzXOIUHXcUS.G2iUrEcXIFgY2Y9qG.X9euprkqPKzf2"
+  },
+  {
+    "id": 1769129947846,
+    "name": "",
+    "email": "a2@gmail.com",
+    "password": "$2b$10$11ZYVsDJ9.52WE9loGLnReJSiK.rXg2zrk.ggtWCsVqV2ok37Ovce"
+  },
+  {
+    "id": 1769130299476,
+    "name": "Iwn",
+    "email": "arrt@gmail.com",
+    "password": "$2b$10$cG2RdSwHO0Hx60uyne0W6uCiXcRhRzw1r7LSb5J2dFHuYuqldRufS"
   }
 ]

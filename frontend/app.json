@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Aroma Luxe",
-    "slug": "aroma-luxe",
+    "slug": "perfume_app_monorepo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,6 +17,7 @@
     },
     "android": {
       "package": "com.devendra.aromaluxe",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,14 +32,14 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "5bfa43ca-5ab8-4bc4-8b56-6895df2dbdc4"
+        "projectId": "3ba1f510-e688-4aa9-8668-7288a7e85d5c"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/5bfa43ca-5ab8-4bc4-8b56-6895df2dbdc4"
+      "url": "https://u.expo.dev/3ba1f510-e688-4aa9-8668-7288a7e85d5c"
     }
   }
 }
