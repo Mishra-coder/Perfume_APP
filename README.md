@@ -1,28 +1,26 @@
 # Aroma Luxe - Premium Perfume Boutique
 
-> This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
+This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
 
 ---
 ## Project Showcase
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" />
-<img width="540" height="1388" alt="image" src="https://github.com/user-attachments/assets/34448a22-f3c2-4528-b95e-a9347761b6a2" />
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/ed9b7cc5-7284-48d3-9c44-ed11de5c2ab3" />
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/51681285-3ef0-4a66-b918-54c207b23f60" />
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/33db004d-9d5e-4b5c-89f7-8e6e5e12fc88" />
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" />
-<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" width="360" />
+  <img src="https://github.com/user-attachments/assets/34448a22-f3c2-4528-b95e-a9347761b6a2" width="360" />
+  <img src="https://github.com/user-attachments/assets/ed9b7cc5-7284-48d3-9c44-ed11de5c2ab3" width="280" />
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/51681285-3ef0-4a66-b918-54c207b23f60" width="220" />
+  <img src="https://github.com/user-attachments/assets/33db004d-9d5e-4b5c-89f7-8e6e5e12fc88" width="220" />
+  <img src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" width="220" />
+  <img src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" width="220" />
+</p>
 
+### Scan to Download the App
+<img src="assets/app_qr_code.png" width="300" alt="Aroma Luxe App QR Code"/>
 
 ---
-
-## Download the App
-Scan the QR code below to download the app directly to your Android device:
-<img src="assets/app_qr_code.png" width="150" alt="Aroma Luxe QR Code"/>
----
-
-## Features
-
 ### Core Features
 - **Luxury Catalog**: Browse a curated collection of high-end perfumes with a focus on visual aesthetics.
 - **Scent Discovery (Quiz)**: An interactive AI-driven quiz that recommends the perfect fragrance based on user occasion and personality.
@@ -33,6 +31,7 @@ Scan the QR code below to download the app directly to your Android device:
 - **Secure Authentication**: User registration and login powered by JWT and BcryptJS.
 - **Order Tracking**: Comprehensive history of all past luxury purchases and their current status.
 
+---
 ### Premium Experience
 - **Live Cart Badge**: Real-time updates of the cart count directly in the header.
 - **Monochromatic Theme**: A premium, minimalist interface using a signature Black & White palette.
