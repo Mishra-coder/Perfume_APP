@@ -15,13 +15,23 @@ const Root = () => {
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
-    if (__DEV__) return;
-    (async () => {
-      const u = await Updates.checkForUpdateAsync();
-      if (u.isAvailable) {
-        Alert.alert('Update', 'New version ready.', [{ text: 'Wait' }, { text: 'Update', onPress: async () => { await Updates.fetchUpdateAsync(); await Updates.reloadAsync(); } }]);
+    async function onFetchUpdateAsync() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          Alert.alert('Update Available', 'The app will now restart to apply the latest fix.', [
+            { text: 'Restart Now', onPress: () => Updates.reloadAsync() }
+          ]);
+        }
+      } catch (error) {
+        console.error(`Error fetching updates: ${error}`);
       }
-    })();
+    }
+
+    if (!__DEV__) {
+      onFetchUpdateAsync();
+    }
   }, []);
 
   const paper = isDarkMode ? darkTheme : lightTheme;
