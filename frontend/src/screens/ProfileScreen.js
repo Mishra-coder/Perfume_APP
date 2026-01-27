@@ -104,7 +104,7 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
         }
 
         <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
-            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA Update TEST)</Text>
+            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA Live Sync OK)</Text>
             <TouchableOpacity onPress={async () => {
                 try {
                     const updateCheck = await Updates.checkForUpdateAsync();

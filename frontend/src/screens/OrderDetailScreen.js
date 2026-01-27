@@ -73,7 +73,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
                     </View>
                 </Surface>
 
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Shipping Address</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>📦 SHIPMENT DETAILS</Text>
                 <Surface style={[styles.card, { borderColor: isDarkMode ? '#333' : '#eee', marginBottom: 40 }]} elevation={0}>
                     <View style={styles.addressContainer}>
                         <Text style={[styles.addressText, { color: colors.text }]}>
