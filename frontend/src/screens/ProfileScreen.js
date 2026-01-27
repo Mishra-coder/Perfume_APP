@@ -105,19 +105,25 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
 
         <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
             <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA Live Sync OK)</Text>
+            <Text style={{ fontSize: 8, color: colors.text, marginTop: 2 }}>
+                ID: {Updates.updateId?.substring(0, 8) || 'No Update ID'} | Ch: {Updates.channel || 'No Channel'} | RV: {Updates.runtimeVersion}
+            </Text>
             <TouchableOpacity onPress={async () => {
                 try {
+                    Alert.alert("Debug", "Checking for updates...");
                     const updateCheck = await Updates.checkForUpdateAsync();
+
                     if (updateCheck.isAvailable) {
-                        Alert.alert("Update Found", "Naya update mil gaya hai! Kya aap abhi install karna chahte hain?", [
-                            { text: "Baad me", style: "cancel" },
-                            { text: "Haan", onPress: async () => { await Updates.fetchUpdateAsync(); await Updates.reloadAsync(); } }
+                        Alert.alert("Update Found", "Naya code mil gaya! Download shuru ho raha hai...");
+                        await Updates.fetchUpdateAsync();
+                        Alert.alert("Success", "Download complete! Restarting...", [
+                            { text: "OK", onPress: () => Updates.reloadAsync() }
                         ]);
                     } else {
-                        Alert.alert("Aroma Luxe", "Aap pehle se hi latest version par hain! ✨");
+                        Alert.alert("Aroma Luxe", "Aap pehle se hi latest version par hain! (None available on this channel)");
                     }
                 } catch (e) {
-                    Alert.alert("Update Error", `Check failed: ${e.message}`);
+                    Alert.alert("Technical Error", `Update system ne mana kar diya: ${e.message}\n\nApp Channel: ${Updates.channel || 'null'}\nRuntime: ${Updates.runtimeVersion}`);
                 }
             }}>
                 <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
