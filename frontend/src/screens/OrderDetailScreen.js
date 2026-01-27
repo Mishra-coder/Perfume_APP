@@ -77,10 +77,12 @@ const OrderDetailScreen = ({ route, navigation }) => {
                 <Surface style={[styles.card, { borderColor: isDarkMode ? '#333' : '#eee', marginBottom: 40 }]} elevation={0}>
                     <View style={styles.addressContainer}>
                         <Text style={[styles.addressText, { color: colors.text }]}>
-                            Default Address
+                            {order.address?.name || 'Customer Address'}
                         </Text>
                         <Text style={[styles.addressSub, { color: '#999' }]}>
-                            123 Luxury Lane, Fragrance District{"\n"}Mumbai, Maharashtra, 400001
+                            {order.address?.street}{"\n"}
+                            {order.address?.city}, {order.address?.zip}{"\n"}
+                            Phone: {order.address?.phone}
                         </Text>
                     </View>
                 </Surface>
