@@ -104,26 +104,20 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
         }
 
         <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
-            <Text style={{ fontSize: 10, color: colors.text }}>
-                Version: 1.0.2 (Offers Update) | Ch: {Updates.channel || 'N/A'} | RV: {Updates.runtimeVersion || 'N/A'}
-            </Text>
+            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (Timeline Fix)</Text>
             <TouchableOpacity onPress={async () => {
                 try {
-                    console.log("Checking for updates...");
-                    // Show immediate feedback
-                    Alert.alert("Updates", "Checking for latest changes...");
-
-                    const u = await Updates.checkForUpdateAsync();
-                    if (u.isAvailable) {
-                        Alert.alert("Update Found", "Downloading and applying update. The app will restart shortly.");
-                        await Updates.fetchUpdateAsync();
-                        await Updates.reloadAsync();
+                    const updateCheck = await Updates.checkForUpdateAsync();
+                    if (updateCheck.isAvailable) {
+                        Alert.alert("Update Found", "Naya update mil gaya hai! Kya aap abhi install karna chahte hain?", [
+                            { text: "Baad me", style: "cancel" },
+                            { text: "Haan", onPress: async () => { await Updates.fetchUpdateAsync(); await Updates.reloadAsync(); } }
+                        ]);
                     } else {
-                        Alert.alert("No Update", "Aapka app already latest version par hai.");
+                        Alert.alert("Aroma Luxe", "Aap pehle se hi latest version par hain! ✨");
                     }
                 } catch (e) {
-                    console.error("Update error:", e);
-                    Alert.alert("Update Error", "Update check failed. Please check your internet connection.");
+                    Alert.alert("Update Error", "Update check nahi ho paya. Internet check karein.");
                 }
             }}>
                 <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
