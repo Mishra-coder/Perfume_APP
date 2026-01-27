@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Appbar, TextInput, Button, Text, RadioButton, Surface, useTheme as usePaperTheme } from 'react-native-paper';
+import { Appbar, TextInput, Button, Text, RadioButton, Surface, Snackbar, useTheme as usePaperTheme } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
@@ -12,6 +12,11 @@ const CheckoutScreen = ({ navigation }) => {
     const { colors } = usePaperTheme();
 
     const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [promoCode, setPromoCode] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [promoError, setPromoError] = useState('');
+    const [isPromoApplied, setIsPromoApplied] = useState(false);
+
     const [addressForm, setAddressForm] = useState({
         name: user.name || '',
         phone: '',
@@ -27,12 +32,30 @@ const CheckoutScreen = ({ navigation }) => {
         addressForm.city &&
         addressForm.zip.length === 6;
 
+    const applyPromo = () => {
+        setPromoError('');
+        const code = promoCode.trim().toUpperCase();
+        if (code === 'LUXE20') {
+            const discValue = Math.round(getGrandTotal() * 0.2);
+            setDiscount(discValue);
+            setIsPromoApplied(true);
+        } else if (code === 'FIRST50') {
+            setDiscount(500);
+            setIsPromoApplied(true);
+        } else {
+            setPromoError('Invalid promo code');
+            setDiscount(0);
+            setIsPromoApplied(false);
+        }
+    };
+
     const handleConfirmOrder = () => {
         const orderId = `AL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
         saveOrder({
             id: orderId,
             items: cartItems,
-            total: getGrandTotal(),
+            total: getGrandTotal() - discount,
+            discount: discount,
             date: new Date().toISOString(),
             status: 'Processing',
             address: addressForm,
@@ -73,14 +96,26 @@ const CheckoutScreen = ({ navigation }) => {
                     colors={colors}
                 />
 
+                <PromoSection
+                    code={promoCode}
+                    onCodeChange={setPromoCode}
+                    onApply={applyPromo}
+                    error={promoError}
+                    isApplied={isPromoApplied}
+                    colors={colors}
+                />
+
                 <OrderFooter
-                    total={getGrandTotal()}
+                    subtotal={getGrandTotal()}
+                    discount={discount}
+                    total={getGrandTotal() - discount}
                     isValid={isFormValid}
                     onConfirm={handleConfirmOrder}
                     isDarkMode={isDarkMode}
                     colors={colors}
                 />
             </ScrollView>
+            <Snackbar visible={!!promoError} onDismiss={() => setPromoError('')} duration={2000}>{promoError}</Snackbar>
         </View>
     );
 };
@@ -184,8 +219,49 @@ const PaymentOption = ({ label, value, active, onSelect, colors, isDarkMode }) =
     </TouchableOpacity>
 );
 
-const OrderFooter = ({ total, isValid, onConfirm, isDarkMode, colors }) => (
+const PromoSection = ({ code, onCodeChange, onApply, error, isApplied, colors }) => (
+    <View style={styles.sectionContainer}>
+        <Text style={[styles.sectionLabel, { color: colors.text }]}>Promo Code</Text>
+        <View style={styles.promoInputRow}>
+            <TextInput
+                placeholder="Enter Code (e.g. LUXE20)"
+                value={code}
+                onChangeText={onCodeChange}
+                mode="outlined"
+                style={styles.promoInput}
+                activeOutlineColor={colors.primary}
+                outlineColor={isApplied ? '#4CAF50' : (error ? '#F44336' : '#ccc')}
+                editable={!isApplied}
+            />
+            <Button
+                mode="contained"
+                onPress={onApply}
+                disabled={!code || isApplied}
+                style={styles.applyBtn}
+                buttonColor={isApplied ? '#4CAF50' : colors.primary}
+                labelStyle={{ color: '#000' }}
+            >
+                {isApplied ? 'Applied' : 'Apply'}
+            </Button>
+        </View>
+        {isApplied && <Text style={styles.promoSuccess}>Promo applied successfully!</Text>}
+    </View>
+);
+
+const OrderFooter = ({ subtotal, discount, total, isValid, onConfirm, isDarkMode, colors }) => (
     <View style={styles.footerContainer}>
+        {discount > 0 && (
+            <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Subtotal</Text>
+                <Text style={[styles.summaryVal, { color: colors.text }]}>₹{subtotal}</Text>
+            </View>
+        )}
+        {discount > 0 && (
+            <View style={styles.summaryRowSmall}>
+                <Text style={styles.summaryLabel}>Discount</Text>
+                <Text style={[styles.summaryVal, { color: '#4CAF50' }]}>−₹{discount}</Text>
+            </View>
+        )}
         <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total Payable</Text>
             <Text style={[styles.totalAmount, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{total}</Text>
@@ -274,6 +350,36 @@ const styles = StyleSheet.create({
     confirmButtonLabel: {
         fontWeight: 'bold',
         fontSize: 16
+    },
+    promoInputRow: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    promoInput: {
+        flex: 1,
+        marginRight: 10,
+        backgroundColor: 'transparent',
+        height: 50
+    },
+    applyBtn: {
+        borderRadius: 10,
+        height: 50,
+        justifyContent: 'center'
+    },
+    promoSuccess: {
+        color: '#4CAF50',
+        fontSize: 12,
+        marginTop: 5,
+        fontWeight: 'bold'
+    },
+    summaryRowSmall: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8
+    },
+    summaryVal: {
+        fontSize: 14,
+        fontWeight: 'bold'
     }
 });
 

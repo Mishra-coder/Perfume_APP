@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { Text, IconButton, Snackbar, Badge, Button, useTheme as usePaperTheme } from 'react-native-paper';
+import { Text, IconButton, Snackbar, Badge, Button, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
@@ -55,6 +55,24 @@ const ProductDetailScreen = ({ navigation, route }) => {
                     <Text style={[styles.section, { color: colors.text }]}>The Scent</Text>
                     <Text style={[styles.desc, { color: isDarkMode ? '#aaa' : '#666' }]}>{product.description}</Text>
 
+                    <Text style={[styles.section, { color: colors.text }]}>Available Offers</Text>
+                    <View style={styles.offersContainer}>
+                        <OfferCard
+                            code="LUXE20"
+                            desc="20% OFF on your first premium order"
+                            icon="ticket-percent-outline"
+                            colors={colors}
+                            isDarkMode={isDarkMode}
+                        />
+                        <OfferCard
+                            code="FREESHIP"
+                            desc="Free express delivery on orders above ₹5000"
+                            icon="truck-fast-outline"
+                            colors={colors}
+                            isDarkMode={isDarkMode}
+                        />
+                    </View>
+
                     <View style={styles.counterRow}>
                         <Text style={{ fontWeight: 'bold', color: colors.text }}>Quantity</Text>
                         <View style={[styles.counter, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
@@ -73,6 +91,16 @@ const ProductDetailScreen = ({ navigation, route }) => {
     );
 };
 
+const OfferCard = ({ code, desc, icon, colors, isDarkMode }) => (
+    <Surface style={[styles.offerCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9', borderColor: colors.primary + '33' }]} elevation={0}>
+        <View style={styles.offerHeader}>
+            <IconButton icon={icon} size={20} iconColor={colors.primary} style={{ margin: 0 }} />
+            <Text style={[styles.offerCode, { color: colors.primary }]}>{code}</Text>
+        </View>
+        <Text style={[styles.offerDesc, { color: isDarkMode ? '#aaa' : '#666' }]}>{desc}</Text>
+    </Surface>
+);
+
 const styles = StyleSheet.create({
     container: { flex: 1 },
     header: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15, paddingTop: 50, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
@@ -90,7 +118,29 @@ const styles = StyleSheet.create({
     counter: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 4 },
     countBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     countVal: { fontSize: 16, fontWeight: 'bold', marginHorizontal: 15 },
-    buyBtn: { borderRadius: 15 }
+    buyBtn: { borderRadius: 15 },
+    offersContainer: { marginTop: 5 },
+    offerCard: {
+        padding: 15,
+        borderRadius: 15,
+        borderWidth: 1,
+        marginBottom: 12
+    },
+    offerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+        marginLeft: -10
+    },
+    offerCode: {
+        fontWeight: 'bold',
+        fontSize: 14,
+        letterSpacing: 1
+    },
+    offerDesc: {
+        fontSize: 13,
+        lineHeight: 18
+    }
 });
 
 export default ProductDetailScreen;
