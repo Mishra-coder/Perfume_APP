@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Appbar, Text, Surface, Divider, useTheme as usePaperTheme, List, Chip } from 'react-native-paper';
+import { Appbar, Text, Surface, Divider, useTheme as usePaperTheme, List, Chip, IconButton } from 'react-native-paper';
 import { useTheme } from '../context/ThemeContext';
 
 const OrderDetailScreen = ({ route, navigation }) => {
@@ -16,6 +16,8 @@ const OrderDetailScreen = ({ route, navigation }) => {
             </Appbar.Header>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
+                <OrderTimeline status={order.status} colors={colors} isDarkMode={isDarkMode} />
+
                 <Surface style={[styles.card, { borderColor: isDarkMode ? '#333' : '#eee' }]} elevation={0}>
                     <View style={styles.headerRow}>
                         <View>
@@ -87,8 +89,112 @@ const OrderDetailScreen = ({ route, navigation }) => {
     );
 };
 
+const OrderTimeline = ({ status, colors, isDarkMode }) => {
+    const steps = [
+        { label: 'Ordered', key: 'ordered' },
+        { label: 'Packed', key: 'packed' },
+        { label: 'Shipped', key: 'shipped' },
+        { label: 'Delivered', key: 'delivered' }
+    ];
+
+    // Simple mapping for demo purposes
+    const getActiveStep = (s) => {
+        const statusLower = s.toLowerCase();
+        if (statusLower === 'delivered') return 3;
+        if (statusLower === 'shipped') return 2;
+        if (statusLower === 'packed' || statusLower === 'processing') return 1;
+        return 0;
+    };
+
+    const activeIndex = getActiveStep(status);
+
+    return (
+        <View style={styles.timelineWrapper}>
+            <View style={styles.timelineRow}>
+                {steps.map((step, index) => (
+                    <View key={index} style={styles.stepContainer}>
+                        {/* Line connector */}
+                        {index !== 0 && (
+                            <View
+                                style={[
+                                    styles.connector,
+                                    { backgroundColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#333' : '#eee') }
+                                ]}
+                            />
+                        )}
+
+                        {/* Status Circle */}
+                        <View
+                            style={[
+                                styles.circle,
+                                {
+                                    backgroundColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#1a1a1a' : '#fff'),
+                                    borderColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#333' : '#eee')
+                                }
+                            ]}
+                        >
+                            {index <= activeIndex && (
+                                <IconButton icon="check" size={12} iconColor="#000" style={{ margin: 0 }} />
+                            )}
+                        </View>
+
+                        {/* Label */}
+                        <Text
+                            style={[
+                                styles.stepLabel,
+                                {
+                                    color: index <= activeIndex ? colors.text : '#888',
+                                    fontWeight: index === activeIndex ? 'bold' : 'normal'
+                                }
+                            ]}
+                        >
+                            {step.label}
+                        </Text>
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+};
+
 const styles = StyleSheet.create({
     container: { flex: 1 },
+    timelineWrapper: {
+        marginBottom: 30,
+        paddingHorizontal: 10
+    },
+    timelineRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    stepContainer: {
+        alignItems: 'center',
+        flex: 1,
+        position: 'relative'
+    },
+    connector: {
+        position: 'absolute',
+        height: 2,
+        width: '100%',
+        left: '-50%',
+        top: 12,
+        zIndex: -1
+    },
+    circle: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8
+    },
+    stepLabel: {
+        fontSize: 10,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
+    },
     scrollContent: { padding: 20 },
     card: {
         borderRadius: 20,
