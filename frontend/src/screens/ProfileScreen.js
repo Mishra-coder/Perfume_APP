@@ -117,7 +117,7 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
                         Alert.alert("Aroma Luxe", "Aap pehle se hi latest version par hain! ✨");
                     }
                 } catch (e) {
-                    Alert.alert("Update Error", "Update check nahi ho paya. Internet check karein.");
+                    Alert.alert("Update Error", `Check failed: ${e.message}`);
                 }
             }}>
                 <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
