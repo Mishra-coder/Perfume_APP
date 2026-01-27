@@ -28,6 +28,7 @@ This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea 
 - **Order Details**: A deep-dive view into past orders, showing itemized breakdowns and delivery status.
 - **Dynamic Shopping Cart**: Real-time cart management with integrated quantity adjustments.
 - **Wishlist Management**: Save and track your favorite luxury scents for future purchases.
+- **Offers & Promo Codes**: A dedicated promotional section on product pages with a dynamic discount system in the checkout flow.
 - **Secure Authentication**: User registration and login powered by JWT and BcryptJS.
 - **Order Tracking**: Comprehensive history of all past luxury purchases and their current status.
 

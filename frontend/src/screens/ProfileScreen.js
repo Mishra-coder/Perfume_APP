@@ -104,14 +104,26 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
         }
 
         <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
-            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA_FIX_v2)</Text>
+            <Text style={{ fontSize: 10, color: colors.text }}>
+                Version: 1.0.2 (Offers Update) | Ch: {Updates.channel || 'N/A'} | RV: {Updates.runtimeVersion || 'N/A'}
+            </Text>
             <TouchableOpacity onPress={async () => {
-                const u = await Updates.checkForUpdateAsync();
-                if (u.isAvailable) {
-                    await Updates.fetchUpdateAsync();
-                    Alert.alert("Update Found", "Restarting to apply fix...", [{ text: "OK", onPress: () => Updates.reloadAsync() }]);
-                } else {
-                    Alert.alert("No Update", "You are on the latest version.");
+                try {
+                    console.log("Checking for updates...");
+                    // Show immediate feedback
+                    Alert.alert("Updates", "Checking for latest changes...");
+
+                    const u = await Updates.checkForUpdateAsync();
+                    if (u.isAvailable) {
+                        Alert.alert("Update Found", "Downloading and applying update. The app will restart shortly.");
+                        await Updates.fetchUpdateAsync();
+                        await Updates.reloadAsync();
+                    } else {
+                        Alert.alert("No Update", "Aapka app already latest version par hai.");
+                    }
+                } catch (e) {
+                    console.error("Update error:", e);
+                    Alert.alert("Update Error", "Update check failed. Please check your internet connection.");
                 }
             }}>
                 <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
