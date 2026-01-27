@@ -16,7 +16,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
             </Appbar.Header>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <OrderTimeline status={order.status} colors={colors} isDarkMode={isDarkMode} />
+                <OrderTimeline status={order.status} isDarkMode={isDarkMode} />
 
                 <Surface style={[styles.card, { borderColor: isDarkMode ? '#333' : '#eee' }]} elevation={0}>
                     <View style={styles.headerRow}>
@@ -89,7 +89,8 @@ const OrderDetailScreen = ({ route, navigation }) => {
     );
 };
 
-const OrderTimeline = ({ status, colors, isDarkMode }) => {
+const OrderTimeline = ({ status, isDarkMode }) => {
+    const { colors } = usePaperTheme();
     const steps = [
         { label: 'Ordered', key: 'ordered' },
         { label: 'Packed', key: 'packed' },
@@ -97,12 +98,11 @@ const OrderTimeline = ({ status, colors, isDarkMode }) => {
         { label: 'Delivered', key: 'delivered' }
     ];
 
-    // Simple mapping for demo purposes
-    const getActiveStep = (s) => {
-        const statusLower = s.toLowerCase();
-        if (statusLower === 'delivered') return 3;
-        if (statusLower === 'shipped') return 2;
-        if (statusLower === 'packed' || statusLower === 'processing') return 1;
+    const getActiveStep = (s = "") => {
+        const sl = s.toLowerCase();
+        if (sl === 'delivered') return 3;
+        if (sl === 'shipped') return 2;
+        if (sl === 'packed' || sl === 'processing') return 1;
         return 0;
     };
 
@@ -113,7 +113,6 @@ const OrderTimeline = ({ status, colors, isDarkMode }) => {
             <View style={styles.timelineRow}>
                 {steps.map((step, index) => (
                     <View key={index} style={styles.stepContainer}>
-                        {/* Line connector */}
                         {index !== 0 && (
                             <View
                                 style={[
@@ -123,28 +122,26 @@ const OrderTimeline = ({ status, colors, isDarkMode }) => {
                             />
                         )}
 
-                        {/* Status Circle */}
                         <View
                             style={[
                                 styles.circle,
                                 {
                                     backgroundColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#1a1a1a' : '#fff'),
-                                    borderColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#333' : '#eee')
+                                    borderColor: index <= activeIndex ? colors.primary : (isDarkMode ? '#333' : '#ddd')
                                 }
                             ]}
                         >
                             {index <= activeIndex && (
-                                <IconButton icon="check" size={12} iconColor="#000" style={{ margin: 0 }} />
+                                <IconButton icon="check" size={14} iconColor={isDarkMode ? "#000" : "#fff"} style={{ margin: 0 }} />
                             )}
                         </View>
 
-                        {/* Label */}
                         <Text
                             style={[
                                 styles.stepLabel,
                                 {
-                                    color: index <= activeIndex ? colors.text : '#888',
-                                    fontWeight: index === activeIndex ? 'bold' : 'normal'
+                                    color: index <= activeIndex ? colors.text : '#999',
+                                    fontWeight: index <= activeIndex ? '800' : 'normal'
                                 }
                             ]}
                         >
@@ -160,8 +157,9 @@ const OrderTimeline = ({ status, colors, isDarkMode }) => {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     timelineWrapper: {
-        marginBottom: 30,
-        paddingHorizontal: 10
+        marginBottom: 35,
+        marginTop: 10,
+        paddingHorizontal: 5
     },
     timelineRow: {
         flexDirection: 'row',
@@ -178,22 +176,22 @@ const styles = StyleSheet.create({
         height: 2,
         width: '100%',
         left: '-50%',
-        top: 12,
+        top: 15,
         zIndex: -1
     },
     circle: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
         borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8
     },
     stepLabel: {
-        fontSize: 10,
+        fontSize: 9,
         textTransform: 'uppercase',
-        letterSpacing: 0.5
+        letterSpacing: 0.2
     },
     scrollContent: { padding: 20 },
     card: {
