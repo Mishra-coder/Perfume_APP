@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity, Dimensions, Animated, StatusBar } from 'react-native';
 import { Text, IconButton, Snackbar, Badge, Button, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
@@ -16,131 +16,200 @@ const ProductDetailScreen = ({ navigation, route }) => {
 
     const [qty, setQty] = useState(1);
     const [snack, setSnack] = useState(false);
-    const [activeImg, setActiveImg] = useState(product.image);
+    const activeImg = product.image;
 
-    const onAdd = () => {
+    const scrollY = useRef(new Animated.Value(0)).current;
+
+    const handleAddToCart = () => {
         addToCart(product, qty);
         setSnack(true);
     };
 
     const isFav = isInWishlist(product.id);
 
+    const headerBg = scrollY.interpolate({
+        inputRange: [0, 200],
+        outputRange: ['rgba(255,255,255,0)', colors.background],
+        extrapolate: 'clamp'
+    });
+
+    const headerElevation = scrollY.interpolate({
+        inputRange: [0, 200],
+        outputRange: [0, 4],
+        extrapolate: 'clamp'
+    });
+
+    const imageScale = scrollY.interpolate({
+        inputRange: [-200, 0, 400],
+        outputRange: [1.3, 1, 0.95],
+        extrapolate: 'clamp'
+    });
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.header}>
-                <IconButton icon="arrow-left" size={24} iconColor={colors.text} onPress={() => navigation.goBack()} />
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <IconButton icon={isFav ? "heart" : "heart-outline"} size={24} iconColor={isFav ? colors.primary : colors.text} onPress={() => toggleWishlist(product)} />
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} transparent translucent />
+
+            <Animated.View style={[
+                styles.header,
+                {
+                    backgroundColor: headerBg,
+                    elevation: headerElevation,
+                    borderBottomWidth: scrollY.interpolate({
+                        inputRange: [0, 200],
+                        outputRange: [0, 0.5],
+                        extrapolate: 'clamp'
+                    }),
+                    borderBottomColor: isDarkMode ? '#333' : '#eee'
+                }
+            ]}>
+                <IconButton
+                    icon="arrow-left"
+                    iconColor={colors.text}
+                    onPress={() => navigation.goBack()}
+                    style={styles.iconCircle}
+                />
+                <View style={styles.headerRight}>
+                    <IconButton
+                        icon={isFav ? "heart" : "heart-outline"}
+                        iconColor={isFav ? colors.primary : colors.text}
+                        onPress={() => toggleWishlist(product)}
+                        style={styles.iconCircle}
+                    />
                     <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                        <IconButton icon="shopping-outline" size={24} iconColor={colors.text} />
-                        {count > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]} size={16}>{count}</Badge>}
+                        <IconButton icon="shopping" iconColor={colors.text} style={styles.iconCircle} />
+                        {count > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]}>{count}</Badge>}
                     </TouchableOpacity>
                 </View>
-            </View>
+            </Animated.View>
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 50 }} showsVerticalScrollIndicator={false}>
-                <View style={[styles.gallery, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
-                    <Image source={activeImg} style={styles.mainImg} />
-                </View>
+            <Animated.ScrollView
+                showsVerticalScrollIndicator={false}
+                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+                scrollEventThrottle={16}
+            >
+                <Animated.View style={[
+                    styles.imageContainer,
+                    {
+                        transform: [{ scale: imageScale }],
+                        backgroundColor: isDarkMode ? '#121212' : '#f5f5f5'
+                    }
+                ]}>
+                    <Image source={activeImg} style={styles.mainImage} />
+                </Animated.View>
 
-                <View style={styles.content}>
-                    <View style={styles.row}>
+                <View style={[styles.detailsSection, { backgroundColor: colors.background }]}>
+                    <View style={styles.nameRow}>
                         <View style={{ flex: 1 }}>
-                            <Text style={[styles.name, { color: colors.text }]}>{product.name}</Text>
-                            <Text style={styles.cat}>{product.category} • EDP</Text>
+                            <Text style={[styles.productName, { color: colors.text }]}>{product.name}</Text>
+                            <Text style={styles.productMeta}>{product.category} • EDP</Text>
                         </View>
-                        <Text style={[styles.price, { color: colors.primary }]}>₹{product.price}</Text>
+                        <Text style={[styles.productPrice, { color: colors.primary }]}>₹{product.price}</Text>
                     </View>
 
-                    <Text style={[styles.section, { color: colors.text }]}>The Scent</Text>
-                    <Text style={[styles.desc, { color: isDarkMode ? '#aaa' : '#666' }]}>{product.description}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Description</Text>
+                    <Text style={[styles.descriptionText, { color: isDarkMode ? '#aaa' : '#666' }]}>{product.description}</Text>
 
-                    <Text style={[styles.section, { color: colors.text }]}>Available Offers</Text>
-                    <View style={styles.offersContainer}>
-                        <OfferCard
-                            code="LUXE20"
-                            desc="20% OFF on your first premium order"
-                            icon="ticket-percent-outline"
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                        <OfferCard
-                            code="FREESHIP"
-                            desc="Free express delivery on orders above ₹5000"
-                            icon="truck-fast-outline"
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                    </View>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Limited Offers</Text>
+                    <OfferItem code="LUXE20" description="Save 20% on your first order" colors={colors} />
+                    <OfferItem code="FREESHIP" description="Free delivery for orders over ₹5000" colors={colors} />
 
-                    <View style={styles.counterRow}>
-                        <Text style={{ fontWeight: 'bold', color: colors.text }}>Quantity</Text>
-                        <View style={[styles.counter, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
-                            <TouchableOpacity onPress={() => setQty(q => Math.max(1, q - 1))} style={styles.countBtn}><Text style={{ color: colors.text }}>−</Text></TouchableOpacity>
-                            <Text style={[styles.countVal, { color: colors.text }]}>{qty}</Text>
-                            <TouchableOpacity onPress={() => setQty(q => q + 1)} style={styles.countBtn}><Text style={{ color: colors.text }}>+</Text></TouchableOpacity>
+                    <View style={styles.quantitySection}>
+                        <Text style={styles.quantityLabel}>Quantity</Text>
+                        <View style={[styles.stepper, { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' }]}>
+                            <TouchableOpacity onPress={() => setQty(q => Math.max(1, q - 1))} style={styles.stepperBtn}>
+                                <Text style={[styles.stepperIcon, { color: colors.text }]}>-</Text>
+                            </TouchableOpacity>
+                            <Text style={[styles.stepperValue, { color: colors.text }]}>{qty}</Text>
+                            <TouchableOpacity onPress={() => setQty(q => q + 1)} style={styles.stepperBtn}>
+                                <Text style={[styles.stepperIcon, { color: colors.text }]}>+</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
-                    <Button mode="contained" onPress={onAdd} style={styles.buyBtn} contentStyle={{ height: 56 }} buttonColor={colors.primary} labelStyle={{ color: isDarkMode ? '#000' : '#fff' }}>Add to Bag</Button>
+                    <Button
+                        mode="contained"
+                        onPress={handleAddToCart}
+                        style={styles.addToCartBtn}
+                        contentStyle={{ height: 58 }}
+                        buttonColor={colors.primary}
+                        labelStyle={{ fontSize: 16, fontWeight: 'bold' }}
+                    >
+                        Add to Bag
+                    </Button>
                 </View>
-            </ScrollView>
+            </Animated.ScrollView>
 
-            <Snackbar visible={snack} onDismiss={() => setSnack(false)} duration={1500}>Added to bag!</Snackbar>
+            <Snackbar
+                visible={snack}
+                onDismiss={() => setSnack(false)}
+                duration={2000}
+                style={{ marginBottom: 20 }}
+            >
+                Successfully added to your bag
+            </Snackbar>
         </View>
     );
 };
 
-const OfferCard = ({ code, desc, icon, colors, isDarkMode }) => (
-    <Surface style={[styles.offerCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9', borderColor: colors.primary + '33' }]} elevation={0}>
-        <View style={styles.offerHeader}>
-            <IconButton icon={icon} size={20} iconColor={colors.primary} style={{ margin: 0 }} />
+const OfferItem = ({ code, description, colors }) => (
+    <Surface style={[styles.offerBox, { borderColor: colors.primary + '25' }]} elevation={0}>
+        <View style={styles.offerDot} />
+        <View style={{ flex: 1 }}>
             <Text style={[styles.offerCode, { color: colors.primary }]}>{code}</Text>
+            <Text style={styles.offerDesc}>{description}</Text>
         </View>
-        <Text style={[styles.offerDesc, { color: isDarkMode ? '#aaa' : '#666' }]}>{desc}</Text>
     </Surface>
 );
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15, paddingTop: 50, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
-    badge: { position: 'absolute', top: 5, right: 5 },
-    gallery: { width: '100%', height: SCREEN_WIDTH * 1, justifyContent: 'center', alignItems: 'center' },
-    mainImg: { width: '80%', height: '80%', resizeMode: 'contain' },
-    content: { padding: 25, borderTopLeftRadius: 30, borderTopRightRadius: 30, marginTop: -30, backgroundColor: 'transparent' },
-    row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-    name: { fontSize: 26, fontWeight: '900' },
-    cat: { fontSize: 13, color: '#888', marginTop: 4 },
-    price: { fontSize: 22, fontWeight: '900' },
-    section: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10 },
-    desc: { fontSize: 15, lineHeight: 22 },
-    counterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 35 },
-    counter: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 4 },
-    countBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-    countVal: { fontSize: 16, fontWeight: 'bold', marginHorizontal: 15 },
-    buyBtn: { borderRadius: 15 },
-    offersContainer: { marginTop: 5 },
-    offerCard: {
-        padding: 15,
-        borderRadius: 15,
-        borderWidth: 1,
-        marginBottom: 12
-    },
-    offerHeader: {
+    header: {
+        height: 110,
+        paddingTop: 50,
+        paddingHorizontal: 15,
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
-        marginLeft: -10
+        justifyContent: 'space-between',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100
     },
-    offerCode: {
-        fontWeight: 'bold',
-        fontSize: 14,
-        letterSpacing: 1
+    headerRight: { flexDirection: 'row', alignItems: 'center' },
+    iconCircle: { backgroundColor: 'rgba(255,255,255,0.7)', margin: 4 },
+    badge: { position: 'absolute', top: 5, right: 5 },
+    imageContainer: { width: SCREEN_WIDTH, height: SCREEN_WIDTH * 1.1, justifyContent: 'center', alignItems: 'center' },
+    mainImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+    detailsSection: {
+        padding: 24,
+        marginTop: -35,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+        minHeight: 650,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
+        elevation: 10
     },
-    offerDesc: {
-        fontSize: 13,
-        lineHeight: 18
-    }
+    nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
+    productName: { fontSize: 26, fontWeight: 'bold', flex: 1, marginRight: 10 },
+    productMeta: { fontSize: 13, color: '#999', marginTop: 4 },
+    productPrice: { fontSize: 24, fontWeight: '900' },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 15 },
+    descriptionText: { fontSize: 15, lineHeight: 24, opacity: 0.8 },
+    offerBox: { padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12, flexDirection: 'row', alignItems: 'center' },
+    offerDot: { width: 4, height: 20, borderRadius: 2, marginRight: 12, backgroundColor: '#888' },
+    offerCode: { fontWeight: 'bold', fontSize: 15, marginBottom: 2 },
+    offerDesc: { fontSize: 12, color: '#888' },
+    quantitySection: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 40 },
+    quantityLabel: { fontSize: 16, fontWeight: '600' },
+    stepper: { flexDirection: 'row', alignItems: 'center', borderRadius: 15, padding: 5 },
+    stepperBtn: { width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
+    stepperIcon: { fontSize: 24 },
+    stepperValue: { marginHorizontal: 20, fontWeight: 'bold', fontSize: 18 },
+    addToCartBtn: { borderRadius: 16, elevation: 6 }
 });
 
 export default ProductDetailScreen;
