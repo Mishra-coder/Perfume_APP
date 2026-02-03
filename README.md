@@ -2,8 +2,9 @@
 
 This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
 
-
----
+### Scan to Download the App
+  <img src="assets/app_qr_code.png" width="300" alt="Aroma Luxe App QR Code"/>
+  
 ## Project Showcase
 <p align="center">
   <img src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" width="360" />
@@ -16,9 +17,6 @@ This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea 
   <img src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" width="220" />
   <img src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" width="220" />
 </p>
-
-### Scan to Download the App
-<img src="assets/app_qr_code.png" width="300" alt="Aroma Luxe App QR Code"/>
 
 ---
 ### Core Features
