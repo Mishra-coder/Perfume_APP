@@ -8,7 +8,5 @@
     "start:backend": "cd backend && npm start",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
-  "dependencies": {
-    "expo-updates": "~0.28.17"
-  }
+  "dependencies": {}
 }
