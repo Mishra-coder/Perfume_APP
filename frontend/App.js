@@ -10,6 +10,7 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import MainNavigator from './src/navigation/MainNavigator';
 import { lightTheme, darkTheme, NavLightTheme, NavDarkTheme } from './src/theme/theme';
 import * as Updates from 'expo-updates';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Root = () => {
   const { isDarkMode } = useTheme();
@@ -37,8 +38,11 @@ const Root = () => {
       const style = document.createElement('style');
       style.textContent = `
         html, body, #root, [data-reactroot] {
-          height: auto !important;
-          overflow: auto !important;
+          height: 100vh !important;
+          width: 100vw !important;
+          overflow: hidden !important;
+          margin: 0;
+          padding: 0;
         }
       `;
       document.head.appendChild(style);
@@ -49,10 +53,12 @@ const Root = () => {
   const nav = isDarkMode ? NavDarkTheme : NavLightTheme;
 
   return (
-    <PaperProvider theme={paper}>
-      <NavigationContainer theme={nav}><MainNavigator /></NavigationContainer>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
-    </PaperProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PaperProvider theme={paper}>
+        <NavigationContainer theme={nav}><MainNavigator /></NavigationContainer>
+        <StatusBar style={isDarkMode ? "light" : "dark"} />
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 };
 
