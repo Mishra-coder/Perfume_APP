@@ -11,7 +11,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/aromaluxe';
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://perfume-app-h3ct.vercel.app', 'http://localhost:19006', 'http://localhost:8081', 'http://localhost:3000'],
+    credentials: true
+}));
 app.use(bodyParser.json());
 
 mongoose.connect(MONGO_URI)

@@ -3,10 +3,13 @@
 <p align="left">
   <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white" />
+  <img src="https://img.shields.io/badge/Web-React_Native_Web-blue?style=for-the-badge&logo=react&logoColor=white" />
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
   <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
   <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
 </p>
+
+### 🌐 [Live Web Demo](https://perfume-app-h3ct.vercel.app)
 
 Aroma Luxe is a premium, minimalist perfume shopping application. It provides a high-end product catalog, a personalized scent quiz to discover your signature fragrance, and a seamless shopping experience.
 
@@ -15,6 +18,7 @@ Aroma Luxe is a premium, minimalist perfume shopping application. It provides a 
 - **Personalization**: Take the recommendation quiz to find scents based on occasion and style.
 - **Commerce**: Real-time cart management, wishlist, and secure checkout.
 - **Account**: Secure JWT-based authentication and order history tracking.
+- **Cross-Platform**: Optimized for Web, iOS, and Android with responsive design.
 
 ---
 
@@ -68,6 +72,7 @@ The API serves at `http://localhost:3000` (or your local IP).
 ```bash
 npm run start:frontend
 ```
+- Press **`w`** for Web browser.
 - Press **`i`** for iOS simulator.
 - Press **`a`** for Android emulator.
 - Scan the QR code with the **Expo Go** app on your physical device.
@@ -94,7 +99,7 @@ eas build --platform ios
 ### Web Build
 ```bash
 cd frontend
-npx expo export:web
+npx expo export -p web
 ```
 
 ---

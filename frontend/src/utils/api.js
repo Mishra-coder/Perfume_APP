@@ -10,7 +10,6 @@ const request = async (endpoint, method = 'GET', data = null) => {
 
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
-  
         const text = await response.text();
         let result = {};
         try {
