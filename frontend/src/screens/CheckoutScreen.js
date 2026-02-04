@@ -6,7 +6,7 @@ import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 
 const CheckoutScreen = ({ navigation }) => {
-    const { getGrandTotal, cartItems } = useCart();
+    const { getGrandTotal, cartItems, clearCart } = useCart();
     const { user, saveOrder } = useUser();
     const { isDarkMode } = useTheme();
     const { colors } = usePaperTheme();
@@ -61,6 +61,7 @@ const CheckoutScreen = ({ navigation }) => {
             address: addressForm,
             method: paymentMethod
         });
+        clearCart();
         navigation.navigate('Success', { orderId });
     };
 
