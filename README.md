@@ -24,7 +24,11 @@ I built Aroma Luxe to provide a premium, minimalist perfume shopping experience.
     <tr>
       <td align="center"><b>Splash Screen</b></td>
       <td align="center"><b>Home Screen</b></td>
+<<<<<<< HEAD
       <td align="center"><b>Product Details</b></td>
+=======
+      <td align="center"><b>Scent Quiz</b></td>
+>>>>>>> 25a70a8 (docs: finalized humanized README and fixed expo config)
     </tr>
     <tr>
       <td><img src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" width="250" /></td>
