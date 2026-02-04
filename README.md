@@ -1,98 +1,98 @@
 # Aroma Luxe - Premium Perfume Boutique
 
-This is Aroma Luxe, a mobile app I built for shopping luxury perfumes. The idea was to create a clean, simple, and premium-looking store where anyone can find their favorite fragrance easily.
+<p align="left">
+  <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img src="https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+</p>
 
-### Scan to Download the App
-  <img src="assets/app_qr_code.png" width="300" alt="Aroma Luxe App QR Code"/>
-  
+I built Aroma Luxe to provide a premium, minimalist perfume shopping experience. The app features a high-end product catalog, a personalized scent quiz to help you find your signature fragrance, and a clean interface designed for both mobile and web.
+
+---
+
+**Scan to Download Aroma Luxe**  
+<img src="assets/app_qr_code.png" width="120" alt="Aroma Luxe Download QR"/>
+
+---
+
 ## Project Showcase
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" width="360" />
-  <img src="https://github.com/user-attachments/assets/34448a22-f3c2-4528-b95e-a9347761b6a2" width="360" />
-  <img src="https://github.com/user-attachments/assets/ed9b7cc5-7284-48d3-9c44-ed11de5c2ab3" width="280" />
+  <table align="center">
+    <tr>
+      <td align="center"><b>Splash Screen</b></td>
+      <td align="center"><b>Home Screen</b></td>
+      <td align="center"><b>Product Details</b></td>
+    </tr>
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/f75a6b94-0063-45e1-9d89-9398826411ad" width="250" /></td>
+      <td><img src="https://github.com/user-attachments/assets/34448a22-f3c2-4528-b95e-a9347761b6a2" width="250" /></td>
+      <td><img src="https://github.com/user-attachments/assets/ed9b7cc5-7284-48d3-9c44-ed11de5c2ab3" width="200" /></td>
+    </tr>
+  </table>
 </p>
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/51681285-3ef0-4a66-b918-54c207b23f60" width="220" />
-  <img src="https://github.com/user-attachments/assets/33db004d-9d5e-4b5c-89f7-8e6e5e12fc88" width="220" />
-  <img src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" width="220" />
-  <img src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" width="220" />
+  <img src="https://github.com/user-attachments/assets/51681285-3ef0-4a66-b918-54c207b23f60" width="180" />
+  <img src="https://github.com/user-attachments/assets/33db004d-9d5e-4b5c-89f7-8e6e5e12fc88" width="180" />
+  <img src="https://github.com/user-attachments/assets/3075f5f4-507b-4ca3-9225-58dd0d79e29b" width="180" />
+  <img src="https://github.com/user-attachments/assets/458f08cf-0127-481f-af74-e093ef8791e9" width="180" />
 </p>
 
 ---
-### Core Features
-- **Luxury Catalog**: Browse a curated collection of high-end perfumes with a focus on visual aesthetics.
-- **Scent Discovery (Quiz)**: An interactive AI-driven quiz that recommends the perfect fragrance based on user occasion and personality.
-- **Detailed Product Pages**: Deep insights into every fragrance, including the olfactory pyramid (Top, Heart, and Base notes).
-- **Order Details**: A deep-dive view into past orders, showing itemized breakdowns and delivery status.
-- **Dynamic Shopping Cart**: Real-time cart management with integrated quantity adjustments.
-- **Wishlist Management**: Save and track your favorite luxury scents for future purchases.
-- **Offers & Promo Codes**: A dedicated promotional section on product pages with a dynamic discount system in the checkout flow.
-- **Secure Authentication**: User registration and login powered by JWT and BcryptJS.
-- **Order Tracking**: Comprehensive history of all past luxury purchases and their current status.
 
----
-### Premium Experience
-- **Live Cart Badge**: Real-time updates of the cart count directly in the header.
-- **Monochromatic Theme**: A premium, minimalist interface using a signature Black & White palette.
-- **Offline Persistence**: Local data storage using AsyncStorage for a seamless experience even without immediate connectivity.
-- **Responsive Layout**: Optimized for both mobile devices (iOS/Android) and web browsers.
+## Features
+
+### Recommendation Quiz
+The app includes a quiz that helps you find a fragrance based on the occasion (office, party, etc.) and your personal style. It matches your answers against the product database to suggest the best fit.
+
+### Product Details
+Each perfume has a dedicated page showing:
+- **Fragrance Notes**: Top, Heart, and Base notes.
+- **Concentration**: Whether it is a Parfum, EDP, or EDT.
+- **Usage Tips**: Best seasons and times of day to wear the scent.
+
+### Shopping Experience
+- **Real-time Cart**: Add and manage items with instant updates.
+- **Wishlist**: Save your favorite items for later.
+- **Secure Auth**: User accounts are protected with JWT-based login and registration.
+- **Order History**: Track your past purchases and delivery status.
 
 ---
 
 ## Tech Stack
 
 ### Frontend
-- **Framework**: React Native with Expo
-- **UI Architecture**: React Native Paper (Customized for Luxury UI)
-- **Navigation**: React Navigation (Stack & Tab)
-- **State Management**: React Context API
-- **Local Storage**: AsyncStorage
-- **Icons**: Material Community Icons
+- **React Native** (Expo SDK 54)
+- **React Native Paper** for the UI components.
+- **React Navigation** for the screen transitions.
+- **Context API** for global state management.
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Security**: JSON Web Tokens (JWT), BcryptJS
-- **Middleware**: CORS, Body-Parser, Dotenv
-- **Database**: MongoDB Atlas (Cloud)
+- **Node.js & Express.js**
+- **MongoDB Atlas** for cloud data storage.
+- **JWT & BcryptJS** for secure authentication.
 
 ---
 
-## How to Run
+## Setup and Installation
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo Go app (for mobile testing)
+1. **Clone the Repo**
+   ```bash
+   git clone <repository-url>
+   cd Perfume_APP
+   ```
 
-### Step 1: Clone the Repository
-```bash
-git clone <repository-url>
-cd Perfume_APP
-```
+2. **Install Dependencies**
+   ```bash
+   npm run install:all
+   ```
 
-### Step 2: Backend Setup
-```bash
-cd backend
-npm install
-```
-Start the backend server:
-```bash
-npm start
-```
-
-### Step 3: Frontend Setup
-```bash
-cd ../frontend
-npm install
-npx expo start
-```
-
-### Step 4: Run the App
-- Press **w** for Web browser
-- Press **i** for iOS simulator
-- Press **a** for Android emulator
-- Or scan the QR code with the **Expo Go** app
+3. **Start the Project**
+   - **Backend**: `npm run start:backend`
+   - **Frontend**: `npm run start:frontend`
 
 ---
 
@@ -100,49 +100,41 @@ npx expo start
 ```text
 ├── frontend/
 │   ├── src/
-│   │   ├── components/    # Reusable UI elements (Header, Cart Badge)
-│   │   ├── screens/       # Detail view, Order Details, Scent Quiz, etc.
-│   │   ├── context/       # Global state (Cart, Auth, Theme)
-│   │   ├── theme/         # Centralized styling tokens
-│   │   └── data/          # Product and olfactory metadata
-│   └── App.js             # Application Entry
+│   │   ├── components/    # Reusable UI elements
+│   │   ├── screens/       # Main app screens
+│   │   ├── context/       # State management
+│   │   └── data/          # Product information
 ├── backend/
 │   ├── routes/            # API endpoints
-│   ├── controllers/       # Business logic
-│   ├── middleware/        # Security and verification
-│   └── server.js          # Express server entry
-└── README.md              # Main documentation
+│   ├── models/            # Database schemas
+│   └── server.js          # Entry point
 ```
 
 ---
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/auth/register` : User registration
-- `POST /api/auth/login` : User authentication
-
-### User Management
-- `GET /api/user/profile` : Fetch user data
-- `PUT /api/user/update` : Update profile information
+| Category | Method | Endpoint | Description |
+| :--- | :---: | :--- | :--- |
+| Auth | `POST` | `/api/auth/register` | Create a new account |
+| Auth | `POST` | `/api/auth/login` | Sign in to your account |
+| Profile | `GET` | `/api/user/profile` | Get your profile info |
+| Profile | `PUT` | `/api/user/update` | Update your details |
 
 ---
 
-## Demo Checklist
-- [ ] Welcome & Splash Screen navigation
-- [ ] Product browsing and filtering
-- [ ] Interactive Scent Quiz completion
-- [ ] Adding/Removing items from Wishlist
-- [ ] Cart management and real-time badge updates
-- [ ] Secure checkout flow simulated
-- [ ] Login/Register functionality
-- [ ] Order history verification
+## Technical Status
+
+- [x] Login and Register logic complete
+- [x] Product and perfume notes mapping complete
+- [x] Scent Quiz logic and recommendations working
+- [x] Shopping cart and total calculation working
+- [x] Mobile layout tested on iOS and Android
+- [x] Local storage for user data working
+- [x] Over-the-air updates configured
 
 ---
 
 ## Author
-**Devendra Mishra**
-
-*Redefining perfume shopping through digital elegance.*
-
----
+**Devendra Mishra**  
+Software Developer focused on creating clean and premium mobile experiences.
