@@ -119,7 +119,7 @@ const HomeHeader = ({ featured, filters, setFilters, reset, navigation, isDarkMo
 
 const FeaturedItem = ({ item, onPress, isDarkMode, colors }) => (
     <TouchableOpacity style={[styles.featuredCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fafafa' }]} onPress={onPress}>
-        <Image source={item.image} style={styles.featuredImg} />
+        <Image source={item.image} style={styles.featuredImg} resizeMode="contain" />
         <View style={[styles.featuredInfo, { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.85)' }]}>
             <Text style={[styles.featuredName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
             <Text style={[styles.featuredPrice, { color: isDarkMode ? colors.primary : '#000' }]}>₹{item.price}</Text>
@@ -129,8 +129,8 @@ const FeaturedItem = ({ item, onPress, isDarkMode, colors }) => (
 
 const ProductItem = ({ item, onPress, isDarkMode, colors }) => (
     <TouchableOpacity style={[styles.card, { width: (SCREEN_WIDTH - 60) / 2 }]} onPress={onPress}>
-        <View style={[styles.imgWrapper, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]}>
-            <Image source={item.image} style={styles.img} />
+        <View style={[styles.imgWrapper, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f5f5f5' }]}>
+            <Image source={item.image} style={styles.img} resizeMode="contain" />
             <View style={styles.badge}><Text style={styles.badgeText}>PARFUM</Text></View>
         </View>
         <View style={styles.info}>
@@ -151,16 +151,16 @@ const styles = StyleSheet.create({
     heroTitle: { fontSize: 36, fontWeight: '900' },
     heroSubtitle: { fontSize: 15, color: '#888', marginTop: 5 },
     featured: { paddingLeft: 20, marginBottom: 30 },
-    featuredCard: { width: SCREEN_WIDTH * 0.7, height: 350, marginRight: 20, borderRadius: 25, overflow: 'hidden' },
-    featuredImg: { width: '100%', height: '100%' },
+    featuredCard: { width: SCREEN_WIDTH * 0.7, height: 380, marginRight: 20, borderRadius: 25, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', paddingTop: 40 },
+    featuredImg: { width: '85%', height: '85%' },
     featuredInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 },
     featuredName: { fontSize: 18, fontWeight: 'bold' },
     featuredPrice: { fontSize: 16, fontWeight: '900', marginTop: 4 },
     sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 15 },
     sectionTitle: { fontSize: 20, fontWeight: 'bold' },
     row: { justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 20 },
-    card: { marginBottom: 10 },
-    imgWrapper: { height: 180, borderRadius: 20, overflow: 'hidden' },
+    card: { marginBottom: 15 },
+    imgWrapper: { height: 210, borderRadius: 20, overflow: 'hidden', paddingTop: 25, paddingHorizontal: 10, paddingBottom: 10 },
     img: { width: '100%', height: '100%' },
     badge: { position: 'absolute', top: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.5)', padding: 4, borderRadius: 4 },
     badgeText: { color: '#fff', fontSize: 8, fontWeight: 'bold' },

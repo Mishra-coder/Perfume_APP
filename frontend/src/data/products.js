@@ -19,6 +19,11 @@ const perfumeImg16 = require('../assets/perfumes/p4.jpg');
 const perfumeImg17 = require('../assets/perfumes/p5.jpg');
 const perfumeImg18 = require('../assets/perfumes/p6.jpg');
 const perfumeImg19 = require('../assets/perfumes/p7.jpg');
+const perfumeImg20 = require('../assets/perfumes/Untitled_design_-_2024-08-16T154018.946_1080x.webp');
+const perfumeImg21 = require('../assets/perfumes/d.webp');
+const perfumeImg22 = require('../assets/perfumes/shopping.webp');
+const perfumeImg23 = require('../assets/perfumes/shopping (2).webp');
+const perfumeImg24 = require('../assets/perfumes/shopping (1).webp');
 
 export const products = [
   {
@@ -377,6 +382,101 @@ export const products = [
       base: ["Sage", "Red Algae"]
     },
     occasions: ["gym", "beach"],
+    timeOfDay: ["day"],
+    seasons: ["summer"],
+    strength: 2,
+    profile: "fresh"
+  },
+  {
+    id: 20,
+    name: "Golden Hour Bloom",
+    price: 9999,
+    image: perfumeImg20,
+    description: "A sunset-inspired fragrance with golden amber and blooming jasmine. Perfect for those who love a warm, floral trail.",
+    category: "Floral",
+    type: "EDP",
+    notes: {
+      top: ["Jasmine", "Bergamot"],
+      middle: ["Golden Amber", "Ylang-Ylang"],
+      base: ["Vanilla", "Sandalwood"]
+    },
+    occasions: ["date", "party"],
+    timeOfDay: ["night", "day"],
+    seasons: ["all"],
+    strength: 4,
+    profile: "sweet"
+  },
+  {
+    id: 21,
+    name: "Desert Oasis",
+    price: 13499,
+    image: perfumeImg21,
+    description: "A refreshing oasis in the middle of a vast desert. Cool aquatic notes meet dry woody accents for a unique experience.",
+    category: "Fresh",
+    type: "EDT",
+    notes: {
+      top: ["Sea Breeze", "Ozone"],
+      middle: ["Cactus Flower", "Sage"],
+      base: ["Dry Woods", "White Musk"]
+    },
+    occasions: ["office", "college", "gym"],
+    timeOfDay: ["day"],
+    seasons: ["summer", "winter"],
+    strength: 3,
+    profile: "fresh"
+  },
+  {
+    id: 22,
+    name: "Urban Chic Noir",
+    price: 10499,
+    image: perfumeImg22,
+    description: "The essence of modern city life. Sophisticated, edgy, and undeniably chic, this scent is for the urban trendsetter.",
+    category: "Woody",
+    type: "EDP",
+    notes: {
+      top: ["Bergamot", "Black Pepper"],
+      middle: ["Violet Leaf", "Leather"],
+      base: ["Patchouli", "Vetiver"]
+    },
+    occasions: ["party", "office", "date"],
+    timeOfDay: ["night"],
+    seasons: ["all"],
+    strength: 4,
+    profile: "mild"
+  },
+  {
+    id: 23,
+    name: "Santal Fusion",
+    price: 15499,
+    image: perfumeImg23,
+    description: "A decadent fusion of sandalwood and spicy cardamom. A warm, creamy fragrance that lingers with an air of sophisticated luxury.",
+    category: "Aromatic",
+    type: "Parfum",
+    notes: {
+      top: ["Cardamom", "Iris"],
+      middle: ["Sandalwood", "Amber"],
+      base: ["Leather", "Cedarwood"]
+    },
+    occasions: ["festival", "party", "date"],
+    timeOfDay: ["night"],
+    seasons: ["winter", "all"],
+    strength: 5,
+    profile: "strong"
+  },
+  {
+    id: 24,
+    name: "Morning Dew",
+    price: 5499,
+    image: perfumeImg24,
+    description: "As fresh as the first light of day. A crisp, green fragrance that captures the revitalizing scent of morning dew on grass.",
+    category: "Fresh",
+    type: "EDT",
+    notes: {
+      top: ["Green Apple", "Lemon"],
+      middle: ["Morning Dew", "Lily of the Valley"],
+      base: ["Musk", "Soft Woods"]
+    },
+    occasions: ["gym", "college", "office"],
     timeOfDay: ["day"],
     seasons: ["summer"],
     strength: 2,

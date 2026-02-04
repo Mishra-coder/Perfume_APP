@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: 'row', alignItems: 'center' },
     iconCircle: { backgroundColor: 'rgba(255,255,255,0.7)', margin: 4 },
     badge: { position: 'absolute', top: 5, right: 5 },
-    imageContainer: { width: SCREEN_WIDTH, height: SCREEN_WIDTH * 1.1, justifyContent: 'center', alignItems: 'center' },
-    mainImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+    imageContainer: { width: SCREEN_WIDTH, height: SCREEN_WIDTH * 1.3, justifyContent: 'center', alignItems: 'center', paddingTop: 100, paddingBottom: 40 },
+    mainImage: { width: '95%', height: '95%', resizeMode: 'contain' },
     detailsSection: {
         padding: 24,
         marginTop: -35,
