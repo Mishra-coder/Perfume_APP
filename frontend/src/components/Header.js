@@ -21,7 +21,7 @@ const Header = ({ isSearch, query, onQuery, onClose, onClear, onSearch, nav, isD
                     {cartCount > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]} size={18}>{cartCount}</Badge>}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => nav.navigate('Profile')}>
-                    <Avatar.Icon size={34} icon="account" backgroundColor={isDark ? '#222' : '#f5f5f5'} color={colors.text} />
+                    <IconButton icon="account-circle" size={30} iconColor={colors.text} />
                 </TouchableOpacity>
             </View>
         </View>
