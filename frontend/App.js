@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
+import { Platform, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -9,7 +10,6 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import MainNavigator from './src/navigation/MainNavigator';
 import { lightTheme, darkTheme, NavLightTheme, NavDarkTheme } from './src/theme/theme';
 import * as Updates from 'expo-updates';
-import { Alert } from 'react-native';
 
 const Root = () => {
   const { isDarkMode } = useTheme();
@@ -31,6 +31,17 @@ const Root = () => {
 
     if (!__DEV__) {
       onFetchUpdateAsync();
+    }
+
+    if (Platform.OS === 'web') {
+      const style = document.createElement('style');
+      style.textContent = `
+        html, body, #root, [data-reactroot] {
+          height: auto !important;
+          overflow: auto !important;
+        }
+      `;
+      document.head.appendChild(style);
     }
   }, []);
 
