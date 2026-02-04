@@ -37,12 +37,14 @@ const Root = () => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
       style.textContent = `
-        html, body, #root, [data-reactroot] {
-          height: 100vh !important;
-          width: 100vw !important;
-          overflow: hidden !important;
-          margin: 0;
-          padding: 0;
+        html, body, #root {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        #root {
+          flex: 1;
+          overflow-y: auto;
         }
       `;
       document.head.appendChild(style);
@@ -53,12 +55,10 @@ const Root = () => {
   const nav = isDarkMode ? NavDarkTheme : NavLightTheme;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <PaperProvider theme={paper}>
-        <NavigationContainer theme={nav}><MainNavigator /></NavigationContainer>
-        <StatusBar style={isDarkMode ? "light" : "dark"} />
-      </PaperProvider>
-    </GestureHandlerRootView>
+    <PaperProvider theme={paper}>
+      <NavigationContainer theme={nav}><MainNavigator /></NavigationContainer>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+    </PaperProvider>
   );
 };
 
