@@ -1,4 +1,4 @@
-const BASE_URL = 'https://perfume-app-tau.vercel.app/api';
+const BASE_URL = 'https:
 
 const request = async (endpoint, method = 'GET', data = null) => {
     try {
