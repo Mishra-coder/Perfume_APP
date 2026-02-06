@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "Aroma Luxe",
-    "slug": "perfume_app_monorepo",
+    "slug": "aroma-luxe",
+    "sdkVersion": "52.0.0",
     "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,19 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": false
+      }
     },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ]
-    ],
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -43,12 +33,6 @@
       "eas": {
         "projectId": "3ba1f510-e688-4aa9-8668-7288a7e85d5c"
       }
-    },
-    "runtimeVersion": "1.0.2",
-    "updates": {
-      "url": "https://u.expo.dev/3ba1f510-e688-4aa9-8668-7288a7e85d5c",
-      "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 30000
     }
   }
 }
