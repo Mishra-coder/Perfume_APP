@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Appbar, TextInput, Button, Text, RadioButton, Surface, Snackbar, useTheme as usePaperTheme } from 'react-native-paper';
+import { Appbar, TextInput, Button, Text, RadioButton, Surface, Snackbar, useTheme as usePaperTheme, IconButton } from 'react-native-paper';
 import { useCart } from '../context/CartContext';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
@@ -43,7 +43,7 @@ const CheckoutScreen = ({ navigation }) => {
             setDiscount(500);
             setIsPromoApplied(true);
         } else {
-            setPromoError('Invalid promo code');
+            setPromoError('The entered code is invalid or expired.');
             setDiscount(0);
             setIsPromoApplied(false);
         }
@@ -78,310 +78,223 @@ const CheckoutScreen = ({ navigation }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background, borderBottomColor: isDarkMode ? '#222222' : '#f0f0f0' }]}>
+            <Appbar.Header style={[styles.appbar, { backgroundColor: colors.background }]}>
                 <Appbar.BackAction onPress={() => navigation.goBack()} color={colors.text} />
-                <Appbar.Content title="Checkout" titleStyle={[styles.headerTitle, { color: colors.text }]} />
+                <Appbar.Content title="SECURE CHECKOUT" titleStyle={styles.headerTitle} />
             </Appbar.Header>
 
-            <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-                <AddressForm
-                    form={addressForm}
-                    onUpdate={updateField}
-                    colors={colors}
-                />
+            <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 150 }}>
+                <Section title="Shipping Details" colors={colors} isDark={isDarkMode}>
+                    <TextInput
+                        label="Full Name"
+                        value={addressForm.name}
+                        onChangeText={t => updateField('name', t)}
+                        mode="flat"
+                        style={styles.inputField}
+                        activeUnderlineColor={colors.primary}
+                        textColor={colors.text}
+                    />
+                    <TextInput
+                        label="Contact Number"
+                        value={addressForm.phone}
+                        onChangeText={t => updateField('phone', t)}
+                        mode="flat"
+                        keyboardType="phone-pad"
+                        style={styles.inputField}
+                        activeUnderlineColor={colors.primary}
+                        textColor={colors.text}
+                    />
+                    <TextInput
+                        label="Street Address"
+                        value={addressForm.street}
+                        onChangeText={t => updateField('street', t)}
+                        mode="flat"
+                        style={styles.inputField}
+                        activeUnderlineColor={colors.primary}
+                        textColor={colors.text}
+                    />
+                    <View style={styles.rowContainer}>
+                        <TextInput
+                            label="City"
+                            value={addressForm.city}
+                            onChangeText={t => updateField('city', t)}
+                            mode="flat"
+                            style={[styles.inputField, { flex: 1.5, marginRight: 10 }]}
+                            activeUnderlineColor={colors.primary}
+                            textColor={colors.text}
+                        />
+                        <TextInput
+                            label="Zip Code"
+                            value={addressForm.zip}
+                            onChangeText={t => updateField('zip', t)}
+                            mode="flat"
+                            keyboardType="number-pad"
+                            style={[styles.inputField, { flex: 1 }]}
+                            activeUnderlineColor={colors.primary}
+                            textColor={colors.text}
+                        />
+                    </View>
+                </Section>
 
-                <PaymentSection
-                    selectedMethod={paymentMethod}
-                    onSelect={setPaymentMethod}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                />
+                <Section title="Payment Method" colors={colors} isDark={isDarkMode}>
+                    <PaymentOption
+                        label="Secure UPI"
+                        value="upi"
+                        current={paymentMethod}
+                        onSelect={setPaymentMethod}
+                        colors={colors}
+                        icon="lightning-bolt-outline"
+                    />
+                    <PaymentOption
+                        label="Payment on Collection"
+                        value="cod"
+                        current={paymentMethod}
+                        onSelect={setPaymentMethod}
+                        colors={colors}
+                        icon="cash-multiple"
+                    />
+                    <PaymentOption
+                        label="Elite Card"
+                        value="card"
+                        current={paymentMethod}
+                        onSelect={setPaymentMethod}
+                        colors={colors}
+                        icon="credit-card-outline"
+                    />
+                </Section>
 
-                <PromoSection
-                    code={promoCode}
-                    onCodeChange={setPromoCode}
-                    onApply={applyPromo}
-                    error={promoError}
-                    isApplied={isPromoApplied}
-                    colors={colors}
-                />
-
-                <OrderFooter
-                    subtotal={getGrandTotal()}
-                    discount={discount}
-                    total={getGrandTotal() - discount}
-                    isValid={isFormValid}
-                    onConfirm={handleConfirmOrder}
-                    isDarkMode={isDarkMode}
-                    colors={colors}
-                />
+                <Section title="Exclusive Offers" colors={colors} isDark={isDarkMode}>
+                    <View style={styles.promoRow}>
+                        <TextInput
+                            placeholder="Promo Code"
+                            value={promoCode}
+                            onChangeText={setPromoCode}
+                            mode="flat"
+                            style={styles.promoInput}
+                            activeUnderlineColor={colors.primary}
+                            textColor={colors.text}
+                            editable={!isPromoApplied}
+                        />
+                        <Button
+                            mode="contained"
+                            onPress={applyPromo}
+                            disabled={!promoCode || isPromoApplied}
+                            style={styles.applyBtn}
+                            buttonColor={colors.primary}
+                            textColor={isDarkMode ? '#000' : '#FFF'}
+                            labelStyle={{ fontWeight: '900', fontSize: 12 }}
+                        >
+                            {isPromoApplied ? 'APPLIED' : 'APPLY'}
+                        </Button>
+                    </View>
+                    {isPromoApplied && <Text style={[styles.promoSuccess, { color: '#4CAF50' }]}>Privilege discount applied successfully!</Text>}
+                </Section>
             </ScrollView>
-            <Snackbar visible={!!promoError} onDismiss={() => setPromoError('')} duration={2000}>{promoError}</Snackbar>
+
+            <Surface style={[styles.footer, { backgroundColor: isDarkMode ? '#050505' : '#FFF', borderTopColor: isDarkMode ? '#1F1F1F' : '#EEE' }]} elevation={4}>
+                <View style={{ overflow: 'hidden', borderRadius: 32 }}>
+                    {discount > 0 && (
+                        <>
+                            <View style={styles.footerRow}>
+                                <Text style={styles.footerLabelSmall}>Bag Subtotal</Text>
+                                <Text style={[styles.footerValueSmall, { color: colors.text }]}>₹{getGrandTotal().toLocaleString()}</Text>
+                            </View>
+                            <View style={styles.footerRow}>
+                                <Text style={styles.footerLabelSmall}>Privilege Discount</Text>
+                                <Text style={[styles.footerValueSmall, { color: '#4CAF50' }]}>−₹{discount.toLocaleString()}</Text>
+                            </View>
+                            <View style={styles.divider} />
+                        </>
+                    )}
+                    <View style={styles.footerTotalRow}>
+                        <Text style={[styles.footerTotalLabel, { color: colors.text }]}>Grand Total</Text>
+                        <Text style={[styles.footerTotalVal, { color: colors.primary }]}>₹{(getGrandTotal() - discount).toLocaleString()}</Text>
+                    </View>
+                    <Button
+                        mode="contained"
+                        style={[styles.payBtn, { backgroundColor: isFormValid ? colors.primary : (isDarkMode ? '#1F1F1F' : '#EEE') }]}
+                        contentStyle={styles.payBtnContent}
+                        labelStyle={[styles.payBtnLabel, { color: isFormValid ? (isDarkMode ? '#000' : '#FFF') : '#666' }]}
+                        disabled={!isFormValid}
+                        onPress={handleConfirmOrder}
+                    >
+                        CONFIRM ORDER
+                    </Button>
+                </View>
+            </Surface>
+
+            <Snackbar
+                visible={!!promoError}
+                onDismiss={() => setPromoError('')}
+                duration={2000}
+                style={{ backgroundColor: '#F44', borderRadius: 12 }}
+            >
+                {promoError}
+            </Snackbar>
         </View>
     );
 };
 
-const AddressForm = ({ form, onUpdate, colors }) => (
+const Section = ({ title, children, colors, isDark }) => (
     <View style={styles.sectionContainer}>
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>Shipping Address</Text>
-        <TextInput
-            label="Name"
-            value={form.name}
-            onChangeText={t => onUpdate('name', t)}
-            mode="outlined"
-            style={styles.inputField}
-            activeOutlineColor={colors.primary}
-        />
-        <TextInput
-            label="Phone"
-            value={form.phone}
-            onChangeText={t => onUpdate('phone', t)}
-            mode="outlined"
-            keyboardType="phone-pad"
-            style={styles.inputField}
-            activeOutlineColor={colors.primary}
-        />
-        <TextInput
-            label="Street"
-            value={form.street}
-            onChangeText={t => onUpdate('street', t)}
-            mode="outlined"
-            style={styles.inputField}
-            activeOutlineColor={colors.primary}
-        />
-        <View style={styles.rowContainer}>
-            <TextInput
-                label="City"
-                value={form.city}
-                onChangeText={t => onUpdate('city', t)}
-                mode="outlined"
-                style={[styles.inputField, { flex: 1.5, marginRight: 10 }]}
-                activeOutlineColor={colors.primary}
-            />
-            <TextInput
-                label="Zip"
-                value={form.zip}
-                onChangeText={t => onUpdate('zip', t)}
-                mode="outlined"
-                keyboardType="number-pad"
-                style={[styles.inputField, { flex: 1 }]}
-                activeOutlineColor={colors.primary}
-            />
-        </View>
-    </View>
-);
-
-const PaymentSection = ({ selectedMethod, onSelect, isDarkMode, colors }) => (
-    <View style={styles.sectionContainer}>
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>Payment Method</Text>
-        <Surface style={[styles.paymentCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f9f9f9' }]} elevation={0}>
-            <PaymentOption
-                label="UPI"
-                value="upi"
-                active={selectedMethod === 'upi'}
-                onSelect={onSelect}
-                colors={colors}
-                isDarkMode={isDarkMode}
-            />
-            <PaymentOption
-                label="Cash on Delivery"
-                value="cod"
-                active={selectedMethod === 'cod'}
-                onSelect={onSelect}
-                colors={colors}
-                isDarkMode={isDarkMode}
-            />
-            <PaymentOption
-                label="Card"
-                value="card"
-                active={selectedMethod === 'card'}
-                onSelect={onSelect}
-                colors={colors}
-                isDarkMode={isDarkMode}
-            />
+        <Text style={[styles.sectionLabel, { color: colors.primary }]}>{title}</Text>
+        <Surface style={[styles.formCard, { backgroundColor: isDark ? 'rgba(212, 175, 55, 0.03)' : 'rgba(0,0,0,0.02)', borderColor: 'rgba(212, 175, 55, 0.1)' }]} elevation={0}>
+            <View style={{ overflow: 'hidden', borderRadius: 24 }}>
+                {children}
+            </View>
         </Surface>
     </View>
 );
 
-const PaymentOption = ({ label, value, active, onSelect, colors, isDarkMode }) => (
+const PaymentOption = ({ label, value, current, onSelect, colors, icon }) => (
     <TouchableOpacity
-        style={[
-            styles.paymentOptionRow,
-            active && {
-                backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                borderColor: colors.primary,
-                borderWidth: 1
-            }
-        ]}
+        style={styles.paymentRow}
         onPress={() => onSelect(value)}
+        activeOpacity={0.7}
     >
-        <RadioButton value={value} status={active ? 'checked' : 'unchecked'} color={colors.primary} onPress={() => onSelect(value)} />
-        <Text style={{ color: colors.text, marginLeft: 5, fontWeight: active ? 'bold' : 'normal' }}>{label}</Text>
+        <IconButton icon={icon} iconColor={current === value ? colors.primary : '#888'} size={24} />
+        <Text style={[styles.paymentLabel, { color: colors.text, fontWeight: current === value ? '800' : '500' }]}>{label}</Text>
+        <RadioButton value={value} status={current === value ? 'checked' : 'unchecked'} color={colors.primary} />
     </TouchableOpacity>
 );
 
-const PromoSection = ({ code, onCodeChange, onApply, error, isApplied, colors }) => (
-    <View style={styles.sectionContainer}>
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>Promo Code</Text>
-        <View style={styles.promoInputRow}>
-            <TextInput
-                placeholder="Enter Code (e.g. LUXE20)"
-                value={code}
-                onChangeText={onCodeChange}
-                mode="outlined"
-                style={styles.promoInput}
-                activeOutlineColor={colors.primary}
-                outlineColor={isApplied ? '#4CAF50' : (error ? '#F44336' : '#ccc')}
-                editable={!isApplied}
-            />
-            <Button
-                mode="contained"
-                onPress={onApply}
-                disabled={!code || isApplied}
-                style={styles.applyBtn}
-                buttonColor={isApplied ? '#4CAF50' : colors.primary}
-                labelStyle={{ color: '#000' }}
-            >
-                {isApplied ? 'Applied' : 'Apply'}
-            </Button>
-        </View>
-        {isApplied && <Text style={styles.promoSuccess}>Promo applied successfully!</Text>}
-    </View>
-);
-
-const OrderFooter = ({ subtotal, discount, total, isValid, onConfirm, isDarkMode, colors }) => (
-    <View style={styles.footerContainer}>
-        {discount > 0 && (
-            <View style={styles.summaryRowSmall}>
-                <Text style={styles.summaryLabel}>Subtotal</Text>
-                <Text style={[styles.summaryVal, { color: colors.text }]}>₹{subtotal}</Text>
-            </View>
-        )}
-        {discount > 0 && (
-            <View style={styles.summaryRowSmall}>
-                <Text style={styles.summaryLabel}>Discount</Text>
-                <Text style={[styles.summaryVal, { color: '#4CAF50' }]}>−₹{discount}</Text>
-            </View>
-        )}
-        <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total Payable</Text>
-            <Text style={[styles.totalAmount, { color: isDarkMode ? colors.primary : '#1a1a1a' }]}>₹{total}</Text>
-        </View>
-        <Button
-            mode="contained"
-            style={[
-                styles.confirmButton,
-                { backgroundColor: isValid ? colors.primary : (isDarkMode ? '#333333' : '#e0e0e0') }
-            ]}
-            contentStyle={styles.confirmButtonContent}
-            labelStyle={[
-                styles.confirmButtonLabel,
-                { color: isValid ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#666666' : '#999999') }
-            ]}
-            disabled={!isValid}
-            onPress={onConfirm}
-        >
-            Confirm Order
-        </Button>
-    </View>
-);
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
+    container: { flex: 1 },
+    contentContainer: { flex: 1, paddingHorizontal: 20 },
+    appbar: { height: 100, paddingTop: 40 },
+    headerTitle: { fontWeight: '900', fontSize: 16, letterSpacing: 2 },
+    sectionContainer: { marginTop: 20 },
+    sectionLabel: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, marginBottom: 12, textTransform: 'uppercase' },
+    formCard: { borderRadius: 24, borderWidth: 1 },
+    inputField: { backgroundColor: 'transparent', height: 56, fontSize: 14 },
+    rowContainer: { flexDirection: 'row' },
+    paymentRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4 },
+    paymentLabel: { flex: 1, fontSize: 15, marginLeft: 8 },
+    promoRow: { flexDirection: 'row', alignItems: 'center', padding: 8 },
+    promoInput: { flex: 1, backgroundColor: 'transparent', height: 50, fontSize: 14 },
+    applyBtn: { marginLeft: 10, borderRadius: 12 },
+    promoSuccess: { fontSize: 12, marginTop: 10, fontWeight: '700', paddingHorizontal: 16, paddingBottom: 12 },
+    footer: {
+        padding: 24,
+        paddingBottom: 40,
+        borderTopWidth: 1,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0
     },
-    appbar: {
-        borderBottomWidth: 1
-    },
-    headerTitle: {
-        fontWeight: 'bold'
-    },
-    contentContainer: {
-        flex: 1,
-        padding: 25
-    },
-    sectionContainer: {
-        marginBottom: 35
-    },
-    sectionLabel: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 20
-    },
-    inputField: {
-        marginBottom: 15,
-        backgroundColor: 'transparent'
-    },
-    rowContainer: {
-        flexDirection: 'row'
-    },
-    paymentCard: {
-        borderRadius: 15,
-        padding: 5
-    },
-    paymentOptionRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12
-    },
-    footerContainer: {
-        marginTop: 10,
-        paddingBottom: 60
-    },
-    summaryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 25,
-        alignItems: 'center'
-    },
-    summaryLabel: {
-        fontSize: 16,
-        color: '#666666'
-    },
-    totalAmount: {
-        fontSize: 26,
-        fontWeight: '900'
-    },
-    confirmButton: {
-        borderRadius: 15
-    },
-    confirmButtonContent: {
-        height: 60
-    },
-    confirmButtonLabel: {
-        fontWeight: 'bold',
-        fontSize: 16
-    },
-    promoInputRow: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    promoInput: {
-        flex: 1,
-        marginRight: 10,
-        backgroundColor: 'transparent',
-        height: 50
-    },
-    applyBtn: {
-        borderRadius: 10,
-        height: 50,
-        justifyContent: 'center'
-    },
-    promoSuccess: {
-        color: '#4CAF50',
-        fontSize: 12,
-        marginTop: 5,
-        fontWeight: 'bold'
-    },
-    summaryRowSmall: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8
-    },
-    summaryVal: {
-        fontSize: 14,
-        fontWeight: 'bold'
-    }
+    footerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+    footerLabelSmall: { fontSize: 14, color: '#888', fontWeight: '500' },
+    footerValueSmall: { fontSize: 14, fontWeight: '700' },
+    divider: { height: 1, backgroundColor: 'rgba(128,128,128,0.1)', marginVertical: 12 },
+    footerTotalRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8, marginBottom: 25, alignItems: 'center' },
+    footerTotalLabel: { fontSize: 18, fontWeight: '900' },
+    footerTotalVal: { fontSize: 24, fontWeight: '900' },
+    payBtn: { borderRadius: 20 },
+    payBtnContent: { height: 60 },
+    payBtnLabel: { fontWeight: '900', fontSize: 16, letterSpacing: 2 }
 });
 
 export default CheckoutScreen;

@@ -57,8 +57,18 @@ const ProfileHero = ({ user, editing, setEditing, onUpdate, isDarkMode, colors }
 
     if (editing) return (
         <View style={styles.hero}>
-            <Avatar.Icon size={80} icon="account" backgroundColor={colors.primary} />
-            <TextInput label="Name" value={name} onChangeText={setName} mode="outlined" style={styles.input} />
+            <Surface style={styles.avatarCard} elevation={2}>
+                <Avatar.Icon size={100} icon="account-edit" backgroundColor={colors.primary} color={isDarkMode ? '#000' : '#FFF'} />
+            </Surface>
+            <TextInput
+                label="Full Name"
+                value={name}
+                onChangeText={setName}
+                mode="flat"
+                style={styles.editInput}
+                activeUnderlineColor={colors.primary}
+                textColor={colors.text}
+            />
             <Button
                 mode="contained"
                 onPress={() => {
@@ -66,67 +76,87 @@ const ProfileHero = ({ user, editing, setEditing, onUpdate, isDarkMode, colors }
                         onUpdate(name);
                         setEditing(false);
                     } else {
-                        Alert.alert("System Error", "Update function missing. Please force close and restart the app to apply updates.");
+                        Alert.alert("System Error", "Update function missing.");
                     }
                 }}
                 buttonColor={colors.primary}
+                textColor={isDarkMode ? '#000' : '#FFF'}
+                style={styles.saveBtn}
+                labelStyle={{ fontWeight: '900' }}
             >
-                Save
+                SAVE CHANGES
             </Button>
+            <TouchableOpacity onPress={() => setEditing(false)} style={{ marginTop: 15 }}>
+                <Text style={{ color: '#888', fontWeight: 'bold' }}>Cancel</Text>
+            </TouchableOpacity>
         </View>
     );
 
     return (
         <View style={styles.hero}>
-            <Avatar.Icon size={80} icon="account" backgroundColor={colors.primary} />
-            <Text style={[styles.name, { color: colors.text }]}>{user.name || "Guest"}</Text>
-            {user.isLoggedIn && <TouchableOpacity onPress={() => setEditing(true)}><Text style={styles.edit}>Edit Profile</Text></TouchableOpacity>}
+            <Surface style={styles.avatarCard} elevation={2}>
+                <Avatar.Icon size={100} icon="account" backgroundColor={colors.primary} color={isDarkMode ? '#000' : '#FFF'} />
+            </Surface>
+            <Text style={[styles.name, { color: colors.text }]}>{user.name || "Guest Collector"}</Text>
+            <Text style={styles.email}>{user.email || "premium@aromaluxe.com"}</Text>
+            {user.isLoggedIn && (
+                <TouchableOpacity onPress={() => setEditing(true)} style={styles.editBtn}>
+                    <Text style={[styles.edit, { color: colors.primary }]}>Edit Profile</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
 
 const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }) => (
     <View style={styles.settings}>
-        <Text style={[styles.label, { color: colors.primary }]}>Settings</Text>
-        <View style={styles.row}>
-            <Text style={{ color: colors.text }}>Dark Mode</Text>
-            <Switch value={isDarkMode} onValueChange={toggleTheme} color={colors.primary} />
+        <View style={styles.sectionHeader}>
+            <Text style={[styles.label, { color: colors.primary }]}>Preferences</Text>
         </View>
+        <Surface style={styles.settingCard} elevation={1}>
+            <View style={{ overflow: 'hidden', borderRadius: 24 }}>
+                <View style={styles.row}>
+                    <View style={styles.rowIconLabel}>
+                        <IconButton icon="theme-light-dark" iconColor={colors.primary} size={20} />
+                        <Text style={[styles.rowText, { color: colors.text }]}>Dark Mode</Text>
+                    </View>
+                    <Switch value={isDarkMode} onValueChange={toggleTheme} color={colors.primary} />
+                </View>
+            </View>
+        </Surface>
 
-        <Text style={[styles.label, { color: colors.primary, marginTop: 30 }]}>Account</Text>
-        <Item icon="cart-outline" title="Cart" nav={nav} to="Cart" colors={colors} />
-        <Item icon="heart-outline" title="Wishlist" nav={nav} to="Wishlist" colors={colors} />
-        <Item icon="package-variant" title="Orders" nav={nav} to="Orders" colors={colors} />
+        <View style={styles.sectionHeader}>
+            <Text style={[styles.label, { color: colors.primary }]}>Account & Orders</Text>
+        </View>
+        <Surface style={styles.settingCard} elevation={1}>
+            <View style={{ overflow: 'hidden', borderRadius: 24 }}>
+                <Item icon="cart-outline" title="My Bag" nav={nav} to="Cart" colors={colors} />
+                <Item icon="heart-outline" title="My Wishlist" nav={nav} to="Wishlist" colors={colors} />
+                <Item icon="package-variant" title="Order History" nav={nav} to="Orders" colors={colors} />
+            </View>
+        </Surface>
 
-        {isLoggedIn ?
-            <Item icon="logout" title="Sign Out" onPress={onLogout} colors={colors} danger /> :
-            <Item icon="login" title="Sign In" nav={nav} to="Auth" colors={colors} />
-        }
+        {isLoggedIn ? (
+            <TouchableOpacity style={styles.logoutBtn} onPress={onLogout}>
+                <Text style={styles.logoutText}>SIGN OUT</Text>
+            </TouchableOpacity>
+        ) : (
+            <Button
+                mode="contained"
+                onPress={() => nav.navigate('Auth')}
+                style={styles.loginBtn}
+                buttonColor={colors.primary}
+                textColor={isDarkMode ? '#000' : '#FFF'}
+                labelStyle={{ fontWeight: '900' }}
+            >
+                SIGN IN
+            </Button>
+        )}
 
-        <View style={{ marginTop: 40, alignItems: 'center', opacity: 0.5 }}>
-            <Text style={{ fontSize: 10, color: colors.text }}>Version: 1.0.2 (OTA Live Sync OK)</Text>
-            <Text style={{ fontSize: 8, color: colors.text, marginTop: 2 }}>
-                ID: {Updates.updateId?.substring(0, 8) || 'No Update ID'} | Ch: {Updates.channel || 'No Channel'} | RV: {Updates.runtimeVersion}
-            </Text>
-            <TouchableOpacity onPress={async () => {
-                try {
-                    Alert.alert("Debug", "Checking for updates...");
-                    const updateCheck = await Updates.checkForUpdateAsync();
-
-                    if (updateCheck.isAvailable) {
-                        Alert.alert("Update Found", "Naya code mil gaya! Download shuru ho raha hai...");
-                        await Updates.fetchUpdateAsync();
-                        Alert.alert("Success", "Download complete! Restarting...", [
-                            { text: "OK", onPress: () => Updates.reloadAsync() }
-                        ]);
-                    } else {
-                        Alert.alert("Aroma Luxe", "Aap pehle se hi latest version par hain! (None available on this channel)");
-                    }
-                } catch (e) {
-                    Alert.alert("Technical Error", `Update system ne mana kar diya: ${e.message}\n\nApp Channel: ${Updates.channel || 'null'}\nRuntime: ${Updates.runtimeVersion}`);
-                }
-            }}>
-                <Text style={{ fontSize: 10, color: colors.primary, marginTop: 5, textDecorationLine: 'underline' }}>Check for Updates</Text>
+        <View style={styles.footer}>
+            <Text style={styles.version}>Aroma Luxe v1.0.2 • GOLD EDITION</Text>
+            <TouchableOpacity onPress={() => Alert.alert("Aroma Luxe", "You are using the latest version.")}>
+                <Text style={[styles.checkUpdate, { color: colors.primary }]}>Check for Updates</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -134,24 +164,76 @@ const Settings = ({ isDarkMode, toggleTheme, isLoggedIn, onLogout, nav, colors }
 
 const Item = ({ icon, title, nav, to, onPress, colors, danger }) => (
     <TouchableOpacity style={styles.item} onPress={onPress || (() => nav.navigate(to))}>
-        <Surface style={styles.iconBox} elevation={0}><IconButton icon={icon} iconColor={danger ? '#f44' : colors.text} /></Surface>
-        <Text style={[styles.itemText, { color: danger ? '#f44' : colors.text }]}>{title}</Text>
-        <IconButton icon="chevron-right" size={20} iconColor="#aaa" />
+        <View style={styles.rowIconLabel}>
+            <IconButton icon={icon} iconColor={danger ? '#f44' : colors.primary} size={20} />
+            <Text style={[styles.itemText, { color: danger ? '#f44' : colors.text }]}>{title}</Text>
+        </View>
+        <IconButton icon="chevron-right" size={20} iconColor="#555" />
     </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    hero: { alignItems: 'center', padding: 40 },
-    name: { fontSize: 24, fontWeight: '900', marginTop: 15 },
-    edit: { color: '#888', marginTop: 5, textDecorationLine: 'underline' },
-    input: { width: '80%', marginVertical: 15 },
-    settings: { padding: 25 },
-    label: { fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1 },
-    row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 },
-    item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15 },
-    iconBox: { width: 44, height: 44, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-    itemText: { flex: 1, marginLeft: 15, fontSize: 16, fontWeight: 'bold' }
+    hero: { alignItems: 'center', paddingVertical: 50, paddingHorizontal: 30 },
+    avatarCard: {
+        padding: 4,
+        borderRadius: 60,
+        backgroundColor: '#D4AF37',
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
+        elevation: 10,
+    },
+    name: { fontSize: 28, fontWeight: '900', marginTop: 24, letterSpacing: -0.5 },
+    email: { fontSize: 14, color: '#888', marginTop: 6, letterSpacing: 0.5 },
+    editBtn: { marginTop: 16, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(212, 175, 55, 0.3)' },
+    edit: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
+    editInput: { width: '100%', marginTop: 30, backgroundColor: 'transparent' },
+    saveBtn: { marginTop: 30, width: '100%', borderRadius: 16 },
+    settings: { paddingHorizontal: 25, paddingBottom: 60 },
+    sectionHeader: { marginTop: 20, marginBottom: 12, paddingHorizontal: 4 },
+    label: { fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 },
+    settingCard: {
+        borderRadius: 24,
+        overflow: 'hidden',
+        backgroundColor: 'rgba(212, 175, 55, 0.03)',
+        borderWidth: 1,
+        borderColor: 'rgba(212, 175, 55, 0.08)',
+        marginBottom: 20
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12
+    },
+    rowIconLabel: { flexDirection: 'row', alignItems: 'center' },
+    rowText: { fontSize: 16, fontWeight: '600', marginLeft: 4 },
+    item: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(212, 175, 55, 0.05)'
+    },
+    itemText: { flex: 1, marginLeft: 4, fontSize: 16, fontWeight: '600' },
+    logoutBtn: {
+        marginTop: 20,
+        paddingVertical: 18,
+        alignItems: 'center',
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 68, 68, 0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 68, 68, 0.1)'
+    },
+    logoutText: { color: '#FF4444', fontWeight: '900', letterSpacing: 2 },
+    loginBtn: { marginTop: 20, borderRadius: 20, height: 56, justifyContent: 'center' },
+    footer: { marginTop: 60, alignItems: 'center' },
+    version: { fontSize: 10, color: '#666', fontWeight: 'bold', letterSpacing: 1 },
+    checkUpdate: { fontSize: 12, fontWeight: '800', marginTop: 12, textDecorationLine: 'underline' }
 });
 
 export default ProfileScreen;

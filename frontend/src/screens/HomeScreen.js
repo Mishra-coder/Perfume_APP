@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, useWindowDimensions, ScrollView } from 'react-native';
-import { Text, IconButton, Chip, useTheme as usePaperTheme } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, useWindowDimensions, ScrollView, Platform } from 'react-native';
+import { Text, IconButton, Chip, Surface, useTheme as usePaperTheme } from 'react-native-paper';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
@@ -108,67 +108,157 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const FeaturedItem = ({ item, onPress, isDark, colors, screenWidth }) => (
-    <TouchableOpacity style={[styles.featuredCard, { width: screenWidth * 0.75, backgroundColor: isDark ? '#1a1a1a' : '#fafafa' }]} onPress={onPress}>
-        <View style={styles.featuredImgWrapper}>
-            <Image source={item.image} style={styles.imgFull} resizeMode="contain" />
-        </View>
-        <View style={[styles.featuredInfo, { backgroundColor: isDark ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.85)' }]}>
-            <Text style={[styles.featuredName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
-            <Text style={[styles.featuredPrice, { color: isDark ? colors.primary : '#000' }]}>₹{item.price}</Text>
-        </View>
-    </TouchableOpacity>
+    <Surface
+        style={[
+            styles.featuredCard,
+            {
+                width: screenWidth * 0.8,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            }
+        ]}
+        elevation={4}
+    >
+        <TouchableOpacity
+            style={{ flex: 1, overflow: 'hidden', borderRadius: 32 }}
+            onPress={onPress}
+            activeOpacity={0.9}
+        >
+            <View style={styles.featuredImgWrapper}>
+                <Image source={item.image} style={styles.imgFull} resizeMode="contain" />
+            </View>
+            <View style={[styles.featuredInfo, { backgroundColor: isDark ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)' }]}>
+                <Text style={[styles.featuredName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                <Text style={[styles.featuredPrice, { color: colors.primary }]}>₹{item.price.toLocaleString()}</Text>
+            </View>
+        </TouchableOpacity>
+    </Surface>
 );
 
 const ProductItem = ({ item, onPress, isDark, colors, screenWidth }) => (
-    <TouchableOpacity style={[styles.card, { width: (screenWidth - 50) / 2 }]} onPress={onPress}>
-        <View style={[styles.imgWrapper, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
-            <Image source={item.image} style={styles.imgFull} resizeMode="contain" />
-            <View style={styles.badge}>
-                <Text style={styles.badgeText}>PARFUM</Text>
+    <Surface
+        style={[
+            styles.card,
+            {
+                width: (screenWidth - 60) / 2,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'
+            }
+        ]}
+        elevation={1}
+    >
+        <TouchableOpacity
+            style={{ flex: 1, overflow: 'hidden', borderRadius: 24 }}
+            onPress={onPress}
+            activeOpacity={0.85}
+        >
+            <View style={[styles.imgWrapper, { backgroundColor: isDark ? '#121212' : '#F5F5F5' }]}>
+                <Image source={item.image} style={styles.imgFull} resizeMode="contain" />
+                <View style={[styles.badge, { backgroundColor: isDark ? 'rgba(212,175,55,0.9)' : 'rgba(0,0,0,0.7)' }]}>
+                    <Text style={[styles.badgeText, { color: isDark ? '#000' : '#fff' }]}>{item.type || 'PARFUM'}</Text>
+                </View>
             </View>
-        </View>
-        <View style={styles.info}>
-            <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.cat} numberOfLines={1}>{item.category} • EDP</Text>
-            <View style={styles.footer}>
-                <Text style={[styles.price, { color: isDark ? colors.primary : '#1a1a1a' }]}>₹{item.price}</Text>
-                <IconButton icon="arrow-right" size={16} iconColor={isDark ? '#555' : '#ccc'} />
+            <View style={styles.info}>
+                <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                <Text style={[styles.cat, { color: colors.textSecondary }]} numberOfLines={1}>{item.category} • {item.type}</Text>
+                <View style={[styles.footer, { marginTop: 8 }]}>
+                    <Text style={[styles.price, { color: colors.primary }]}>₹{item.price.toLocaleString()}</Text>
+                    <IconButton icon="arrow-right" size={16} iconColor={colors.primary} style={{ margin: 0 }} />
+                </View>
             </View>
-        </View>
-    </TouchableOpacity>
+        </TouchableOpacity>
+    </Surface>
 );
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    hero: { paddingHorizontal: 20, paddingTop: 25, paddingBottom: 15 },
-    heroTitle: { fontSize: 36, fontWeight: '900' },
-    heroSubtitle: { fontSize: 15, color: '#888', marginTop: 5 },
-    featured: { paddingLeft: 20, marginBottom: 30 },
-    featuredCard: { height: 350, marginRight: 20, borderRadius: 25, overflow: 'hidden' },
-    featuredImgWrapper: { flex: 1, padding: 30, justifyContent: 'center', alignItems: 'center' },
-    featuredInfo: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 },
-    featuredName: { fontSize: 18, fontWeight: 'bold' },
-    featuredPrice: { fontSize: 16, fontWeight: '900', marginTop: 4 },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 15 },
-    sectionTitle: { fontSize: 20, fontWeight: 'bold' },
-    card: { marginBottom: 20 },
+    hero: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 24 },
+    heroTitle: { fontSize: 44, fontWeight: '900', letterSpacing: -1, lineHeight: 48 },
+    heroSubtitle: { fontSize: 16, color: '#888', marginTop: 8, letterSpacing: 0.5, fontWeight: '500' },
+    featured: { paddingLeft: 20, marginBottom: 40 },
+    featuredCard: {
+        height: 400,
+        marginRight: 20,
+        borderRadius: 32,
+        overflow: 'hidden',
+    },
+    featuredImgWrapper: {
+        flex: 1,
+        padding: 40,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    featuredInfo: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 24,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.1)',
+    },
+    featuredName: { fontSize: 22, fontWeight: '700', letterSpacing: -0.5 },
+    featuredPrice: { fontSize: 18, fontWeight: '900', marginTop: 8, color: '#D4AF37' },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        marginBottom: 20,
+        marginTop: 10,
+    },
+    sectionTitle: { fontSize: 24, fontWeight: '800', letterSpacing: -0.5 },
+    card: { marginBottom: 24 },
     imgWrapper: {
-        height: 190,
-        borderRadius: 20,
+        height: 220,
+        borderRadius: 24,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 15
+        padding: 24,
     },
     imgFull: { width: '100%', height: '100%' },
-    badge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-    badgeText: { color: '#fff', fontSize: 9, fontWeight: '900' },
-    info: { marginTop: 12, paddingHorizontal: 4 },
-    name: { fontSize: 14, fontWeight: 'bold' },
-    cat: { fontSize: 11, color: '#888', marginTop: 2 },
-    footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-    price: { fontSize: 15, fontWeight: '900' },
-    fab: { position: 'absolute', bottom: 30, right: 20, width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', elevation: 5 }
+    badge: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 8,
+    },
+    badgeText: { fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+    info: { marginTop: 14, paddingHorizontal: 6 },
+    name: { fontSize: 16, fontWeight: '700', letterSpacing: -0.3 },
+    cat: { fontSize: 12, marginTop: 6, letterSpacing: 0.3, opacity: 0.6 },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    price: { fontSize: 17, fontWeight: '900', letterSpacing: -0.4 },
+    fab: {
+        position: 'absolute',
+        bottom: 32,
+        right: 22,
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#D4AF37',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 12,
+            },
+            android: {
+                elevation: 10,
+            },
+            web: {
+                boxShadow: '0 8px 16px rgba(212, 175, 55, 0.4)',
+            }
+        })
+    }
 });
 
 export default HomeScreen;

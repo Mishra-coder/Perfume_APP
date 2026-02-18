@@ -47,8 +47,25 @@ export const UserProvider = ({ children }) => {
         await save(updatedUser);
     };
 
+    const cancelOrder = async (orderId) => {
+        const updatedOrders = user.orders.map(o =>
+            o.id === orderId ? { ...o, status: 'Cancelled' } : o
+        );
+        await save({ ...user, orders: updatedOrders });
+    };
+
     return (
-        <UserContext.Provider value={{ user, login, signup, logout, setUserProfile, saveOrder: (o) => save({ ...user, orders: [o, ...user.orders] }), toggleWishlist, isInWishlist: (id) => (user.wishlist || []).some(i => i.id === id) }}>
+        <UserContext.Provider value={{
+            user,
+            login,
+            signup,
+            logout,
+            setUserProfile,
+            saveOrder: (o) => save({ ...user, orders: [o, ...user.orders] }),
+            cancelOrder,
+            toggleWishlist,
+            isInWishlist: (id) => (user.wishlist || []).some(i => i.id === id)
+        }}>
             {children}
         </UserContext.Provider>
     );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Appbar, Text, IconButton, Surface, Badge, useTheme as usePaperTheme } from 'react-native-paper';
 import RecommendationCard from '../components/RecommendationCard';
 import { products } from '../data/products';
@@ -47,9 +47,11 @@ const RecommendationScreen = ({ navigation }) => {
                     <View style={styles.grid}>
                         {OPTS.map(o => (
                             <TouchableOpacity key={o.k} style={styles.tile} onPress={() => pick(o)}>
-                                <Surface style={[styles.surf, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fcfcfc' }]} elevation={0}>
-                                    <IconButton icon={o.i} size={30} iconColor={isDarkMode ? colors.primary : "#1a1a1a"} />
-                                    <Text style={[styles.label, { color: colors.text }]}>{o.l}</Text>
+                                <Surface style={[styles.surf, { backgroundColor: isDarkMode ? '#1A1A1A' : '#fcfcfc', borderColor: isDarkMode ? '#333' : '#eee' }]} elevation={1}>
+                                    <View style={styles.surfInner}>
+                                        <IconButton icon={o.i} size={30} iconColor={isDarkMode ? colors.primary : "#1a1a1a"} />
+                                        <Text style={[styles.label, { color: colors.text }]}>{o.l}</Text>
+                                    </View>
                                 </Surface>
                             </TouchableOpacity>
                         ))}
@@ -77,13 +79,24 @@ const RecommendationScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    pad: { padding: 25 },
-    title: { fontSize: 32, fontWeight: '900' },
-    sub: { fontSize: 16, marginTop: 8, color: '#888', marginBottom: 30 },
+    pad: { padding: 24 },
+    title: { fontSize: 34, fontWeight: '900', letterSpacing: -0.6 },
+    sub: { fontSize: 16, marginTop: 8, color: '#888', marginBottom: 32, letterSpacing: 0.2 },
     grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-    tile: { width: '48%', marginBottom: 15 },
-    surf: { height: 120, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#eee' },
-    label: { fontWeight: 'bold', fontSize: 14 }
+    tile: { width: '48%', marginBottom: 16 },
+    surf: {
+        height: 130,
+        borderRadius: 18,
+        borderWidth: 1.5,
+    },
+    surfInner: {
+        flex: 1,
+        borderRadius: 18,
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    label: { fontWeight: '700', fontSize: 15, marginTop: 8, letterSpacing: -0.2 }
 });
 
 export default RecommendationScreen;

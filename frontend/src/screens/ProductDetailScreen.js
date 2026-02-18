@@ -29,54 +29,51 @@ const ProductDetailScreen = ({ navigation, route }) => {
 
     const headerBg = scrollY.interpolate({
         inputRange: [0, 200],
-        outputRange: ['rgba(255,255,255,0)', colors.background],
-        extrapolate: 'clamp'
-    });
-
-    const headerElevation = scrollY.interpolate({
-        inputRange: [0, 200],
-        outputRange: [0, 4],
+        outputRange: ['rgba(5,5,5,0)', isDarkMode ? '#050505' : '#FFFFFF'],
         extrapolate: 'clamp'
     });
 
     const imageScale = scrollY.interpolate({
         inputRange: [-200, 0, 400],
-        outputRange: [1.3, 1, 0.95],
+        outputRange: [1.3, 1, 0.9],
         extrapolate: 'clamp'
     });
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} transparent translucent />
+            <StatusBar barStyle="light-content" transparent translucent />
 
             <Animated.View style={[
                 styles.header,
                 {
                     backgroundColor: headerBg,
-                    elevation: headerElevation,
                     borderBottomWidth: scrollY.interpolate({
                         inputRange: [0, 200],
                         outputRange: [0, 0.5],
                         extrapolate: 'clamp'
                     }),
-                    borderBottomColor: isDarkMode ? '#333' : '#eee'
+                    borderBottomColor: isDarkMode ? '#1F1F1F' : '#EEE'
                 }
             ]}>
                 <IconButton
                     icon="arrow-left"
                     iconColor={colors.text}
                     onPress={() => navigation.goBack()}
-                    style={styles.iconCircle}
+                    style={[styles.iconCircle, { backgroundColor: isDarkMode ? 'rgba(20,20,20,0.8)' : 'rgba(255,255,255,0.9)' }]}
                 />
                 <View style={styles.headerRight}>
                     <IconButton
                         icon={isFav ? "heart" : "heart-outline"}
                         iconColor={isFav ? colors.primary : colors.text}
                         onPress={() => toggleWishlist(product)}
-                        style={styles.iconCircle}
+                        style={[styles.iconCircle, { backgroundColor: isDarkMode ? 'rgba(20,20,20,0.8)' : 'rgba(255,255,255,0.9)' }]}
                     />
                     <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                        <IconButton icon="shopping" iconColor={colors.text} style={styles.iconCircle} />
+                        <IconButton
+                            icon="shopping"
+                            iconColor={colors.text}
+                            style={[styles.iconCircle, { backgroundColor: isDarkMode ? 'rgba(20,20,20,0.8)' : 'rgba(255,255,255,0.9)' }]}
+                        />
                         {count > 0 && <Badge style={[styles.badge, { backgroundColor: colors.primary }]}>{count}</Badge>}
                     </TouchableOpacity>
                 </View>
@@ -91,7 +88,7 @@ const ProductDetailScreen = ({ navigation, route }) => {
                     styles.imageContainer,
                     {
                         transform: [{ scale: imageScale }],
-                        backgroundColor: isDarkMode ? '#121212' : '#f5f5f5'
+                        backgroundColor: isDarkMode ? '#0D0D0D' : '#F5F5F5'
                     }
                 ]}>
                     <Image source={activeImg} style={styles.mainImage} />
@@ -101,26 +98,42 @@ const ProductDetailScreen = ({ navigation, route }) => {
                     <View style={styles.nameRow}>
                         <View style={{ flex: 1 }}>
                             <Text style={[styles.productName, { color: colors.text }]}>{product.name}</Text>
-                            <Text style={styles.productMeta}>{product.category} • EDP</Text>
+                            <Text style={styles.productMeta}>{product.category} • {product.type}</Text>
                         </View>
-                        <Text style={[styles.productPrice, { color: colors.primary }]}>₹{product.price}</Text>
+                        <Text style={[styles.productPrice, { color: colors.primary }]}>₹{product.price.toLocaleString()}</Text>
                     </View>
 
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Description</Text>
-                    <Text style={[styles.descriptionText, { color: isDarkMode ? '#aaa' : '#666' }]}>{product.description}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>The Fragrance</Text>
+                    <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>{product.description}</Text>
 
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Limited Offers</Text>
+                    {product.notes && (
+                        <View style={styles.notesContainer}>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Scent Profile</Text>
+
+                            <NoteSection title="Top Notes" notes={product.notes.top} icon="leaf-outline" color={colors.primary} isDarkMode={isDarkMode} />
+                            <NoteSection title="Heart Notes" notes={product.notes.middle} icon="heart-outline" color={colors.primary} isDarkMode={isDarkMode} />
+                            <NoteSection title="Base Notes" notes={product.notes.base} icon="water-outline" color={colors.primary} isDarkMode={isDarkMode} />
+                        </View>
+                    )}
+
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Exclusive Benefits</Text>
                     <OfferItem code="LUXE20" description="Save 20% on your first order" colors={colors} />
-                    <OfferItem code="FREESHIP" description="Free delivery for orders over ₹5000" colors={colors} />
+                    <OfferItem code="FREESHIP" description="Complimentary shipping on this order" colors={colors} />
 
                     <View style={styles.quantitySection}>
-                        <Text style={styles.quantityLabel}>Quantity</Text>
-                        <View style={[styles.stepper, { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' }]}>
-                            <TouchableOpacity onPress={() => setQty(q => Math.max(1, q - 1))} style={styles.stepperBtn}>
-                                <Text style={[styles.stepperIcon, { color: colors.text }]}>-</Text>
+                        <Text style={[styles.quantityLabel, { color: colors.text }]}>Quantity</Text>
+                        <View style={[styles.stepper, { backgroundColor: isDarkMode ? '#121212' : '#F8F8F8', borderWidth: 1, borderColor: isDarkMode ? '#1F1F1F' : '#EEE' }]}>
+                            <TouchableOpacity
+                                onPress={() => setQty(q => Math.max(1, q - 1))}
+                                style={styles.stepperBtn}
+                            >
+                                <Text style={[styles.stepperIcon, { color: colors.text }]}>−</Text>
                             </TouchableOpacity>
                             <Text style={[styles.stepperValue, { color: colors.text }]}>{qty}</Text>
-                            <TouchableOpacity onPress={() => setQty(q => q + 1)} style={styles.stepperBtn}>
+                            <TouchableOpacity
+                                onPress={() => setQty(q => q + 1)}
+                                style={styles.stepperBtn}
+                            >
                                 <Text style={[styles.stepperIcon, { color: colors.text }]}>+</Text>
                             </TouchableOpacity>
                         </View>
@@ -130,11 +143,12 @@ const ProductDetailScreen = ({ navigation, route }) => {
                         mode="contained"
                         onPress={handleAddToCart}
                         style={styles.addToCartBtn}
-                        contentStyle={{ height: 58 }}
+                        contentStyle={{ height: 60 }}
                         buttonColor={colors.primary}
-                        labelStyle={{ fontSize: 16, fontWeight: 'bold' }}
+                        textColor={isDarkMode ? '#000' : '#FFF'}
+                        labelStyle={{ fontSize: 17, fontWeight: '900', letterSpacing: 1 }}
                     >
-                        Add to Bag
+                        ADD TO BAG
                     </Button>
                 </View>
             </Animated.ScrollView>
@@ -143,20 +157,38 @@ const ProductDetailScreen = ({ navigation, route }) => {
                 visible={snack}
                 onDismiss={() => setSnack(false)}
                 duration={2000}
-                style={{ marginBottom: 20 }}
+                style={{ backgroundColor: colors.primary, borderRadius: 12 }}
             >
-                Successfully added to your bag
+                <Text style={{ color: isDarkMode ? '#000' : '#FFF', fontWeight: '700' }}>Added to your collection</Text>
             </Snackbar>
         </View>
     );
 };
 
+const NoteSection = ({ title, notes, icon, color, isDarkMode }) => (
+    <View style={styles.noteSection}>
+        <View style={styles.noteHeader}>
+            <IconButton icon={icon} size={18} iconColor={color} style={{ margin: 0 }} />
+            <Text style={styles.noteTitle}>{title}</Text>
+        </View>
+        <View style={styles.noteChips}>
+            {notes.map((note, i) => (
+                <View key={i} style={[styles.noteChip, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F5F5F5' }]}>
+                    <Text style={styles.noteText}>{note}</Text>
+                </View>
+            ))}
+        </View>
+    </View>
+);
+
 const OfferItem = ({ code, description, colors }) => (
-    <Surface style={[styles.offerBox, { borderColor: colors.primary + '25' }]} elevation={0}>
-        <View style={styles.offerDot} />
-        <View style={{ flex: 1 }}>
-            <Text style={[styles.offerCode, { color: colors.primary }]}>{code}</Text>
-            <Text style={styles.offerDesc}>{description}</Text>
+    <Surface style={[styles.offerBox, { borderColor: colors.primary + '20', backgroundColor: colors.primary + '08' }]} elevation={0}>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', borderRadius: 20 }}>
+            <View style={[styles.offerDot, { backgroundColor: colors.primary }]} />
+            <View style={{ flex: 1 }}>
+                <Text style={[styles.offerCode, { color: colors.primary }]}>{code}</Text>
+                <Text style={[styles.offerDesc, { color: colors.textSecondary }]}>{description}</Text>
+            </View>
         </View>
     </Surface>
 );
@@ -166,7 +198,7 @@ const styles = StyleSheet.create({
     header: {
         height: 110,
         paddingTop: 50,
-        paddingHorizontal: 15,
+        paddingHorizontal: 16,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -177,39 +209,148 @@ const styles = StyleSheet.create({
         zIndex: 100
     },
     headerRight: { flexDirection: 'row', alignItems: 'center' },
-    iconCircle: { backgroundColor: 'rgba(255,255,255,0.7)', margin: 4 },
+    iconCircle: {
+        margin: 4,
+        borderRadius: 22,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 2,
+    },
     badge: { position: 'absolute', top: 5, right: 5 },
-    imageContainer: { width: '100%', aspectRatio: 0.8, justifyContent: 'center', alignItems: 'center', paddingTop: 100, paddingBottom: 40 },
+    imageContainer: {
+        width: '100%',
+        aspectRatio: 0.85,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 100,
+        paddingBottom: 60
+    },
     mainImage: { width: '85%', height: '85%', resizeMode: 'contain' },
     detailsSection: {
-        padding: 24,
-        marginTop: -35,
-        borderTopLeftRadius: 35,
-        borderTopRightRadius: 35,
-        minHeight: 650,
+        padding: 30,
+        marginTop: -40,
+        borderTopLeftRadius: 40,
+        borderTopRightRadius: 40,
+        minHeight: 800,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: -10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 10
+        shadowOffset: { width: 0, height: -12 },
+        shadowOpacity: 0.08,
+        shadowRadius: 24,
+        elevation: 20
     },
-    nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
-    productName: { fontSize: 26, fontWeight: 'bold', flex: 1, marginRight: 10 },
-    productMeta: { fontSize: 13, color: '#999', marginTop: 4 },
-    productPrice: { fontSize: 24, fontWeight: '900' },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 15 },
-    descriptionText: { fontSize: 15, lineHeight: 24, opacity: 0.8 },
-    offerBox: { padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12, flexDirection: 'row', alignItems: 'center' },
-    offerDot: { width: 4, height: 20, borderRadius: 2, marginRight: 12, backgroundColor: '#888' },
-    offerCode: { fontWeight: 'bold', fontSize: 15, marginBottom: 2 },
-    offerDesc: { fontSize: 12, color: '#888' },
-    quantitySection: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 40 },
-    quantityLabel: { fontSize: 16, fontWeight: '600' },
-    stepper: { flexDirection: 'row', alignItems: 'center', borderRadius: 15, padding: 5 },
-    stepperBtn: { width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
-    stepperIcon: { fontSize: 24 },
-    stepperValue: { marginHorizontal: 20, fontWeight: 'bold', fontSize: 18 },
-    addToCartBtn: { borderRadius: 16, elevation: 6 }
+    nameRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 28
+    },
+    productName: {
+        fontSize: 32,
+        fontWeight: '900',
+        flex: 1,
+        marginRight: 12,
+        letterSpacing: -0.5,
+        lineHeight: 38,
+    },
+    productMeta: { fontSize: 14, color: '#888', marginTop: 8, letterSpacing: 0.5, fontWeight: '500' },
+    productPrice: { fontSize: 28, fontWeight: '900', letterSpacing: -1 },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '800',
+        marginTop: 40,
+        marginBottom: 16,
+        letterSpacing: -0.5,
+    },
+    descriptionText: {
+        fontSize: 15,
+        lineHeight: 26,
+        letterSpacing: 0.2,
+        opacity: 0.7,
+    },
+    notesContainer: {
+        marginTop: 10,
+    },
+    noteSection: {
+        marginBottom: 20,
+    },
+    noteHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        marginLeft: -8
+    },
+    noteTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#888',
+        textTransform: 'uppercase',
+        letterSpacing: 1
+    },
+    noteChips: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    noteChip: {
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 12,
+        marginRight: 8,
+        marginBottom: 8,
+    },
+    noteText: {
+        fontSize: 13,
+        fontWeight: '600',
+        opacity: 0.8
+    },
+    offerBox: {
+        padding: 20,
+        borderRadius: 20,
+        borderWidth: 1,
+        marginBottom: 14,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    offerDot: {
+        width: 3,
+        height: 30,
+        borderRadius: 2,
+        marginRight: 16,
+    },
+    offerCode: { fontWeight: '800', fontSize: 16, marginBottom: 4, letterSpacing: 1 },
+    offerDesc: { fontSize: 13, opacity: 0.7 },
+    quantitySection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 40
+    },
+    quantityLabel: { fontSize: 18, fontWeight: '700', letterSpacing: -0.3 },
+    stepper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 16,
+        padding: 6,
+    },
+    stepperValue: { marginHorizontal: 20, fontWeight: '800', fontSize: 20 },
+    stepperBtn: {
+        width: 48,
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 12,
+    },
+    stepperIcon: { fontSize: 24, fontWeight: '400' },
+    addToCartBtn: {
+        borderRadius: 20,
+        marginTop: 10,
+        shadowColor: '#D4AF37',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
+        elevation: 10
+    }
 });
 
 export default ProductDetailScreen;

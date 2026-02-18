@@ -1,4 +1,6 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+import { Platform } from 'react-native';
+
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'web' ? 'http://localhost:3000/api' : 'http://10.254.205.98:3000/api');
 
 const request = async (endpoint, method = 'GET', data = null) => {
     try {
